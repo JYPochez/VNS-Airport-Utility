@@ -1,0 +1,13 @@
+__pycache__
+*.py[cod]
+.DS_Store
+.build/
+.venv/
+.worktrees/
+captures/
+local-artifacts/network-captures/
+*.pcap
+*.pcapng
+*.log
+*.keylog
+DerivedData/

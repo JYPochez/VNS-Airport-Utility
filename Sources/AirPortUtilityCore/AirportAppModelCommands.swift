@@ -1,0 +1,495 @@
+import Foundation
+
+extension AirportAppModel {
+  private func shouldTrackBaseStationUpdate(cleanScope: CleanScope) -> Bool {
+    cleanScope != .none
+  }
+
+  private func refreshSettingsAfterApply(requestHost: String) async {
+    let deviceName = postApplyDeviceNameForStatus
+    status = "Waiting for \(deviceName) to restart."
+    var lastError: Error?
+    let maxAttempts = usesLegacyACP ? 18 : 12
+    for attempt in 1...maxAttempts {
+      do {
+        try await Task.sleep(nanoseconds: 5_000_000_000)
+      } catch {
+        lastError = error
+        break
+      }
+      guard connectionStillMatches(requestHost) else {
+        ignoreStaleOperation("Stopped post-apply refresh for stale host \(requestHost).")
+        return
+      }
+      do {
+        status = "Waiting for \(deviceName) to come back online."
+        try await refreshSettings()
+        guard connectionStillMatches(requestHost) else { return }
+        clearBaseStationUpdate(requestHost: requestHost)
+        return
+      } catch {
+        lastError = error
+        appendLog(
+          "Post-apply refresh attempt \(attempt) failed: \(Self.userFacingErrorDescription(error.localizedDescription))"
+        )
+      }
+    }
+    if let lastError {
+      let errorDescription = Self.userFacingErrorDescription(lastError.localizedDescription)
+      status = "Could not confirm \(deviceName) came back online: \(errorDescription)"
+      appendLog("Post-apply refresh failed: \(errorDescription)")
+    }
+  }
+
+  var postApplyDeviceNameForStatus: String {
+    if usesLegacyACP {
+      return "AirPort Express"
+    }
+    switch baseStation.productID.trimmingCharacters(in: .whitespacesAndNewlines) {
+    case "102", "107", "115":
+      return "AirPort Express"
+    case "106", "109", "113", "116", "119":
+      return "Time Capsule"
+    case "3", "104", "105", "108", "114", "117", "120":
+      return "AirPort Extreme"
+    default:
+      return "base station"
+    }
+  }
+
+  func ignoreStaleOperation(_ message: String) {
+    appendLog(message)
+    updateIdleConnectionStatus()
+  }
+
+  func clearPreviewAfterValidationFailure() {
+    preview = nil
+  }
+
+  private func writeScriptForCurrentConnection() -> String {
+    usesLegacyACP ? AirportCommand.legacyWriteScript : AirportCommand.writeScript
+  }
+
+  private func writeArgumentsForCurrentConnection(_ args: [String]) -> [String] {
+    guard usesLegacyACP else { return args }
+    var arguments = args.usingAirPortBackendSubcommand("legacy-write")
+    if usesLegacyACP17, !arguments.contains("--acp17") {
+      arguments.append("--acp17")
+    }
+    if usesLegacyFullSnapshotWrites,
+      !legacyACPSettingsValuesJSON.isEmpty,
+      !arguments.contains("--base-values-json")
+    {
+      arguments += ["--base-values-json", legacyACPSettingsValuesJSON, "--apply"]
+    }
+    return arguments
+  }
+
+  var usesLegacyFullSnapshotWrites: Bool {
+    usesLegacyACP
+  }
+
+  var usesLegacyACP17: Bool {
+    let selectedProductID =
+      selectedTopologyDevice()?.productID.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    let productID =
+      selectedProductID.isEmpty
+      ? baseStation.productID.trimmingCharacters(in: .whitespacesAndNewlines)
+      : selectedProductID
+    return productID == "3"
+  }
+
+  func appliedWriteArguments(_ args: [String]) -> [String] {
+    var applied = writeArgumentsForCurrentConnection(args)
+    if usesLegacyACP && !usesLegacyFullSnapshotWrites {
+      applied.append("--restart")
+    }
+    if needsSetupCompletion() {
+      applied.append("--setup-complete")
+    }
+    return applied
+  }
+
+  func appliedFinalCommand(_ commands: [(String, [String])]) -> [(String, [String])] {
+    guard !commands.isEmpty else { return commands }
+    let shouldMarkFinal = usesLegacyACP || needsSetupCompletion()
+    guard usesLegacyACP || shouldMarkFinal else { return commands }
+
+    var applied = commands
+    if usesLegacyACP {
+      applied = applied.map { ($0.0, writeArgumentsForCurrentConnection($0.1)) }
+    }
+    guard shouldMarkFinal else { return applied }
+
+    var final = applied[applied.count - 1]
+    if usesLegacyACP && !usesLegacyFullSnapshotWrites {
+      final.1.append("--restart")
+    } else {
+      final.1 = writeArgumentsForCurrentConnection(final.1)
+    }
+    if needsSetupCompletion() {
+      final.1.append("--setup-complete")
+    }
+    applied[applied.count - 1] = final
+    return applied
+  }
+
+  private func needsSetupCompletion() -> Bool {
+    let host = AirportConnection.normalizedHost(connection.host)
+    return visibleTopologyDevices.contains { device in
+      guard device.requiresSetup else { return false }
+      if !host.isEmpty, device.matchesConnectionHost(host) {
+        return true
+      }
+      return device.sharesStableIdentity(with: selectedTopologyDeviceIdentifiers)
+        || device.sharesStableIdentity(with: connectedTopologyDeviceIdentifiers)
+    }
+  }
+
+  func dryRun(title: String, args: [String], connection: AirportConnection) {
+    let args = writeArgumentsForCurrentConnection(args)
+    let requestHost = AirportConnection.normalizedHost(connection.host)
+    let writeScript = writeScriptForCurrentConnection()
+    runTask("Running \(title) dry-run", requestHost: requestHost) {
+      if self.mockMode {
+        let redacted = AirportCommand.redact(args)
+        let output = AirportMockBackend.output(for: args, dryRun: true)
+        guard self.connectionStillMatches(requestHost) else {
+          self.ignoreStaleOperation("Ignored \(title) dry-run for stale host \(requestHost).")
+          return
+        }
+        self.preview = CommandPreview(
+          title: title, arguments: args, redactedArguments: redacted, output: output)
+        self.appendLog(
+          "$ \(AirportCommand.display(writeScript, redacted))\n\(output)")
+        if output.localizedCaseInsensitiveContains("failed") {
+          self.status = output
+        } else {
+          self.status = "\(title) dry-run succeeded. Mock mode."
+        }
+        return
+      }
+      let result = try await self.runner.run(
+        script: writeScript, arguments: args, connection: connection)
+      guard self.connectionStillMatches(requestHost) else {
+        self.ignoreStaleOperation("Ignored \(title) dry-run for stale host \(requestHost).")
+        return
+      }
+      let output = Self.userFacingCommandOutput(result.combinedOutput)
+      self.preview = CommandPreview(
+        title: title,
+        arguments: args,
+        redactedArguments: result.redactedArguments,
+        output: output
+      )
+      self.appendLog(
+        "$ \(AirportCommand.display(writeScript, result.redactedArguments))\n\(output)"
+      )
+      self.status = "\(title) dry-run succeeded."
+    }
+  }
+
+  func dryRunSequence(
+    title: String, commands: [(String, [String])], connection: AirportConnection
+  ) {
+    let commands = commands.map { ($0.0, writeArgumentsForCurrentConnection($0.1)) }
+    let requestHost = AirportConnection.normalizedHost(connection.host)
+    let writeScript = writeScriptForCurrentConnection()
+    runTask("Running \(title) dry-run", requestHost: requestHost) {
+      if self.mockMode {
+        guard self.connectionStillMatches(requestHost) else {
+          self.ignoreStaleOperation("Ignored \(title) dry-run for stale host \(requestHost).")
+          return
+        }
+        var outputParts: [String] = []
+        var firstArgs: [String] = []
+        var firstRedacted: [String] = []
+        for (commandTitle, args) in commands {
+          let redacted = AirportCommand.redact(args)
+          if firstArgs.isEmpty {
+            firstArgs = args
+            firstRedacted = redacted
+          }
+          let output = AirportMockBackend.output(for: args, dryRun: true)
+          outputParts.append("\(commandTitle): \(output)")
+          self.appendLog(
+            "$ \(AirportCommand.display(writeScript, redacted))\n\(output)")
+        }
+        guard self.connectionStillMatches(requestHost) else {
+          self.ignoreStaleOperation("Ignored \(title) dry-run for stale host \(requestHost).")
+          return
+        }
+        let output = outputParts.joined(separator: "\n")
+        self.preview = CommandPreview(
+          title: title, arguments: firstArgs, redactedArguments: firstRedacted, output: output)
+        self.status = "\(title) dry-run succeeded. Mock mode."
+        return
+      }
+
+      var outputParts: [String] = []
+      var firstResult: CommandResult?
+      for (commandTitle, args) in commands {
+        guard self.connectionStillMatches(requestHost) else {
+          self.ignoreStaleOperation("Stopped \(title) dry-run for stale host \(requestHost).")
+          return
+        }
+        let result = try await self.runner.run(
+          script: writeScript, arguments: args, connection: connection)
+        guard self.connectionStillMatches(requestHost) else {
+          self.ignoreStaleOperation(
+            "Ignored \(title) dry-run result for stale host \(requestHost).")
+          return
+        }
+        if firstResult == nil { firstResult = result }
+        let output = Self.userFacingCommandOutput(result.combinedOutput)
+        outputParts.append("\(commandTitle): \(output)")
+        self.appendLog(
+          "$ \(AirportCommand.display(writeScript, result.redactedArguments))\n\(output)"
+        )
+      }
+      guard self.connectionStillMatches(requestHost) else {
+        self.ignoreStaleOperation("Ignored \(title) dry-run for stale host \(requestHost).")
+        return
+      }
+      if let firstResult {
+        self.preview = CommandPreview(
+          title: title,
+          arguments: firstResult.arguments,
+          redactedArguments: firstResult.redactedArguments,
+          output: outputParts.joined(separator: "\n")
+        )
+      }
+      self.status = "\(title) dry-run succeeded."
+    }
+  }
+
+  func apply(
+    title: String, args: [String], connection: AirportConnection,
+    cleanScope: CleanScope = .all,
+    appliedSnapshot: AirportSettingsSnapshot? = nil,
+    appliedAdminPassword: String = "",
+    completion: @escaping () -> Void = {}
+  ) {
+    guard !isBusy else { return }
+    let args = writeArgumentsForCurrentConnection(args)
+    let requestHost = AirportConnection.normalizedHost(connection.host)
+    let writeScript = writeScriptForCurrentConnection()
+    let appliedSnapshot = appliedSnapshot ?? currentSnapshot
+    let tracksBaseStationUpdate = shouldTrackBaseStationUpdate(cleanScope: cleanScope)
+    if tracksBaseStationUpdate {
+      beginBaseStationUpdate(requestHost: requestHost)
+    }
+    runTask("Applying \(title)", requestHost: requestHost) {
+      if self.mockMode {
+        let redacted = AirportCommand.redact(args)
+        let output = AirportMockBackend.output(for: args, dryRun: false)
+        guard self.connectionStillMatches(requestHost) else {
+          self.ignoreStaleOperation("Ignored \(title) apply result for stale host \(requestHost).")
+          return
+        }
+        self.appendLog(
+          "$ \(AirportCommand.display(writeScript, redacted))\n\(output)")
+        completion()
+        self.status = "\(title) applied. Mock mode."
+        self.preview = nil
+        self.markClean(
+          cleanScope, from: appliedSnapshot, appliedAdminPassword: appliedAdminPassword)
+        if tracksBaseStationUpdate {
+          self.clearBaseStationUpdate(requestHost: requestHost)
+        }
+        return
+      }
+      let result: CommandResult
+      do {
+        result = try await self.runner.run(
+          script: writeScript, arguments: args, connection: connection,
+          timeout: 90)
+      } catch {
+        if tracksBaseStationUpdate {
+          self.clearBaseStationUpdate(requestHost: requestHost)
+        }
+        throw error
+      }
+      guard self.connectionStillMatches(requestHost) else {
+        self.ignoreStaleOperation("Ignored \(title) apply result for stale host \(requestHost).")
+        return
+      }
+      let output = Self.userFacingCommandOutput(result.combinedOutput)
+      self.appendLog(
+        "$ \(AirportCommand.display(writeScript, result.redactedArguments))\n\(output)"
+      )
+      completion()
+      self.status = "\(title) applied."
+      self.preview = nil
+      self.markClean(
+        cleanScope, from: appliedSnapshot, appliedAdminPassword: appliedAdminPassword)
+      if tracksBaseStationUpdate {
+        await self.refreshSettingsAfterApply(requestHost: requestHost)
+      }
+    }
+  }
+
+  func applySequence(
+    title: String, commands: [(String, [String])], connection: AirportConnection,
+    cleanScope: CleanScope = .all,
+    appliedSnapshot: AirportSettingsSnapshot? = nil,
+    appliedAdminPassword: String = "",
+    delayBetweenCommandsNanoseconds: UInt64 = 0,
+    allowsConnectionHostChange: Bool = false,
+    completion: @escaping () -> Void = {},
+    failure: @escaping (String) -> Void = { _ in }
+  ) {
+    guard !isBusy else { return }
+    let requestHost = AirportConnection.normalizedHost(connection.host)
+    let writeScript = writeScriptForCurrentConnection()
+    let appliedSnapshot = appliedSnapshot ?? currentSnapshot
+    let tracksBaseStationUpdate = shouldTrackBaseStationUpdate(cleanScope: cleanScope)
+    if tracksBaseStationUpdate {
+      beginBaseStationUpdate(requestHost: requestHost)
+    }
+    runTask("Applying \(title)", requestHost: requestHost) {
+      if self.mockMode {
+        guard allowsConnectionHostChange || self.connectionStillMatches(requestHost) else {
+          self.ignoreStaleOperation("Ignored \(title) apply result for stale host \(requestHost).")
+          return
+        }
+        for (_, args) in commands {
+          let redacted = AirportCommand.redact(args)
+          let output = AirportMockBackend.output(for: args, dryRun: false)
+          self.appendLog(
+            "$ \(AirportCommand.display(writeScript, redacted))\n\(output)")
+        }
+        guard allowsConnectionHostChange || self.connectionStillMatches(requestHost) else {
+          self.ignoreStaleOperation("Ignored \(title) apply result for stale host \(requestHost).")
+          return
+        }
+        completion()
+        self.status = "\(title) applied. Mock mode."
+        self.preview = nil
+        self.markClean(
+          cleanScope, from: appliedSnapshot, appliedAdminPassword: appliedAdminPassword)
+        if tracksBaseStationUpdate {
+          self.clearBaseStationUpdate(requestHost: requestHost)
+        }
+        return
+      }
+      var didApplyCommand = false
+      for (index, command) in commands.enumerated() {
+        let (_, args) = command
+        if index > 0, delayBetweenCommandsNanoseconds > 0 {
+          try await Task.sleep(nanoseconds: delayBetweenCommandsNanoseconds)
+        }
+        guard allowsConnectionHostChange || self.connectionStillMatches(requestHost) else {
+          self.ignoreStaleOperation("Stopped \(title) apply for stale host \(requestHost).")
+          return
+        }
+        let result: CommandResult
+        do {
+          result = try await self.runner.run(
+            script: writeScript, arguments: args, connection: connection,
+            timeout: 90)
+        } catch {
+          if tracksBaseStationUpdate && !didApplyCommand {
+            self.clearBaseStationUpdate(requestHost: requestHost)
+          }
+          failure(Self.userFacingErrorDescription(error.localizedDescription))
+          throw error
+        }
+        didApplyCommand = true
+        guard allowsConnectionHostChange || self.connectionStillMatches(requestHost) else {
+          self.ignoreStaleOperation("Ignored \(title) apply result for stale host \(requestHost).")
+          return
+        }
+        let output = Self.userFacingCommandOutput(result.combinedOutput)
+        self.appendLog(
+          "$ \(AirportCommand.display(writeScript, result.redactedArguments))\n\(output)"
+        )
+      }
+      guard allowsConnectionHostChange || self.connectionStillMatches(requestHost) else {
+        self.ignoreStaleOperation("Ignored \(title) apply result for stale host \(requestHost).")
+        return
+      }
+      completion()
+      self.status = "\(title) applied."
+      self.preview = nil
+      self.markClean(
+        cleanScope, from: appliedSnapshot, appliedAdminPassword: appliedAdminPassword)
+      if tracksBaseStationUpdate {
+        await self.refreshSettingsAfterApply(requestHost: requestHost)
+      }
+    }
+  }
+
+  func runTask(
+    _ busyStatus: String,
+    requestHost: String? = nil,
+    operation: @escaping () async throws -> Void
+  ) {
+    guard !isBusy else { return }
+    isBusy = true
+    status = busyStatus
+    Task {
+      defer {
+        isBusy = false
+        applyPendingTopologyConnectionHostIfNeeded()
+        refreshAfterBusySelectionIfNeeded()
+        startPendingRestoreIfNeeded()
+      }
+      do {
+        try await operation()
+      } catch {
+        if let requestHost, !connectionStillMatches(requestHost) {
+          ignoreStaleOperation("Ignored \(busyStatus) failure for stale host \(requestHost).")
+        } else {
+          let errorDescription = Self.userFacingErrorDescription(error.localizedDescription)
+          if busyStatus == "Refreshing settings" {
+            hasTrustedConnectionPassword = false
+          }
+          preview = nil
+          status = errorDescription
+          appendLog("Error: \(errorDescription)")
+        }
+      }
+    }
+  }
+
+  private func refreshAfterBusySelectionIfNeeded() {
+    guard shouldRefreshAfterBusySelection else { return }
+    shouldRefreshAfterBusySelection = false
+    refreshLiveSettingsIfPossible()
+  }
+
+  private func applyPendingTopologyConnectionHostIfNeeded() {
+    guard let host = pendingTopologyConnectionHost else { return }
+    pendingTopologyConnectionHost = nil
+    connection.host = host
+  }
+
+  nonisolated static func userFacingErrorDescription(_ description: String) -> String {
+    DiskInventoryMessage.userFacingErrorDescription(description)
+  }
+
+  nonisolated static func userFacingCommandOutput(_ output: String) -> String {
+    DiskInventoryMessage.userFacingCommandOutput(output)
+  }
+
+  func appendLog(_ message: String) {
+    let message = Self.sanitizedLogMessage(message)
+    guard !message.isEmpty else { return }
+    logs.insert(message, at: 0)
+    logs = Array(logs.prefix(60))
+  }
+
+  func appendDeduplicatedLog(_ message: String) {
+    let message = Self.sanitizedLogMessage(message)
+    guard !message.isEmpty else { return }
+    if logs.first != message {
+      logs.insert(message, at: 0)
+      logs = Array(logs.prefix(60))
+    }
+  }
+
+  nonisolated static func sanitizedLogMessage(_ message: String) -> String {
+    DiskInventoryMessage.sanitizedLogMessage(message)
+  }
+}

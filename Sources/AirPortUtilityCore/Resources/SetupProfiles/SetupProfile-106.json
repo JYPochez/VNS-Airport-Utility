@@ -1,0 +1,377 @@
+{
+  "restoreProfile": {
+    "6Lad": "::",
+    "6Lfw": true,
+    "6Lfx": {
+      "decimal": "0",
+      "type": "integer",
+      "width": 1
+    },
+    "6NS1": "::",
+    "6NS2": "::",
+    "6PDa": "::",
+    "6PDl": {
+      "decimal": "0",
+      "type": "integer",
+      "width": 1
+    },
+    "6Wad": "fe80:5::21f:f3ff:fec9:6299",
+    "6Wfx": {
+      "decimal": "0",
+      "type": "integer",
+      "width": 1
+    },
+    "6Wgw": "::1",
+    "6Wte": "0.0.0.0",
+    "6aut": true,
+    "6cfg": {
+      "decimal": "0",
+      "type": "integer",
+      "width": 1
+    },
+    "6fwl": {
+      "entries": []
+    },
+    "6sec": true,
+    "6sfw": true,
+    "6trd": false,
+    "AUVs": "639.26-MacAU",
+    "DRes": {
+      "dhcpReservations": []
+    },
+    "IDNm": "",
+    "SMBs": "",
+    "SMBw": "",
+    "SUEn": true,
+    "SUFq": {
+      "decimal": "604800",
+      "type": "integer",
+      "width": 4
+    },
+    "SUSv": "",
+    "WiFi": {
+      "radios": [
+        {
+          "acEn": false,
+          "country": "United States",
+          "dWDS": true,
+          "dwFl": {
+            "decimal": "0",
+            "type": "integer",
+            "width": 1
+          },
+          "iso_cc": "US",
+          "legacywds": [],
+          "phymodes": {
+            "decimal": "62",
+            "type": "integer",
+            "width": 1
+          },
+          "rTSN": false,
+          "ra1C": true,
+          "raAu": {
+            "decimal": "1812",
+            "type": "integer",
+            "width": 2
+          },
+          "raCA": true,
+          "raCh": {
+            "decimal": "1",
+            "type": "integer",
+            "width": 1
+          },
+          "raCi": false,
+          "raCl": false,
+          "raCr": {
+            "hex": "",
+            "length": 0,
+            "type": "bytes"
+          },
+          "raDe": {
+            "decimal": "1",
+            "type": "integer",
+            "width": 1
+          },
+          "raDt": {
+            "decimal": "3",
+            "type": "integer",
+            "width": 1
+          },
+          "raEA": false,
+          "raEV": {
+            "decimal": "0",
+            "type": "integer",
+            "width": 1
+          },
+          "raF2": {
+            "decimal": "0",
+            "type": "integer",
+            "width": 1
+          },
+          "raFl": {
+            "decimal": "0",
+            "type": "integer",
+            "width": 1
+          },
+          "raKT": {
+            "decimal": "3600",
+            "type": "integer",
+            "width": 2
+          },
+          "raMA": {
+            "hex": "0021e9b92ec3",
+            "length": 6,
+            "type": "bytes"
+          },
+          "raMd": {
+            "decimal": "6",
+            "type": "integer",
+            "width": 1
+          },
+          "raMu": {
+            "decimal": "2",
+            "type": "integer",
+            "width": 1
+          },
+          "raNm": "time capsule",
+          "raPo": {
+            "decimal": "100",
+            "type": "integer",
+            "width": 1
+          },
+          "raR2": {
+            "decimal": "3",
+            "type": "integer",
+            "width": 1
+          },
+          "raRe": {
+            "decimal": "3",
+            "type": "integer",
+            "width": 1
+          },
+          "raRo": false,
+          "raSk": false,
+          "raSt": {
+            "decimal": "0",
+            "type": "integer",
+            "width": 1
+          },
+          "raT2": {
+            "decimal": "10",
+            "type": "integer",
+            "width": 1
+          },
+          "raTm": {
+            "decimal": "10",
+            "type": "integer",
+            "width": 1
+          },
+          "raU2": {
+            "decimal": "1812",
+            "type": "integer",
+            "width": 2
+          },
+          "raWC": false,
+          "raWE": {
+            "hex": "",
+            "length": 0,
+            "type": "bytes"
+          },
+          "raWM": {
+            "decimal": "5",
+            "type": "integer",
+            "width": 1
+          },
+          "sku": "FCC",
+          "vaps": [],
+          "wdFl": {
+            "decimal": "0",
+            "type": "integer",
+            "width": 1
+          }
+        }
+      ]
+    },
+    "dh95": "",
+    "dhBg": "10.0.1.2",
+    "dhEn": "10.0.1.200",
+    "dhLe": {
+      "decimal": "86400",
+      "type": "integer",
+      "width": 4
+    },
+    "dhMg": "",
+    "dhSN": "255.255.255.0",
+    "fire": {
+      "entries": [],
+      "firewallEnabled": false
+    },
+    "fssp": "",
+    "iCld": {
+      "users": []
+    },
+    "laIP": "10.0.1.1",
+    "laSM": "255.255.255.0",
+    "leAc": {
+      "decimal": "1",
+      "type": "integer",
+      "width": 1
+    },
+    "nDMZ": "0.0.0.0",
+    "naAF": {
+      "decimal": "0",
+      "type": "integer",
+      "width": 1
+    },
+    "naBg": "0.0.0.0",
+    "naEn": "0.0.0.0",
+    "naFl": {
+      "decimal": "1",
+      "type": "integer",
+      "width": 1
+    },
+    "naRo": "0.0.0.0",
+    "naSN": "0.0.0.0",
+    "name": "restoreProfile",
+    "ntSV": "time.apple.com",
+    "peAC": true,
+    "peAO": false,
+    "peID": {
+      "decimal": "0",
+      "type": "integer",
+      "width": 1
+    },
+    "pePW": "",
+    "peSC": true,
+    "peSN": "",
+    "peUN": "",
+    "pmPI": "0.0.0.0",
+    "pmPR": "0.0.0.0",
+    "pmPS": "0.0.0.0",
+    "prnR": {
+      "hex": "00000003000000000000000000000000",
+      "length": 16,
+      "type": "bytes"
+    },
+    "raDS": false,
+    "raNA": false,
+    "raTr": {
+      "decimal": "4294967295",
+      "type": "integer",
+      "width": 4
+    },
+    "raWB": true,
+    "slCl": "0.0.0.0",
+    "slvl": {
+      "decimal": "5",
+      "type": "integer",
+      "width": 1
+    },
+    "snAF": {
+      "decimal": "1",
+      "type": "integer",
+      "width": 1
+    },
+    "snCS": "",
+    "snLL": {
+      "hex": "",
+      "length": 0,
+      "type": "bytes"
+    },
+    "snLW": {
+      "hex": "",
+      "length": 0,
+      "type": "bytes"
+    },
+    "snRL": "",
+    "snRW": "",
+    "snWL": "",
+    "snWW": "",
+    "syCt": "",
+    "syDN": "",
+    "syIg": {
+      "problems": []
+    },
+    "syLo": "",
+    "syNm": "time capsule",
+    "syPR": "public",
+    "syPW": "",
+    "syRe": {
+      "decimal": "0",
+      "type": "integer",
+      "width": 1
+    },
+    "tACL": {
+      "entries": [
+        {
+          "description": "FullAccess",
+          "expiryTime": {
+            "decimal": "18446744073709551615",
+            "type": "integer",
+            "width": 8
+          },
+          "macAddress": "00:00:00:00:00:00",
+          "wirelessAccessTimes": [
+            "days=mtwtfss;t=0-0"
+          ]
+        }
+      ]
+    },
+    "time": {
+      "decimal": "1783889014",
+      "type": "integer",
+      "width": 4
+    },
+    "timz": {
+      "zoneFile": {
+        "hex": "545a696632000000000000000000000000000000000000060000000600000000000000ec0000000600000014800000009ea61e709fbaeb60a0860070a19acd60a265e270a383e9e0a46aae70a535a760a653caf0a7158960a833acf0a8fea5e0aa138ef0aade87e0abf370f0acbe69e0add352f0ae9e4be0afb334f0b07e2de0b19c5170b2674a60b37c3370b4472c60b55c1570b6270e60b73bf770b806f060b91bd970b9e6d260bb04f5f0bbc6b460bce4d7f0bdafd0e0bec4b9f0bf8fb2e0c0a49bf0c16f94e0c2847df0c34f76e0c4645ff0c52f58e0c64d7c70c70f3ae0c82d5e70c8f85760ca0d4070cad83960cb88f070d223f470d260fbe0d375e4f0d440dde0d555c6f0d620bfe0d735a8f0d800a1e0d9158af0d9e083e0dafea770dbc065e0dcde8970dda98260debe6b70df896460e09e4d70e1694660e27e2f70e3492860e45e1170e5572ee0e6472df0e73710e0e8270ff0e916f2e0ea06f1f0eaf6d4e0ebe6d3f0ecd6b6e0edc6b5f0eebfd360efafd270f09fb560f18fb470f27f9760f36f9670f45f7960f54f7870f63f5b60f72f5a70f82877e0f90f3c70fa0859e0faf858f0fbe83be0fcd83af0fdc81de0feb81cf0ffa7ffe00097fef00187e1e00277e0f00370fe600460fd700550e0600640df700730c260078d19700910a46009ad94f00af086600be085700cd9a2e00dc067700eb984e00fa983f0109966e0118965f0127948e0136947f014592ae0154929f016390ce017290bf0182229601908edf01a020b601af20a701be1ed601cd1ec701dc1cf601eb1ce701fa1b160207600f0218193602255e2f0236aafe02435c4f0254a91e02615a6f0272a73e027fec370290a55e029dea5702aea37e02bbe87702cd354602d9e69702eb336602f7e4b7030931860316767f03272fa60334749f03452dc6035272bf03632be6037070df0381bdae038e6eff039fbbce03ac6d1f03bdb9ee03cafee703dbb80e03e8fd0703f9b62e0406fb27041847f60424f947043646160442f76704544436045f3a8f0472d5fe047d38af0490d41e049b36cf04aed23e04b9c89704cd640604d7c6b704eb622604f5c4d7050960460513c2f705275e660531c11705455c86054fbf3705635aa6056e50ff0581ec6e058c4f1f059fea8e05aa4d3f05bde8ae05c84b5f05dbe6ce05e6497f05f9e4ee0604db47061876b60622d967063674d60640d787065472f6065ed5a706727116067cd3c706906f36069ad1e706ae6d5606b963af06ccff1e06d761cf06eafd3e06f55fef0708fb5e07135e0f0726f97e07315c2f0744f79e074fedf707638966076dec1707818786078bea37079f85a607a9e85707bd83c607c7e67707db81e607e5e49707f9800600301020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010204050201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102ffffba9e0000ffffc7c00104ffffb9b00008ffffb9b00008ffffc7c0010cffffc7c001104c4d540045445400455354004557540045505400000000010001000000010001545a696632000000000000000000000000000000000000060000000600000000000000ec0000000600000014ffffffff5e03f090ffffffff9ea61e70ffffffff9fbaeb60ffffffffa0860070ffffffffa19acd60ffffffffa265e270ffffffffa383e9e0ffffffffa46aae70ffffffffa535a760ffffffffa653caf0ffffffffa7158960ffffffffa833acf0ffffffffa8fea5e0ffffffffaa138ef0ffffffffaade87e0ffffffffabf370f0ffffffffacbe69e0ffffffffadd352f0ffffffffae9e4be0ffffffffafb334f0ffffffffb07e2de0ffffffffb19c5170ffffffffb2674a60ffffffffb37c3370ffffffffb4472c60ffffffffb55c1570ffffffffb6270e60ffffffffb73bf770ffffffffb806f060ffffffffb91bd970ffffffffb9e6d260ffffffffbb04f5f0ffffffffbbc6b460ffffffffbce4d7f0ffffffffbdafd0e0ffffffffbec4b9f0ffffffffbf8fb2e0ffffffffc0a49bf0ffffffffc16f94e0ffffffffc2847df0ffffffffc34f76e0ffffffffc4645ff0ffffffffc52f58e0ffffffffc64d7c70ffffffffc70f3ae0ffffffffc82d5e70ffffffffc8f85760ffffffffca0d4070ffffffffcad83960ffffffffcb88f070ffffffffd223f470ffffffffd260fbe0ffffffffd375e4f0ffffffffd440dde0ffffffffd555c6f0ffffffffd620bfe0ffffffffd735a8f0ffffffffd800a1e0ffffffffd9158af0ffffffffd9e083e0ffffffffdafea770ffffffffdbc065e0ffffffffdcde8970ffffffffdda98260ffffffffdebe6b70ffffffffdf896460ffffffffe09e4d70ffffffffe1694660ffffffffe27e2f70ffffffffe3492860ffffffffe45e1170ffffffffe5572ee0ffffffffe6472df0ffffffffe73710e0ffffffffe8270ff0ffffffffe916f2e0ffffffffea06f1f0ffffffffeaf6d4e0ffffffffebe6d3f0ffffffffecd6b6e0ffffffffedc6b5f0ffffffffeebfd360ffffffffefafd270fffffffff09fb560fffffffff18fb470fffffffff27f9760fffffffff36f9670fffffffff45f7960fffffffff54f7870fffffffff63f5b60fffffffff72f5a70fffffffff82877e0fffffffff90f3c70fffffffffa0859e0fffffffffaf858f0fffffffffbe83be0fffffffffcd83af0fffffffffdc81de0fffffffffeb81cf0ffffffffffa7ffe0000000000097fef0000000000187e1e0000000000277e0f0000000000370fe60000000000460fd70000000000550e060000000000640df70000000000730c26000000000078d1970000000000910a4600000000009ad94f0000000000af08660000000000be08570000000000cd9a2e0000000000dc06770000000000eb984e0000000000fa983f000000000109966e000000000118965f000000000127948e000000000136947f00000000014592ae000000000154929f00000000016390ce00000000017290bf00000000018222960000000001908edf0000000001a020b60000000001af20a70000000001be1ed60000000001cd1ec70000000001dc1cf60000000001eb1ce70000000001fa1b16000000000207600f00000000021819360000000002255e2f000000000236aafe0000000002435c4f000000000254a91e0000000002615a6f000000000272a73e00000000027fec37000000000290a55e00000000029dea570000000002aea37e0000000002bbe8770000000002cd35460000000002d9e6970000000002eb33660000000002f7e4b70000000003093186000000000316767f0000000003272fa6000000000334749f0000000003452dc600000000035272bf0000000003632be600000000037070df000000000381bdae00000000038e6eff00000000039fbbce0000000003ac6d1f0000000003bdb9ee0000000003cafee70000000003dbb80e0000000003e8fd070000000003f9b62e000000000406fb2700000000041847f6000000000424f9470000000004364616000000000442f767000000000454443600000000045f3a8f000000000472d5fe00000000047d38af000000000490d41e00000000049b36cf0000000004aed23e0000000004b9c8970000000004cd64060000000004d7c6b70000000004eb62260000000004f5c4d70000000005096046000000000513c2f70000000005275e66000000000531c1170000000005455c8600000000054fbf370000000005635aa600000000056e50ff000000000581ec6e00000000058c4f1f00000000059fea8e0000000005aa4d3f0000000005bde8ae0000000005c84b5f0000000005dbe6ce0000000005e6497f0000000005f9e4ee000000000604db4700000000061876b6000000000622d96700000000063674d6000000000640d78700000000065472f600000000065ed5a7000000000672711600000000067cd3c70000000006906f3600000000069ad1e70000000006ae6d560000000006b963af0000000006ccff1e0000000006d761cf0000000006eafd3e0000000006f55fef000000000708fb5e0000000007135e0f000000000726f97e0000000007315c2f000000000744f79e00000000074fedf7000000000763896600000000076dec17000000000781878600000000078bea3700000000079f85a60000000007a9e8570000000007bd83c60000000007c7e6770000000007db81e60000000007e5e4970000000007f9800600301020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010204050201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102010201020102ffffba9e0000ffffc7c00104ffffb9b00008ffffb9b00008ffffc7c0010cffffc7c001104c4d5400454454004553540045575400455054000000000100010000000100010a455354354544542c4d332e322e302c4d31312e312e300a",
+        "length": 3552,
+        "type": "bytes"
+      },
+      "zoneName": "America/New_York",
+      "zoneVersion": "2026b"
+    },
+    "usbF": {
+      "decimal": "1104",
+      "type": "integer",
+      "width": 2
+    },
+    "usrd": {
+      "users": []
+    },
+    "waCD": "",
+    "waCV": {
+      "decimal": "33536",
+      "type": "integer",
+      "width": 2
+    },
+    "waD1": "0.0.0.0",
+    "waD2": "0.0.0.0",
+    "waD3": "0.0.0.0",
+    "waDC": "",
+    "waDN": "",
+    "waDS": false,
+    "waIP": "192.168.4.45",
+    "waIn": {
+      "decimal": "16",
+      "type": "integer",
+      "width": 1
+    },
+    "waNM": false,
+    "waRA": "192.168.4.1",
+    "waSD": {
+      "decimal": "0",
+      "type": "integer",
+      "width": 1
+    },
+    "waSM": "255.255.252.0",
+    "wbAC": false,
+    "wbEn": false,
+    "wbHN": "",
+    "wbHP": "",
+    "wbHU": "",
+    "wbRD": "",
+    "wbRP": "",
+    "wbRU": ""
+  }
+}
