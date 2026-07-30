@@ -68,9 +68,16 @@ from backend.srp import int_to_bytes
 from backend.srp import int_to_padded_bytes
 from backend.srp import xor_bytes
 from backend.wireless_clients import DHCP_IP_ADDRESS_OID
+from backend.wireless_clients import WIRELESS_DATA_RATES_OID
+from backend.wireless_clients import WIRELESS_LAST_REFRESH_OID
+from backend.wireless_clients import WIRELESS_NOISE_OID
 from backend.wireless_clients import WIRELESS_PHYS_ADDRESS_OID
+from backend.wireless_clients import WIRELESS_RATE_OID
+from backend.wireless_clients import WIRELESS_STRENGTH_OID
 from backend.wireless_clients import WIRELESS_TYPE_OID
+from backend.wireless_clients import modern_wireless_client_details
 from backend.wireless_clients import modern_wireless_macs
+from backend.wireless_clients import parse_legacy_snmp_client_details
 from backend.wireless_clients import parse_legacy_snmp_walk
 from backend.wireless_clients import resolved_client_records
 from backend.wireless_clients import run_legacy_snmp_walk
@@ -945,6 +952,9 @@ class WirelessClientTests(unittest.TestCase):
                                 {
                                     "opmode": "sta",
                                     "macAddress": "C8:BC:C8:30:CD:3B",
+                                    "rssi_local": CFB0Integer((1 << 64) - 39, 8),
+                                    "txrate_local": 866,
+                                    "phy_mode": "802.11a/n/ac",
                                 }
                             ]
                         }
@@ -982,6 +992,9 @@ class WirelessClientTests(unittest.TestCase):
             ],
         )
         self.assertEqual(clients[0]["ipAddress"], "192.168.4.41")
+        self.assertEqual(clients[0]["rssi"], -39)
+        self.assertEqual(clients[0]["dataRateMbps"], 866)
+        self.assertEqual(clients[0]["phyMode"], "802.11a/n/ac")
 
     def test_modern_clients_combine_radio_and_wireless_interface_without_ethernet(self):
         radio_stations = {
@@ -1023,6 +1036,55 @@ class WirelessClientTests(unittest.TestCase):
             ],
         )
 
+    def test_modern_clients_retain_trace_connection_telemetry_and_rpc_phy_fallback(self):
+        radio_stations = {
+            "wlan0": [
+                {
+                    "opmode": "sta",
+                    "macAddress": "F6:41:D9:E3:B6:17",
+                    "rssi_local": CFB0Integer((1 << 64) - 39, 8),
+                    "rssi": CFB0Integer((1 << 64) - 41, 8),
+                    "txrate_local": 866,
+                    "txrate": 780,
+                    "noise": 0,
+                }
+            ]
+        }
+        interfaces = {
+            "outputs": {
+                "data": {
+                    "LAN": {
+                        "interfaces": [
+                            {
+                                "type": "802.11 VAP",
+                                "clients": [
+                                    {
+                                        "MAC": "F6:41:D9:E3:B6:17",
+                                        "PHY": "802.11a/n/ac",
+                                    }
+                                ],
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+
+        macs, details = modern_wireless_client_details(
+            radio_stations, interfaces
+        )
+
+        self.assertEqual(macs, ["F6:41:D9:E3:B6:17"])
+        self.assertEqual(
+            details["F6:41:D9:E3:B6:17"],
+            {
+                "rssi": -39,
+                "dataRateMbps": 866,
+                "noise": 0,
+                "phyMode": "802.11a/n/ac",
+            },
+        )
+
     def test_legacy_snmp_uses_associations_and_dhcp_only_for_enrichment(self):
         station = "6.200.188.200.48.205.59"
         wds = "6.0.17.34.108.80.85"
@@ -1058,6 +1120,81 @@ class WirelessClientTests(unittest.TestCase):
 
         self.assertEqual(macs, ["74:1B:B2:F1:BB:9D"])
         self.assertEqual(addresses, {"74:1B:B2:F1:BB:9D": "10.0.1.2"})
+
+    def test_legacy_snmp_retains_express_trace_connection_telemetry(self):
+        station = "116.27.178.241.187.157"
+        walk = "\n".join(
+            [
+                f".{WIRELESS_PHYS_ADDRESS_OID}.{station} = \"74 1B B2 F1 BB 9D \"",
+                f".{WIRELESS_TYPE_OID}.{station} = INTEGER: sta(1)",
+                f".{WIRELESS_DATA_RATES_OID}.{station} = STRING: \"1 2 5.5 11 36\"",
+                f".{WIRELESS_LAST_REFRESH_OID}.{station} = INTEGER: 0",
+                f".{WIRELESS_STRENGTH_OID}.{station} = INTEGER: -42",
+                f".{WIRELESS_NOISE_OID}.{station} = INTEGER: -98",
+                f".{WIRELESS_RATE_OID}.{station} = INTEGER: 36",
+                f".{DHCP_IP_ADDRESS_OID}.{station} = IpAddress: 10.0.1.2",
+            ]
+        )
+
+        macs, addresses, details = parse_legacy_snmp_client_details(walk)
+
+        self.assertEqual(macs, ["74:1B:B2:F1:BB:9D"])
+        self.assertEqual(addresses, {"74:1B:B2:F1:BB:9D": "10.0.1.2"})
+        self.assertEqual(
+            details["74:1B:B2:F1:BB:9D"],
+            {
+                "supportedDataRates": "1 2 5.5 11 36",
+                "statisticsAgeSeconds": 0,
+                "rssi": -42,
+                "noise": -98,
+                "dataRateMbps": 36.0,
+            },
+        )
+
+    def test_legacy_snmp_omits_unsupported_metrics_and_wds_details(self):
+        station = "116.27.178.241.187.157"
+        wds = "6.0.17.34.108.80.85"
+        walk = "\n".join(
+            [
+                f".{WIRELESS_PHYS_ADDRESS_OID}.{station} = \"74 1B B2 F1 BB 9D \"",
+                f".{WIRELESS_TYPE_OID}.{station} = INTEGER: sta(1)",
+                f".{WIRELESS_LAST_REFRESH_OID}.{station} = INTEGER: -1",
+                f".{WIRELESS_STRENGTH_OID}.{station} = INTEGER: -1",
+                f".{WIRELESS_RATE_OID}.{station} = INTEGER: -1",
+                f".{WIRELESS_PHYS_ADDRESS_OID}.{wds} = Hex-STRING: 00 11 22 6C 50 55",
+                f".{WIRELESS_TYPE_OID}.{wds} = INTEGER: wds(2)",
+                f".{WIRELESS_STRENGTH_OID}.{wds} = INTEGER: -42",
+            ]
+        )
+
+        macs, _, details = parse_legacy_snmp_client_details(walk)
+
+        self.assertEqual(macs, ["74:1B:B2:F1:BB:9D"])
+        self.assertEqual(details, {})
+
+    def test_legacy_snmp_retains_spaceship_trace_connection_telemetry(self):
+        station = "116.27.178.241.187.157"
+        walk = "\n".join(
+            [
+                f".{WIRELESS_PHYS_ADDRESS_OID}.{station} = \"74 1B B2 F1 BB 9D \"",
+                f".{WIRELESS_TYPE_OID}.{station} = INTEGER: sta(1)",
+                f".{WIRELESS_STRENGTH_OID}.{station} = INTEGER: -42",
+                f".{WIRELESS_NOISE_OID}.{station} = INTEGER: -101",
+                f".{WIRELESS_RATE_OID}.{station} = INTEGER: 18",
+            ]
+        )
+
+        macs, _, details = parse_legacy_snmp_client_details(walk)
+
+        self.assertEqual(macs, ["74:1B:B2:F1:BB:9D"])
+        self.assertEqual(
+            details["74:1B:B2:F1:BB:9D"],
+            {
+                "rssi": -42,
+                "noise": -101,
+                "dataRateMbps": 18.0,
+            },
+        )
 
     def test_resolved_clients_prefer_hostname_then_ip_and_retain_mac_only_clients(self):
         records = resolved_client_records(
@@ -1161,6 +1298,36 @@ class WirelessClientTests(unittest.TestCase):
             list(addresses.values()),
         )
         self.assertTrue(all(not record["hostname"] for record in records))
+
+    def test_resolved_clients_merge_telemetry_without_affecting_identity_resolution(self):
+        records = resolved_client_records(
+            ["F6:41:D9:E3:B6:17"],
+            neighbor_addresses={
+                "F6:41:D9:E3:B6:17": ["192.168.4.41"]
+            },
+            details_by_mac={
+                "F6:41:D9:E3:B6:17": {
+                    "rssi": -39,
+                    "dataRateMbps": 866,
+                    "phyMode": "802.11a/n/ac",
+                }
+            },
+            hostname_lookup=lambda _ip: "iphone.local",
+        )
+
+        self.assertEqual(
+            records,
+            [
+                {
+                    "macAddress": "F6:41:D9:E3:B6:17",
+                    "ipAddress": "192.168.4.41",
+                    "hostname": "iphone.local",
+                    "rssi": -39,
+                    "dataRateMbps": 866,
+                    "phyMode": "802.11a/n/ac",
+                }
+            ],
+        )
 
 
 if __name__ == "__main__":

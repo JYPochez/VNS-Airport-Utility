@@ -2187,7 +2187,11 @@ final class PaneFlagTests: XCTestCase {
         WirelessClient(
           macAddress: "C8:BC:C8:30:CD:3B",
           ipAddress: "192.168.4.41",
-          hostname: "iphone.local")
+          hostname: "iphone.local",
+          rssi: -39,
+          noise: -92,
+          dataRateMbps: 866,
+          phyMode: "802.11a/n/ac")
       ]
     }
 
@@ -2202,6 +2206,9 @@ final class PaneFlagTests: XCTestCase {
     XCTAssertTrue(model.hasLoadedWirelessClients)
     XCTAssertFalse(model.shouldShowDeviceLoading)
     XCTAssertEqual(model.wirelessClients.map(\.displayName), ["iphone.local"])
+    XCTAssertEqual(model.wirelessClients.first?.rssi, -39)
+    XCTAssertEqual(model.wirelessClients.first?.dataRateMbps, 866)
+    XCTAssertEqual(model.wirelessClients.first?.phyMode, "802.11a/n/ac")
     XCTAssertGreaterThanOrEqual(fetchCount, 1)
 
     model.isDevicePopoverPresented = false

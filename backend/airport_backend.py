@@ -593,7 +593,7 @@ def prepare_firmware_upload_session(transport: ACPEncryptedTransport) -> dict[st
     return result
 
 
-def read_modern_wireless_clients(host: str, password: str) -> list[dict[str, str]]:
+def read_modern_wireless_clients(host: str, password: str) -> list[dict[str, Any]]:
     """Read AirPort Utility's radio/interface client sources in one session."""
 
     sock, transport = open_encrypted_transport(host, password)
@@ -618,24 +618,30 @@ def read_modern_wireless_clients(host: str, password: str) -> list[dict[str, str
             errors.append(f"{SYSTEM_INTERFACES}: {exc}")
     if len(errors) == 2:
         raise RuntimeError("; ".join(errors))
-    macs = wireless_clients.modern_wireless_macs(radio_station_list, interfaces)
+    macs, details_by_mac = wireless_clients.modern_wireless_client_details(
+        radio_station_list, interfaces
+    )
     return wireless_clients.resolved_client_records(
         macs,
         neighbor_addresses=wireless_clients.read_neighbor_cache(),
+        details_by_mac=details_by_mac,
     )
 
 
 def read_legacy_wireless_clients(
     host: str, community: str
-) -> list[dict[str, str]]:
+) -> list[dict[str, Any]]:
     """Read associated legacy stations and correlate their DHCP addresses."""
 
     walk = wireless_clients.run_legacy_snmp_walk(host, community)
-    macs, dhcp_addresses = wireless_clients.parse_legacy_snmp_walk(walk)
+    macs, dhcp_addresses, details_by_mac = (
+        wireless_clients.parse_legacy_snmp_client_details(walk)
+    )
     return wireless_clients.resolved_client_records(
         macs,
         addresses_by_mac=dhcp_addresses,
         neighbor_addresses=wireless_clients.read_neighbor_cache(),
+        details_by_mac=details_by_mac,
     )
 
 

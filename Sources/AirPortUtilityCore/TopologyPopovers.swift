@@ -49,7 +49,7 @@ struct DevicePopover: View {
       .padding(.bottom, 6)
       PopoverDetailsRows(
         rows: deviceDetailRows,
-        wirelessClients: model.wirelessClients.map(\.displayName),
+        wirelessClients: model.wirelessClients,
         viewportHeight: deviceDetailsHeight)
         .frame(width: 274, height: deviceDetailsHeight)
       HStack {
@@ -196,11 +196,11 @@ private struct PopoverTitleLabel: NSViewRepresentable {
 
 private struct PopoverDetailsRows: NSViewRepresentable {
   var rows: [(String, String)]
-  var wirelessClients: [String] = []
+  var wirelessClients: [WirelessClient] = []
   var viewportHeight: CGFloat = DevicePopoverLayout.minimumDetailsHeight
 
   func makeNSView(context: Context) -> NSScrollView {
-    let scrollView = NSScrollView(
+    let scrollView = PopoverDetailsScrollView(
       frame: NSRect(x: 0, y: 0, width: 274, height: viewportHeight))
     scrollView.drawsBackground = false
     scrollView.borderType = .noBorder
@@ -229,7 +229,10 @@ private struct PopoverDetailsRows: NSViewRepresentable {
 }
 
 private final class PopoverDetailsDocumentView: NSView {
-  private var renderedContent: [String] = []
+  private var renderedLayoutContent: [String] = []
+  private var wirelessClientFields: [String: WirelessClientHoverField] = [:]
+  private let wirelessClientDetailsPanel = WirelessClientDetailsPanelController()
+  private var presentedWirelessClientID: String?
 
   override var isFlipped: Bool {
     true
@@ -238,6 +241,10 @@ private final class PopoverDetailsDocumentView: NSView {
   override init(frame frameRect: NSRect) {
     super.init(frame: frameRect)
     self.frame = NSRect(x: 0, y: 0, width: 274, height: 107)
+    wirelessClientDetailsPanel.presentationDidEnd = {
+      [weak self] clientID in
+      self?.wirelessClientPresentationDidEnd(clientID: clientID)
+    }
   }
 
   @available(*, unavailable)
@@ -245,17 +252,21 @@ private final class PopoverDetailsDocumentView: NSView {
     nil
   }
 
-  func configure(rows: [(String, String)], wirelessClients: [String]) {
+  func configure(rows: [(String, String)], wirelessClients: [WirelessClient]) {
     frame.size.height = DevicePopoverLayout.detailsContentHeight(
       detailRowCount: rows.count,
       wirelessClientCount: wirelessClients.count)
-    let content =
+    let layoutContent =
       rows.flatMap { [$0.0, $0.1] }
       + ["\u{0}wireless-clients"]
-      + wirelessClients
-    guard content != renderedContent else { return }
-    renderedContent = content
+      + wirelessClients.flatMap { [$0.id, $0.displayName] }
+    guard layoutContent != renderedLayoutContent else {
+      updateWirelessClients(wirelessClients)
+      return
+    }
+    renderedLayoutContent = layoutContent
     subviews.forEach { $0.removeFromSuperview() }
+    wirelessClientFields.removeAll()
 
     for (index, row) in rows.enumerated() {
       let y = CGFloat(index) * DevicePopoverLayout.rowHeight
@@ -275,16 +286,84 @@ private final class PopoverDetailsDocumentView: NSView {
         frame: NSRect(x: 0, y: y, width: 108, height: 19),
         label: true))
     for (index, client) in wirelessClients.enumerated() {
-      let clientField = textField(
-        client,
+      let clientField = WirelessClientHoverField(
+        client: client,
         frame: NSRect(
           x: 122,
           y: y + CGFloat(index) * DevicePopoverLayout.rowHeight,
           width: 152,
-          height: 19),
-        label: false)
+          height: 19))
       clientField.setAccessibilityIdentifier("popover.wirelessClients.client")
+      clientField.presentationChanged = {
+        [weak self] field, shouldPresent, immediately in
+        self?.wirelessClientPresentationChanged(
+          field: field,
+          shouldPresent: shouldPresent,
+          immediately: immediately)
+      }
+      wirelessClientFields[client.id] = clientField
       addSubview(clientField)
+    }
+    updateWirelessClients(wirelessClients)
+  }
+
+  fileprivate func hideWirelessClientHoverPanel() {
+    presentedWirelessClientID = nil
+    wirelessClientDetailsPanel.hide()
+  }
+
+  override func viewWillMove(toWindow newWindow: NSWindow?) {
+    if newWindow == nil {
+      hideWirelessClientHoverPanel()
+    }
+    super.viewWillMove(toWindow: newWindow)
+  }
+
+  private func updateWirelessClients(_ wirelessClients: [WirelessClient]) {
+    let clientsByID = Dictionary(
+      uniqueKeysWithValues: wirelessClients.map { ($0.id, $0) })
+    for (id, field) in wirelessClientFields {
+      if let client = clientsByID[id] {
+        field.client = client
+      }
+    }
+    guard let presentedWirelessClientID else { return }
+    guard let client = clientsByID[presentedWirelessClientID] else {
+      hideWirelessClientHoverPanel()
+      return
+    }
+    wirelessClientDetailsPanel.update(client: client)
+  }
+
+  private func wirelessClientPresentationChanged(
+    field: WirelessClientHoverField,
+    shouldPresent: Bool,
+    immediately: Bool
+  ) {
+    if shouldPresent {
+      presentedWirelessClientID = field.client.id
+      if immediately {
+        wirelessClientDetailsPanel.presentImmediately(
+          client: field.client,
+          from: field)
+      } else {
+        wirelessClientDetailsPanel.schedule(
+          client: field.client,
+          from: field)
+      }
+    } else if presentedWirelessClientID == field.client.id {
+      if immediately {
+        hideWirelessClientHoverPanel()
+      } else {
+        wirelessClientDetailsPanel.dismissAfterGracePeriod()
+      }
+    }
+  }
+
+  private func wirelessClientPresentationDidEnd(clientID: String) {
+    wirelessClientFields[clientID]?.detailsPresentationDidEnd()
+    if presentedWirelessClientID == clientID {
+      presentedWirelessClientID = nil
     }
   }
 
@@ -301,6 +380,22 @@ private final class PopoverDetailsDocumentView: NSView {
     field.isEditable = false
     field.isSelectable = false
     return field
+  }
+}
+
+private final class PopoverDetailsScrollView: NSScrollView {
+  override func reflectScrolledClipView(_ cView: NSClipView) {
+    super.reflectScrolledClipView(cView)
+    (documentView as? PopoverDetailsDocumentView)?
+      .hideWirelessClientHoverPanel()
+  }
+
+  override func viewWillMove(toWindow newWindow: NSWindow?) {
+    if newWindow == nil {
+      (documentView as? PopoverDetailsDocumentView)?
+        .hideWirelessClientHoverPanel()
+    }
+    super.viewWillMove(toWindow: newWindow)
   }
 }
 

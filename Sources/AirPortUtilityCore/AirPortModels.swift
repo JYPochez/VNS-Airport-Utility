@@ -51,6 +51,10 @@ struct WirelessClient: Codable, Equatable, Identifiable, Sendable {
   var macAddress: String
   var ipAddress: String
   var hostname: String
+  var rssi: Int? = nil
+  var noise: Int? = nil
+  var dataRateMbps: Double? = nil
+  var phyMode: String? = nil
 
   var id: String { macAddress }
 
@@ -65,6 +69,78 @@ struct WirelessClient: Codable, Equatable, Identifiable, Sendable {
     }
     return macAddress.trimmingCharacters(in: .whitespacesAndNewlines)
   }
+
+  var detailRows: [WirelessClientDetailRow] {
+    [
+      WirelessClientDetailRow(
+        label: "hardware address",
+        value: detailMACAddress),
+      WirelessClientDetailRow(
+        label: "quality",
+        value: qualityLabel),
+      WirelessClientDetailRow(
+        label: "data rate",
+        value: dataRateLabel),
+      WirelessClientDetailRow(
+        label: "RSSI",
+        value: rssiLabel),
+      WirelessClientDetailRow(
+        label: "PHY mode",
+        value: phyModeLabel),
+    ]
+  }
+
+  private var normalizedRSSI: Int? {
+    guard let rssi else { return nil }
+    return rssi > 0 ? rssi - 100 : rssi
+  }
+
+  private var detailMACAddress: String {
+    let address = macAddress.trimmingCharacters(in: .whitespacesAndNewlines)
+    return address.isEmpty ? "Unknown" : address.uppercased()
+  }
+
+  private var qualityLabel: String {
+    guard let rssi = normalizedRSSI else { return "Unknown" }
+    switch rssi {
+    case ..<(-99): return "Poor"
+    case -99...(-90): return "Fair"
+    case -89...(-83): return "Average"
+    case -82...(-71): return "Good"
+    default: return "Excellent"
+    }
+  }
+
+  private var dataRateLabel: String {
+    guard
+      let dataRateMbps,
+      dataRateMbps.isFinite,
+      dataRateMbps >= 0,
+      dataRateMbps < Double(Int.max)
+    else {
+      return "Unknown"
+    }
+    let value =
+      dataRateMbps.rounded() == dataRateMbps
+      ? String(Int(dataRateMbps))
+      : String(format: "%g", dataRateMbps)
+    return "\(value) Mb/s"
+  }
+
+  private var rssiLabel: String {
+    guard let rssi = normalizedRSSI else { return "Unknown" }
+    return "\(rssi) dBm"
+  }
+
+  private var phyModeLabel: String {
+    let mode = phyMode?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    return mode.isEmpty ? "Unknown" : mode
+  }
+}
+
+struct WirelessClientDetailRow: Equatable, Sendable {
+  var label: String
+  var value: String
 }
 
 struct CommandResult: Equatable, Sendable {
