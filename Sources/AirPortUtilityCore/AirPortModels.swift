@@ -47,6 +47,26 @@ struct AirportConnection: Equatable, Sendable {
   }
 }
 
+struct WirelessClient: Codable, Equatable, Identifiable, Sendable {
+  var macAddress: String
+  var ipAddress: String
+  var hostname: String
+
+  var id: String { macAddress }
+
+  var displayName: String {
+    let hostname = hostname.trimmingCharacters(in: .whitespacesAndNewlines)
+    if !hostname.isEmpty {
+      return hostname
+    }
+    let ipAddress = ipAddress.trimmingCharacters(in: .whitespacesAndNewlines)
+    if !ipAddress.isEmpty {
+      return ipAddress
+    }
+    return macAddress.trimmingCharacters(in: .whitespacesAndNewlines)
+  }
+}
+
 struct CommandResult: Equatable, Sendable {
   var arguments: [String]
   var redactedArguments: [String]

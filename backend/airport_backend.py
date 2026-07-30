@@ -67,6 +67,7 @@ from backend import disk_rpc
 from backend import firmware_session
 from backend import legacy_cli
 from backend import session as acp_session
+from backend import wireless_clients
 
 # ---------------------------------------------------------------------------
 # Modern write/RPC helpers
@@ -590,6 +591,95 @@ def prepare_firmware_upload_session(transport: ACPEncryptedTransport) -> dict[st
             except Exception as exc:
                 result[SYSTEM_INTERFACES] = {"available": False, "error": str(exc)}
     return result
+
+
+def read_modern_wireless_clients(host: str, password: str) -> list[dict[str, str]]:
+    """Read AirPort Utility's radio/interface client sources in one session."""
+
+    sock, transport = open_encrypted_transport(host, password)
+    radio_station_list: Any = {}
+    interfaces: Any = {}
+    errors: list[str] = []
+    with sock:
+        try:
+            radio_station_list = cfb0_loads(
+                read_property(transport, "raSL", flags=FIRMWARE_REQUEST_FLAGS)
+            )
+        except Exception as exc:
+            errors.append(f"raSL: {exc}")
+        try:
+            interfaces = rpc_call(
+                transport,
+                SYSTEM_INTERFACES,
+                {},
+                flags=FIRMWARE_REQUEST_FLAGS,
+            )
+        except Exception as exc:
+            errors.append(f"{SYSTEM_INTERFACES}: {exc}")
+    if len(errors) == 2:
+        raise RuntimeError("; ".join(errors))
+    macs = wireless_clients.modern_wireless_macs(radio_station_list, interfaces)
+    return wireless_clients.resolved_client_records(
+        macs,
+        neighbor_addresses=wireless_clients.read_neighbor_cache(),
+    )
+
+
+def read_legacy_wireless_clients(
+    host: str, community: str
+) -> list[dict[str, str]]:
+    """Read associated legacy stations and correlate their DHCP addresses."""
+
+    walk = wireless_clients.run_legacy_snmp_walk(host, community)
+    macs, dhcp_addresses = wireless_clients.parse_legacy_snmp_walk(walk)
+    return wireless_clients.resolved_client_records(
+        macs,
+        addresses_by_mac=dhcp_addresses,
+        neighbor_addresses=wireless_clients.read_neighbor_cache(),
+    )
+
+
+def wireless_clients_main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        description="List currently associated wireless AirPort clients."
+    )
+    parser.add_argument("host", help="AirPort base station IP address or hostname")
+    parser.add_argument("--password", help="admin password for modern ACP")
+    parser.add_argument(
+        "--legacy",
+        action="store_true",
+        help="use the legacy AirPort SNMP client table",
+    )
+    parser.add_argument("--snmp-community", help="legacy AirPort SNMP community")
+    parser.add_argument("--json", action="store_true", help="print structured JSON")
+    args = parser.parse_args(argv)
+
+    try:
+        if args.legacy:
+            if not args.snmp_community:
+                raise ValueError("--snmp-community is required with --legacy")
+            clients = read_legacy_wireless_clients(args.host, args.snmp_community)
+        else:
+            if args.password is None:
+                raise ValueError("--password is required for modern ACP")
+            clients = read_modern_wireless_clients(args.host, args.password)
+        result = {"clients": clients}
+        if args.json:
+            print(json.dumps(result, indent=2, sort_keys=True))
+        else:
+            for client in clients:
+                print(client["hostname"] or client["ipAddress"])
+        return 0
+    except (
+        ACPError,
+        CFB0CodecError,
+        OSError,
+        RuntimeError,
+        ValueError,
+        TypeError,
+    ) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
 
 def wait_for_firmware_progress(
     transport: ACPEncryptedTransport,
@@ -1638,7 +1728,14 @@ def legacy_write_main(argv: list[str] | None = None) -> int:
 
 def main() -> int:
     argv = sys.argv[1:]
-    commands = {"read", "write", "property-write", "legacy-read", "legacy-write"}
+    commands = {
+        "read",
+        "write",
+        "property-write",
+        "legacy-read",
+        "legacy-write",
+        "wireless-clients",
+    }
     if argv and argv[0] not in commands:
         if "--restart" in argv:
             return legacy_write_main(argv)
@@ -1659,6 +1756,8 @@ def main() -> int:
         return legacy_read_main(remaining)
     if namespace.command == "legacy-write":
         return legacy_write_main(remaining)
+    if namespace.command == "wireless-clients":
+        return wireless_clients_main(remaining)
     parser.error(f"unknown command: {namespace.command}")
     return 2
 

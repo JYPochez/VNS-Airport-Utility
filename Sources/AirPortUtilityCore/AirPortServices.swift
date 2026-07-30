@@ -30,7 +30,12 @@ public final class AirportAppModel: ObservableObject {
   @Published var setup = AirPortSetupState()
   var setupSessionID = UUID()
   @Published var isRestoringDefaults = false
-  @Published var isDevicePopoverPresented = false
+  @Published var isDevicePopoverPresented = false {
+    didSet {
+      guard isDevicePopoverPresented != oldValue else { return }
+      devicePopoverPresentationDidChange()
+    }
+  }
   @Published var isInternetPopoverPresented = false
   @Published var isConnectionPopoverPresented = false
   @Published var isInternetSelected = false
@@ -55,6 +60,8 @@ public final class AirportAppModel: ObservableObject {
   @Published var hasDetectedClassicWDSSupport = false
   @Published var usesLegacyACP = false
   var legacyACPSettingsValuesJSON = ""
+  @Published var wirelessClients: [WirelessClient] = []
+  @Published var hasLoadedWirelessClients = false
   @Published var firmware = FirmwareState()
   var hasLoadedSettings = false
   var hasStartedBonjourDiscovery = false
@@ -67,8 +74,12 @@ public final class AirportAppModel: ObservableObject {
   var selectedTopologyDeviceID: String? {
     get { topologyStore.selectedDeviceID }
     set {
+      let didChange = topologyStore.selectedDeviceID != newValue
       objectWillChange.send()
       topologyStore.selectedDeviceID = newValue
+      if didChange {
+        selectedDeviceForWirelessClientsDidChange()
+      }
     }
   }
   var updatingBaseStationHost: String? {
@@ -161,6 +172,32 @@ public final class AirportAppModel: ObservableObject {
   var baseStationRestartStatusTrackerID: UUID? {
     get { topologyStore.restartStatusTrackerID }
     set { topologyStore.restartStatusTrackerID = newValue }
+  }
+  var wirelessClientPollTask: Task<Void, Never>? {
+    get { topologyStore.wirelessClientPollTask }
+    set { topologyStore.wirelessClientPollTask = newValue }
+  }
+  var wirelessClientPollGeneration: UUID {
+    get { topologyStore.wirelessClientPollGeneration }
+    set { topologyStore.wirelessClientPollGeneration = newValue }
+  }
+  var wirelessClientPollIntervalNanoseconds: UInt64 {
+    get { topologyStore.wirelessClientPollIntervalNanoseconds }
+    set { topologyStore.wirelessClientPollIntervalNanoseconds = newValue }
+  }
+  var wirelessClientFetchOverride:
+    (@MainActor (AirportConnection, Bool, String) async throws -> [WirelessClient])?
+  {
+    get { topologyStore.wirelessClientFetchOverride }
+    set { topologyStore.wirelessClientFetchOverride = newValue }
+  }
+  var legacySNMPCommunity: String {
+    get { topologyStore.legacySNMPCommunity }
+    set { topologyStore.legacySNMPCommunity = newValue }
+  }
+  var lastWirelessClientError: String {
+    get { topologyStore.lastWirelessClientError }
+    set { topologyStore.lastWirelessClientError = newValue }
   }
   var archiveCompletionMonitorTask: Task<Void, Never>? {
     get { configurationSession.archiveCompletionMonitorTask }
@@ -866,6 +903,8 @@ public final class AirportAppModel: ObservableObject {
   }
 
   func clearLoadedDeviceDetails(name: String) {
+    stopWirelessClientPolling(clearClients: true)
+    legacySNMPCommunity = ""
     firmwareCatalogRefreshTask?.cancel()
     firmwareCatalogRefreshTask = nil
     firmwareCompletionMonitorTask?.cancel()

@@ -19,6 +19,24 @@ private final class MemoryAirportPasswordStore: AirportPasswordStore {
   }
 }
 
+private actor TestAsyncGate {
+  private var isReleased = false
+
+  func wait() async throws {
+    while !isReleased {
+      try await Task.sleep(nanoseconds: 1_000_000)
+    }
+  }
+
+  func release() {
+    isReleased = true
+  }
+}
+
+private enum WirelessClientTestError: Error {
+  case unavailable
+}
+
 @MainActor
 final class PaneFlagTests: XCTestCase {
   private func fixtureURL(
@@ -2141,6 +2159,185 @@ final class PaneFlagTests: XCTestCase {
     XCTAssertFalse(model.shouldShowDeviceConnectionPrompt)
     XCTAssertFalse(model.shouldShowDeviceLoading)
     XCTAssertTrue(model.hasDevicePopoverDetails)
+  }
+
+  func testWirelessClientsPollWhileDevicePopoverIsOpenAndClearOnClose() async throws {
+    let model = AirportAppModel(passwordStore: MemoryAirportPasswordStore())
+    let device = AirportDiscoveredDevice(
+      id: "modern-extreme",
+      name: "airport extreme",
+      hostName: "airport-extreme.local.",
+      productID: "120")
+    model.connection = AirportConnection(
+      host: "airport-extreme.local", password: "secret", repoPath: "/repo")
+    model.hasTrustedConnectionPassword = true
+    model.hasLoadedSettings = true
+    model.discoveredDevices = [device]
+    model.selectedTopologyDeviceID = device.id
+    model.wirelessClientPollIntervalNanoseconds = 10_000_000
+    var fetchCount = 0
+    let initialFetchGate = TestAsyncGate()
+    model.wirelessClientFetchOverride = { connection, legacy, community in
+      fetchCount += 1
+      XCTAssertEqual(connection.host, "airport-extreme.local")
+      XCTAssertFalse(legacy)
+      XCTAssertEqual(community, "")
+      try await initialFetchGate.wait()
+      return [
+        WirelessClient(
+          macAddress: "C8:BC:C8:30:CD:3B",
+          ipAddress: "192.168.4.41",
+          hostname: "iphone.local")
+      ]
+    }
+
+    model.isDevicePopoverPresented = true
+    XCTAssertFalse(model.hasLoadedWirelessClients)
+    XCTAssertTrue(model.shouldShowDeviceLoading)
+    await initialFetchGate.release()
+    for _ in 0..<20 where !model.hasLoadedWirelessClients {
+      try await Task.sleep(nanoseconds: 5_000_000)
+    }
+
+    XCTAssertTrue(model.hasLoadedWirelessClients)
+    XCTAssertFalse(model.shouldShowDeviceLoading)
+    XCTAssertEqual(model.wirelessClients.map(\.displayName), ["iphone.local"])
+    XCTAssertGreaterThanOrEqual(fetchCount, 1)
+
+    model.isDevicePopoverPresented = false
+    let fetchCountAfterClose = fetchCount
+    XCTAssertTrue(model.wirelessClients.isEmpty)
+    XCTAssertFalse(model.hasLoadedWirelessClients)
+    try await Task.sleep(nanoseconds: 30_000_000)
+    XCTAssertEqual(fetchCount, fetchCountAfterClose)
+  }
+
+  func testWirelessClientPollingDefaultsToTwoSeconds() {
+    let model = AirportAppModel(passwordStore: MemoryAirportPasswordStore())
+
+    XCTAssertEqual(model.wirelessClientPollIntervalNanoseconds, 2_000_000_000)
+  }
+
+  func testSuccessfulEmptyWirelessClientRefreshCompletesInitialPopoverLoad() async throws {
+    let model = AirportAppModel(passwordStore: MemoryAirportPasswordStore())
+    let device = AirportDiscoveredDevice(
+      id: "modern-extreme",
+      name: "airport extreme",
+      hostName: "airport-extreme.local.",
+      productID: "120")
+    model.connection = AirportConnection(
+      host: "airport-extreme.local", password: "secret", repoPath: "/repo")
+    model.hasTrustedConnectionPassword = true
+    model.hasLoadedSettings = true
+    model.discoveredDevices = [device]
+    model.selectedTopologyDeviceID = device.id
+    model.wirelessClientFetchOverride = { _, _, _ in [] }
+
+    model.isDevicePopoverPresented = true
+    for _ in 0..<20 where !model.hasLoadedWirelessClients {
+      try await Task.sleep(nanoseconds: 5_000_000)
+    }
+
+    XCTAssertTrue(model.hasLoadedWirelessClients)
+    XCTAssertTrue(model.wirelessClients.isEmpty)
+    XCTAssertFalse(model.shouldShowDeviceLoading)
+  }
+
+  func testInitialWirelessClientFailureReleasesPopoverAndRetries() async throws {
+    let model = AirportAppModel(passwordStore: MemoryAirportPasswordStore())
+    let device = AirportDiscoveredDevice(
+      id: "modern-extreme",
+      name: "airport extreme",
+      hostName: "airport-extreme.local.",
+      productID: "120")
+    model.connection = AirportConnection(
+      host: "airport-extreme.local", password: "secret", repoPath: "/repo")
+    model.hasTrustedConnectionPassword = true
+    model.hasLoadedSettings = true
+    model.discoveredDevices = [device]
+    model.selectedTopologyDeviceID = device.id
+    model.wirelessClientPollIntervalNanoseconds = 5_000_000
+    let retryGate = TestAsyncGate()
+    var fetchCount = 0
+    model.wirelessClientFetchOverride = { _, _, _ in
+      fetchCount += 1
+      if fetchCount == 1 {
+        throw WirelessClientTestError.unavailable
+      }
+      try await retryGate.wait()
+      return [
+        WirelessClient(
+          macAddress: "C8:BC:C8:30:CD:3B",
+          ipAddress: "192.168.4.41",
+          hostname: "iphone.local")
+      ]
+    }
+
+    model.isDevicePopoverPresented = true
+    for _ in 0..<20 where !model.hasLoadedWirelessClients {
+      try await Task.sleep(nanoseconds: 2_000_000)
+    }
+
+    XCTAssertTrue(model.hasLoadedWirelessClients)
+    XCTAssertFalse(model.shouldShowDeviceLoading)
+    XCTAssertTrue(model.wirelessClients.isEmpty)
+
+    await retryGate.release()
+    for _ in 0..<20 where model.wirelessClients.isEmpty {
+      try await Task.sleep(nanoseconds: 2_000_000)
+    }
+
+    XCTAssertGreaterThanOrEqual(fetchCount, 2)
+    XCTAssertEqual(model.wirelessClients.map(\.displayName), ["iphone.local"])
+  }
+
+  func testDevicePopoverCapsUnifiedDetailsViewport() {
+    XCTAssertEqual(
+      DevicePopoverLayout.detailsViewportHeight(
+        detailRowCount: 6,
+        wirelessClientCount: 0),
+      DevicePopoverLayout.minimumDetailsHeight)
+    XCTAssertGreaterThan(
+      DevicePopoverLayout.detailsContentHeight(
+        detailRowCount: 6,
+        wirelessClientCount: 30),
+      DevicePopoverLayout.maximumDetailsHeight)
+    XCTAssertEqual(
+      DevicePopoverLayout.detailsViewportHeight(
+        detailRowCount: 6,
+        wirelessClientCount: 30),
+      DevicePopoverLayout.maximumDetailsHeight)
+  }
+
+  func testLegacyWirelessClientPollingRequiresEnabledSNMPAndCommunity() async throws {
+    let model = AirportAppModel(passwordStore: MemoryAirportPasswordStore())
+    let device = AirportDiscoveredDevice(
+      id: "legacy-express",
+      name: "airport express",
+      hostName: "airport-express.local.",
+      productID: "102")
+    model.connection = AirportConnection(
+      host: "airport-express.local", password: "secret", repoPath: "/repo")
+    model.hasTrustedConnectionPassword = true
+    model.hasLoadedSettings = true
+    model.usesLegacyACP = true
+    model.advanced.allowSNMP = false
+    model.legacySNMPCommunity = "public"
+    model.discoveredDevices = [device]
+    model.selectedTopologyDeviceID = device.id
+    var fetchCount = 0
+    model.wirelessClientFetchOverride = { _, _, _ in
+      fetchCount += 1
+      return []
+    }
+
+    model.isDevicePopoverPresented = true
+    try await Task.sleep(nanoseconds: 20_000_000)
+
+    XCTAssertEqual(fetchCount, 0)
+    XCTAssertNil(model.wirelessClientPollTask)
+    XCTAssertTrue(model.hasLoadedWirelessClients)
+    XCTAssertFalse(model.shouldShowDeviceLoading)
   }
 
   func testMockOffWirelessStateDoesNotCarryHiddenWirelessFields() {

@@ -85,6 +85,7 @@ extension AirportAppModel {
           previousPasswordTrusted: selectedPasswordTrusted)
         updateConnectionHostAfterStableIdentityReplacement(
           replacementDevice, selectedHost: selectedHost)
+        restartWirelessClientPollingIfPossible()
         return
       }
       self.selectedTopologyDeviceID = nil
@@ -161,7 +162,10 @@ extension AirportAppModel {
   }
 
   var shouldShowDeviceLoading: Bool {
-    !mockMode && !hasCompleteDevicePopoverDetails && liveCredentialsAvailable && isBusy
+    guard !mockMode, liveCredentialsAvailable else { return false }
+    let isLoadingDeviceDetails = !hasCompleteDevicePopoverDetails && isBusy
+    let isLoadingInitialWirelessClients = hasLoadedSettings && !hasLoadedWirelessClients
+    return isLoadingDeviceDetails || isLoadingInitialWirelessClients
   }
 
   var shouldShowInternetLoading: Bool {
@@ -1200,6 +1204,7 @@ extension AirportAppModel {
         baseStation.name = device.displayName
       }
     }
+    restartWirelessClientPollingIfPossible()
   }
 
   func deselectTopologyDevice(_ device: AirportDiscoveredDevice) {

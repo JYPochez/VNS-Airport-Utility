@@ -61,6 +61,32 @@ final class AirPortCommandTests: XCTestCase {
       ])
   }
 
+  func testWirelessClientCommandsSelectProtocolAndRedactCredentials() {
+    let modern = AirportCommand.wirelessClients(
+      connection: connection,
+      usesLegacyACP: false,
+      snmpCommunity: "")
+    XCTAssertEqual(
+      modern,
+      [
+        "wireless-clients", "192.168.4.45", "--json",
+        "--password", "secret",
+      ])
+    XCTAssertEqual(AirportCommand.redact(modern).last, "<password>")
+
+    let legacy = AirportCommand.wirelessClients(
+      connection: connection,
+      usesLegacyACP: true,
+      snmpCommunity: "private-community")
+    XCTAssertEqual(
+      legacy,
+      [
+        "wireless-clients", "192.168.4.45", "--json",
+        "--legacy", "--snmp-community", "private-community",
+      ])
+    XCTAssertEqual(AirportCommand.redact(legacy).last, "<password>")
+  }
+
   func testRedactsInlinePasswordArguments() {
     let args = [
       "192.168.4.45",

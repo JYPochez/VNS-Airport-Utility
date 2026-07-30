@@ -30,6 +30,13 @@ final class TopologyStore {
   var restartProbeOverride:
     (@MainActor (AirportConnection, Bool, Bool) async -> Bool)?
   var restartStatusTrackerID: UUID?
+  var wirelessClientPollTask: Task<Void, Never>?
+  var wirelessClientPollGeneration = UUID()
+  var wirelessClientPollIntervalNanoseconds: UInt64 = 2_000_000_000
+  var wirelessClientFetchOverride:
+    (@MainActor (AirportConnection, Bool, String) async throws -> [WirelessClient])?
+  var legacySNMPCommunity = ""
+  var lastWirelessClientError = ""
 }
 
 @MainActor

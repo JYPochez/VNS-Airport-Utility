@@ -4,6 +4,51 @@ import XCTest
 
 @MainActor
 final class ProfileReaderTests: XCTestCase {
+  func testWirelessClientDisplayNamePrefersHostnameThenIPAddressThenMACAddress() {
+    XCTAssertEqual(
+      WirelessClient(
+        macAddress: "C8:BC:C8:30:CD:3B",
+        ipAddress: "192.168.4.41",
+        hostname: "iphone.local"
+      ).displayName,
+      "iphone.local")
+    XCTAssertEqual(
+      WirelessClient(
+        macAddress: "C8:BC:C8:30:CD:3B",
+        ipAddress: "192.168.4.41",
+        hostname: ""
+      ).displayName,
+      "192.168.4.41")
+    XCTAssertEqual(
+      WirelessClient(
+        macAddress: "C8:BC:C8:30:CD:3B",
+        ipAddress: "",
+        hostname: ""
+      ).displayName,
+      "C8:BC:C8:30:CD:3B")
+    XCTAssertEqual(
+      WirelessClient(macAddress: " ", ipAddress: " ", hostname: " ").displayName,
+      "")
+  }
+
+  func testLegacySNMPCommunityUsesConfiguredValueOrFallsBackToAdminPassword() {
+    XCTAssertEqual(
+      AirportAppModel.legacySNMPCommunity(
+        configured: " private-community ",
+        adminPassword: "password"),
+      "private-community")
+    XCTAssertEqual(
+      AirportAppModel.legacySNMPCommunity(
+        configured: "",
+        adminPassword: "password"),
+      "password")
+    XCTAssertEqual(
+      AirportAppModel.legacySNMPCommunity(
+        configured: nil,
+        adminPassword: "password"),
+      "password")
+  }
+
   func testApplySpaceshipProfilePopulatesSupportedLegacyOptions() throws {
     var table = Data(repeating: 0, count: 15)
     table.append(1)

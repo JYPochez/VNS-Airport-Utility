@@ -102,10 +102,14 @@ extension AirportAppModel {
 
     apply(profile: batch.value)
     if usesLegacyACP {
+      legacySNMPCommunity = Self.legacySNMPCommunity(
+        configured: reader.string("settings.snCS"),
+        adminPassword: requestConnection.password)
       legacyACPSettingsValuesJSON = Self.legacySettingsValuesJSON(
         from: batch.value,
         excluding: identity.productID == "3" ? [] : ["acTa"])
     } else {
+      legacySNMPCommunity = ""
       legacyACPSettingsValuesJSON = ""
     }
     let liveAirPlaySettings = Self.liveAirPlaySettings(reader: reader)
@@ -163,6 +167,7 @@ extension AirportAppModel {
     showConnectionDetails = false
     saveConnectionPasswordIfRequested()
     scheduleAutomaticFirmwareCatalogRefreshIfNeeded(requestHost: requestHost)
+    restartWirelessClientPollingIfPossible()
     appendLog("Refresh completed.")
   }
 
@@ -258,7 +263,7 @@ extension AirportAppModel {
       guard Self.shouldRetryWithLegacyACP(error) else { throw error }
       usesLegacyACP = true
       let legacySettings = Self.uniqueACPSettings(
-        settings + Self.legacySetupSnapshotSettings + Self.legacyExtremeSnapshotSettings)
+        settings + Self.legacySetupSnapshotSettings + Self.legacyExtremeSnapshotSettings + ["snCS"])
       var legacyArguments = AirportCommand.readSettings(
         legacySettings, connection: connection, json: true
       ).usingAirPortBackendSubcommand("legacy-read")
@@ -1091,6 +1096,11 @@ extension AirportAppModel {
   static let legacyExtremeSnapshotSettings = """
     6CWp,AAU ,acEn,acTa,ctim,cver,dh95,dhBg,dhDB,dhDE,dhDL,dhDS,dhEn,dhFl,dhLe,dhMg,dhRo,dhSN,laIP,laSM,lcVs,moAD,moAP,moCC,moCI,moDT,moID,moMF,moMP,moPD,moPN,moPW,moUN,nDMZ,naAF,naBg,naEn,naFl,naRo,naSN,ntSV,paFR,pdAR,pdFl,pdID,pdMC,pdPW,pdUN,peAC,peAO,peID,pePW,peSC,peSN,peUN,pmPI,pmPR,pmPS,pmTa,prnR,ra1C,raAc,raAu,raC2,raCA,raCh,raCi,raCl,raCr,raDS,raEA,raF2,raFl,raI1,raI2,raKT,raMd,raMu,raNA,raNm,raPo,raPx,raR2,raRe,raRo,raS2,raSe,raSk,raSt,raT2,raTm,raTr,raU2,raWB,raWE,raWM,slCl,slvl,snAF,snLL,snLW,snRL,snRW,snWL,snWW,syCt,syDN,syLo,syNm,syPR,syPW,usbF,waCV,waD1,waD2,waD3,waDC,waDN,waDS,waIP,waIn,waNM,waRA,waSD,waSM,wdFl,wdLs
     """.split(separator: ",").map(String.init)
+
+  static func legacySNMPCommunity(configured: String?, adminPassword: String) -> String {
+    let configured = configured?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    return configured.isEmpty ? adminPassword : configured
+  }
 
   static func legacySettingsValuesJSON(
     from response: JSONValue, excluding excludedSettings: Set<String> = []

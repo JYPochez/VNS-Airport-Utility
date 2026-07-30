@@ -1,6 +1,32 @@
 import AppKit
 import SwiftUI
 
+enum DevicePopoverLayout {
+  static let rowHeight: CGFloat = 17.5
+  static let minimumDetailsHeight: CGFloat = 107
+  static let maximumDetailsHeight: CGFloat = 280
+
+  static func detailsContentHeight(
+    detailRowCount: Int,
+    wirelessClientCount: Int
+  ) -> CGFloat {
+    max(
+      minimumDetailsHeight,
+      CGFloat(detailRowCount + wirelessClientCount) * rowHeight + 2)
+  }
+
+  static func detailsViewportHeight(
+    detailRowCount: Int,
+    wirelessClientCount: Int
+  ) -> CGFloat {
+    min(
+      detailsContentHeight(
+        detailRowCount: detailRowCount,
+        wirelessClientCount: wirelessClientCount),
+      maximumDetailsHeight)
+  }
+}
+
 struct DevicePopover: View {
   @EnvironmentObject private var model: AirportAppModel
 
@@ -22,7 +48,9 @@ struct DevicePopover: View {
       .frame(width: 283, height: 19)
       .padding(.bottom, 6)
       PopoverDetailsRows(
-        rows: deviceDetailRows)
+        rows: deviceDetailRows,
+        wirelessClients: model.wirelessClients.map(\.displayName),
+        viewportHeight: deviceDetailsHeight)
         .frame(width: 274, height: deviceDetailsHeight)
       HStack {
         Spacer()
@@ -65,7 +93,9 @@ struct DevicePopover: View {
   }
 
   private var deviceDetailsHeight: CGFloat {
-    CGFloat(deviceDetailRows.count) * 17 + 5
+    DevicePopoverLayout.detailsViewportHeight(
+      detailRowCount: deviceDetailRows.count,
+      wirelessClientCount: model.wirelessClients.count)
   }
 
   private var devicePopoverHeight: CGFloat {
@@ -74,8 +104,14 @@ struct DevicePopover: View {
 }
 
 struct DeviceLoadingPopover: View {
+  @EnvironmentObject private var model: AirportAppModel
+
   var body: some View {
-    SettingsLoadingPopover(title: "Connecting to Base Station")
+    SettingsLoadingPopover(
+      title:
+        model.hasLoadedSettings && !model.hasLoadedWirelessClients
+        ? "Loading Wireless Clients"
+        : "Connecting to Base Station")
   }
 }
 
@@ -160,27 +196,41 @@ private struct PopoverTitleLabel: NSViewRepresentable {
 
 private struct PopoverDetailsRows: NSViewRepresentable {
   var rows: [(String, String)]
+  var wirelessClients: [String] = []
+  var viewportHeight: CGFloat = DevicePopoverLayout.minimumDetailsHeight
 
   func makeNSView(context: Context) -> NSScrollView {
-    let scrollView = NSScrollView(frame: NSRect(x: 0, y: 0, width: 274, height: 107))
+    let scrollView = NSScrollView(
+      frame: NSRect(x: 0, y: 0, width: 274, height: viewportHeight))
     scrollView.drawsBackground = false
     scrollView.borderType = .noBorder
     scrollView.hasVerticalScroller = false
     scrollView.hasHorizontalScroller = false
     scrollView.autohidesScrollers = true
+    scrollView.scrollerStyle = .overlay
     scrollView.documentView = PopoverDetailsDocumentView()
     return scrollView
   }
 
   func updateNSView(_ scrollView: NSScrollView, context: Context) {
-    let documentView =
-      (scrollView.documentView as? PopoverDetailsDocumentView) ?? PopoverDetailsDocumentView()
-    documentView.configure(rows: rows)
-    scrollView.documentView = documentView
+    let documentView: PopoverDetailsDocumentView
+    if let existingDocumentView = scrollView.documentView as? PopoverDetailsDocumentView {
+      documentView = existingDocumentView
+    } else {
+      documentView = PopoverDetailsDocumentView()
+      scrollView.documentView = documentView
+    }
+    documentView.configure(rows: rows, wirelessClients: wirelessClients)
+    let contentHeight = DevicePopoverLayout.detailsContentHeight(
+      detailRowCount: rows.count,
+      wirelessClientCount: wirelessClients.count)
+    scrollView.hasVerticalScroller = contentHeight > viewportHeight
   }
 }
 
 private final class PopoverDetailsDocumentView: NSView {
+  private var renderedContent: [String] = []
+
   override var isFlipped: Bool {
     true
   }
@@ -195,18 +245,46 @@ private final class PopoverDetailsDocumentView: NSView {
     nil
   }
 
-  func configure(rows: [(String, String)]) {
+  func configure(rows: [(String, String)], wirelessClients: [String]) {
+    frame.size.height = DevicePopoverLayout.detailsContentHeight(
+      detailRowCount: rows.count,
+      wirelessClientCount: wirelessClients.count)
+    let content =
+      rows.flatMap { [$0.0, $0.1] }
+      + ["\u{0}wireless-clients"]
+      + wirelessClients
+    guard content != renderedContent else { return }
+    renderedContent = content
     subviews.forEach { $0.removeFromSuperview() }
-    frame.size.height = max(107, CGFloat(rows.count) * 17.5 + 2)
 
     for (index, row) in rows.enumerated() {
-      let y = CGFloat(index) * 17.5
+      let y = CGFloat(index) * DevicePopoverLayout.rowHeight
       addSubview(textField(row.0, frame: NSRect(x: 0, y: y, width: 108, height: 19), label: true))
       addSubview(
         textField(
           row.1.isEmpty ? "--" : row.1,
           frame: NSRect(x: 122, y: y, width: 152, height: 19),
           label: false))
+    }
+
+    guard !wirelessClients.isEmpty else { return }
+    let y = CGFloat(rows.count) * DevicePopoverLayout.rowHeight
+    addSubview(
+      textField(
+        "wireless clients",
+        frame: NSRect(x: 0, y: y, width: 108, height: 19),
+        label: true))
+    for (index, client) in wirelessClients.enumerated() {
+      let clientField = textField(
+        client,
+        frame: NSRect(
+          x: 122,
+          y: y + CGFloat(index) * DevicePopoverLayout.rowHeight,
+          width: 152,
+          height: 19),
+        label: false)
+      clientField.setAccessibilityIdentifier("popover.wirelessClients.client")
+      addSubview(clientField)
     }
   }
 

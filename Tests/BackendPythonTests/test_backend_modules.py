@@ -3,6 +3,8 @@ import hashlib
 import os
 import struct
 import tempfile
+import threading
+import time
 import unittest
 from unittest import mock
 
@@ -65,6 +67,13 @@ from backend.srp import derive_keys
 from backend.srp import int_to_bytes
 from backend.srp import int_to_padded_bytes
 from backend.srp import xor_bytes
+from backend.wireless_clients import DHCP_IP_ADDRESS_OID
+from backend.wireless_clients import WIRELESS_PHYS_ADDRESS_OID
+from backend.wireless_clients import WIRELESS_TYPE_OID
+from backend.wireless_clients import modern_wireless_macs
+from backend.wireless_clients import parse_legacy_snmp_walk
+from backend.wireless_clients import resolved_client_records
+from backend.wireless_clients import run_legacy_snmp_walk
 
 
 class CFB0CodecTests(unittest.TestCase):
@@ -886,6 +895,272 @@ class LegacyProtocolTests(unittest.TestCase):
         self.assertEqual(encode_setting_value("raMd", 3), b"\x00\x03")
         self.assertEqual(encode_setting_value("waIP", "192.168.1.1"), b"\xc0\xa8\x01\x01")
         self.assertEqual(encode_setting_value("slCl", "192.168.5.6"), b"\xc0\xa8\x05\x06")
+
+
+class WirelessClientTests(unittest.TestCase):
+    def test_legacy_walk_uses_numeric_apple_mib_and_rejects_agent_errors(self):
+        completed = mock.Mock(
+            returncode=0,
+            stdout=".1.3.6.1.4.1.63.501.3 = No Such Object available on this agent at this OID\n",
+            stderr="",
+        )
+        run = mock.Mock(return_value=completed)
+
+        with self.assertRaisesRegex(RuntimeError, "No Such Object"):
+            run_legacy_snmp_walk("10.0.1.1", "public", run=run)
+
+        arguments = run.call_args.args[0]
+        self.assertEqual(arguments[0], "/usr/bin/snmpwalk")
+        self.assertIn("-On", arguments)
+        self.assertIn("-OQ", arguments)
+        self.assertEqual(arguments[-1], "1.3.6.1.4.1.63.501.3")
+        self.assertEqual(run.call_args.kwargs["errors"], "replace")
+
+    def test_modern_backend_reads_radio_then_interfaces_in_one_session(self):
+        calls = []
+
+        class FakeSocket:
+            def __enter__(self):
+                calls.append(("enter",))
+                return self
+
+            def __exit__(self, exc_type, exc, traceback):
+                calls.append(("exit",))
+                return False
+
+        with (
+            mock.patch.object(
+                airport_backend,
+                "open_encrypted_transport",
+                return_value=(FakeSocket(), object()),
+            ),
+            mock.patch.object(
+                airport_backend,
+                "read_property",
+                side_effect=lambda transport, setting, flags=0: (
+                    calls.append(("read", setting, flags))
+                    or cfb0_dumps(
+                        {
+                            "wlan0": [
+                                {
+                                    "opmode": "sta",
+                                    "macAddress": "C8:BC:C8:30:CD:3B",
+                                }
+                            ]
+                        }
+                    )
+                ),
+            ),
+            mock.patch.object(
+                airport_backend,
+                "rpc_call",
+                side_effect=lambda transport, function, inputs, flags: (
+                    calls.append(("rpc", function, inputs, flags))
+                    or {"outputs": {"data": {"LAN": {"interfaces": []}}}}
+                ),
+            ),
+            mock.patch.object(
+                airport_backend.wireless_clients,
+                "read_neighbor_cache",
+                return_value={"C8:BC:C8:30:CD:3B": ["192.168.4.41"]},
+            ),
+            mock.patch.object(
+                airport_backend.wireless_clients,
+                "reverse_hostname",
+                return_value="iphone.local",
+            ),
+        ):
+            clients = airport_backend.read_modern_wireless_clients("base.local", "secret")
+
+        self.assertEqual(
+            calls,
+            [
+                ("enter",),
+                ("read", "raSL", 4),
+                ("rpc", "acpd.system.interfaces", {}, 4),
+                ("exit",),
+            ],
+        )
+        self.assertEqual(clients[0]["ipAddress"], "192.168.4.41")
+
+    def test_modern_clients_combine_radio_and_wireless_interface_without_ethernet(self):
+        radio_stations = {
+            "wlan1": [
+                {"opmode": "sta", "macAddress": "c8:bc:c8:30:cd:3b"},
+                {"opmode": "sta", "macAddress": "5A:7C:07:D4:71:D1"},
+            ],
+            "wlan0": [],
+        }
+        interfaces = {
+            "outputs": {
+                "data": {
+                    "LAN": {
+                        "interfaces": [
+                            {
+                                "type": "Ethernet",
+                                "SwitchCache": {"0": ["AA:BB:CC:DD:EE:FF"]},
+                                "Cache": [{"MAC": "11:22:33:44:55:66"}],
+                            },
+                            {
+                                "type": "802.11 VAP",
+                                "clients": [
+                                    {"MAC": "C8:BC:C8:30:CD:3B"},
+                                    {"MAC": "72:11:22:33:44:55"},
+                                ],
+                            },
+                        ]
+                    }
+                }
+            }
+        }
+
+        self.assertEqual(
+            modern_wireless_macs(radio_stations, interfaces),
+            [
+                "C8:BC:C8:30:CD:3B",
+                "5A:7C:07:D4:71:D1",
+                "72:11:22:33:44:55",
+            ],
+        )
+
+    def test_legacy_snmp_uses_associations_and_dhcp_only_for_enrichment(self):
+        station = "6.200.188.200.48.205.59"
+        wds = "6.0.17.34.108.80.85"
+        lease_only = "6.170.187.204.221.238.255"
+        walk = "\n".join(
+            [
+                f".{WIRELESS_PHYS_ADDRESS_OID}.{station} = Hex-STRING: C8 BC C8 30 CD 3B",
+                f".{WIRELESS_TYPE_OID}.{station} = INTEGER: sta(1)",
+                f".{WIRELESS_PHYS_ADDRESS_OID}.{wds} = Hex-STRING: 00 11 22 6C 50 55",
+                f".{WIRELESS_TYPE_OID}.{wds} = INTEGER: wds(2)",
+                f".{DHCP_IP_ADDRESS_OID}.{station} = IpAddress: 10.0.1.2",
+                f".{DHCP_IP_ADDRESS_OID}.{lease_only} = IpAddress: 10.0.1.25",
+            ]
+        )
+
+        macs, addresses = parse_legacy_snmp_walk(walk)
+
+        self.assertEqual(macs, ["C8:BC:C8:30:CD:3B"])
+        self.assertEqual(addresses["C8:BC:C8:30:CD:3B"], "10.0.1.2")
+        self.assertEqual(addresses["AA:BB:CC:DD:EE:FF"], "10.0.1.25")
+
+    def test_legacy_snmp_accepts_live_six_octet_indexes_without_length_prefix(self):
+        station = "116.27.178.241.187.157"
+        walk = "\n".join(
+            [
+                f".{WIRELESS_PHYS_ADDRESS_OID}.{station} = \"74 1B B2 F1 BB 9D \"",
+                f".{WIRELESS_TYPE_OID}.{station} = 1",
+                f".{DHCP_IP_ADDRESS_OID}.{station} = 10.0.1.2",
+            ]
+        )
+
+        macs, addresses = parse_legacy_snmp_walk(walk)
+
+        self.assertEqual(macs, ["74:1B:B2:F1:BB:9D"])
+        self.assertEqual(addresses, {"74:1B:B2:F1:BB:9D": "10.0.1.2"})
+
+    def test_resolved_clients_prefer_hostname_then_ip_and_retain_mac_only_clients(self):
+        records = resolved_client_records(
+            [
+                "C8:BC:C8:30:CD:3B",
+                "5A:7C:07:D4:71:D1",
+                "AA:BB:CC:DD:EE:FF",
+            ],
+            addresses_by_mac={"C8:BC:C8:30:CD:3B": "10.0.1.2"},
+            neighbor_addresses={"5A:7C:07:D4:71:D1": ["169.254.30.149"]},
+            hostname_lookup=lambda ip: "iphone.local" if ip == "10.0.1.2" else "",
+        )
+
+        self.assertEqual(
+            records,
+            [
+                {
+                    "macAddress": "C8:BC:C8:30:CD:3B",
+                    "ipAddress": "10.0.1.2",
+                    "hostname": "iphone.local",
+                },
+                {
+                    "macAddress": "5A:7C:07:D4:71:D1",
+                    "ipAddress": "169.254.30.149",
+                    "hostname": "",
+                },
+                {
+                    "macAddress": "AA:BB:CC:DD:EE:FF",
+                    "ipAddress": "",
+                    "hostname": "",
+                },
+            ],
+        )
+
+    def test_client_hostname_lookups_run_concurrently(self):
+        active_lookups = 0
+        maximum_active_lookups = 0
+        lock = threading.Lock()
+
+        def hostname_lookup(ip):
+            nonlocal active_lookups, maximum_active_lookups
+            with lock:
+                active_lookups += 1
+                maximum_active_lookups = max(
+                    maximum_active_lookups, active_lookups
+                )
+            time.sleep(0.03)
+            with lock:
+                active_lookups -= 1
+            return f"client-{ip}.local"
+
+        macs = [
+            "02:00:00:00:00:01",
+            "02:00:00:00:00:02",
+            "02:00:00:00:00:03",
+            "02:00:00:00:00:04",
+        ]
+        addresses = {
+            mac: f"10.0.1.{index}"
+            for index, mac in enumerate(macs, start=2)
+        }
+
+        records = resolved_client_records(
+            macs,
+            addresses_by_mac=addresses,
+            hostname_lookup=hostname_lookup,
+            hostname_lookup_budget_seconds=1,
+            hostname_lookup_max_workers=4,
+        )
+
+        self.assertGreater(maximum_active_lookups, 1)
+        self.assertTrue(all(record["hostname"] for record in records))
+
+    def test_client_hostname_shared_budget_preserves_unresolved_records(self):
+        macs = [
+            f"02:00:00:00:00:{index:02X}"
+            for index in range(1, 9)
+        ]
+        addresses = {
+            mac: f"10.0.1.{index}"
+            for index, mac in enumerate(macs, start=2)
+        }
+
+        def slow_hostname_lookup(_ip):
+            time.sleep(0.25)
+            return "too-late.local"
+
+        started = time.monotonic()
+        records = resolved_client_records(
+            macs,
+            addresses_by_mac=addresses,
+            hostname_lookup=slow_hostname_lookup,
+            hostname_lookup_budget_seconds=0.02,
+            hostname_lookup_max_workers=2,
+        )
+        elapsed = time.monotonic() - started
+
+        self.assertLess(elapsed, 0.15)
+        self.assertEqual(
+            [record["ipAddress"] for record in records],
+            list(addresses.values()),
+        )
+        self.assertTrue(all(not record["hostname"] for record in records))
 
 
 if __name__ == "__main__":

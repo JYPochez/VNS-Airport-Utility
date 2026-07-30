@@ -21,6 +21,7 @@ enum AirportCommand {
     "--ppp-dial-in-password",
     "--radius-primary-secret",
     "--radius-secondary-secret",
+    "--snmp-community",
   ]
 
   static func redact(_ arguments: [String]) -> [String] {
@@ -119,6 +120,22 @@ enum AirportCommand {
     ]
     if json { args.append("--json") }
     return args
+  }
+
+  static func wirelessClients(
+    connection: AirportConnection,
+    usesLegacyACP: Bool,
+    snmpCommunity: String
+  ) -> [String] {
+    var arguments = [
+      "wireless-clients", normalizedHost(connection), "--json",
+    ]
+    if usesLegacyACP {
+      arguments += ["--legacy", "--snmp-community", snmpCommunity]
+    } else {
+      arguments += ["--password", connection.password]
+    }
+    return arguments
   }
 
   static func rawWrite(
