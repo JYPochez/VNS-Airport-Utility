@@ -21,6 +21,7 @@ public final class AirportAppModel: ObservableObject {
   @Published var didSetupDeviceDisappear = false
   var setupPreRestartServiceID = ""
   var setupPreRestartBonjourSeed = ""
+  @Published var isShowingRestartConfirmation = false
   @Published var isShowingRestoreConfirmation = false
   @Published var isRestorePending = false
   @Published var isWaitingForRestoreRestart = false
@@ -123,6 +124,43 @@ public final class AirportAppModel: ObservableObject {
   var pendingTopologyConnectionHost: String? {
     get { topologyStore.pendingConnectionHost }
     set { topologyStore.pendingConnectionHost = newValue }
+  }
+  var baseStationRestartTrackers: [UUID: BaseStationRestartTracker] {
+    get { topologyStore.restartTrackers }
+    set {
+      objectWillChange.send()
+      topologyStore.restartTrackers = newValue
+    }
+  }
+  var baseStationRestartTimeoutTasks: [UUID: Task<Void, Never>] {
+    get { topologyStore.restartTimeoutTasks }
+    set { topologyStore.restartTimeoutTasks = newValue }
+  }
+  var baseStationRestartRecoveryTasks: [UUID: Task<Void, Never>] {
+    get { topologyStore.restartRecoveryTasks }
+    set { topologyStore.restartRecoveryTasks = newValue }
+  }
+  var baseStationRestartTimeoutNanoseconds: UInt64 {
+    get { topologyStore.restartTimeoutNanoseconds }
+    set { topologyStore.restartTimeoutNanoseconds = newValue }
+  }
+  var baseStationRestartPollIntervalNanoseconds: UInt64 {
+    get { topologyStore.restartPollIntervalNanoseconds }
+    set { topologyStore.restartPollIntervalNanoseconds = newValue }
+  }
+  var baseStationRestartProbeTimeout: TimeInterval {
+    get { topologyStore.restartProbeTimeout }
+    set { topologyStore.restartProbeTimeout = newValue }
+  }
+  var baseStationRestartProbeOverride:
+    (@MainActor (AirportConnection, Bool, Bool) async -> Bool)?
+  {
+    get { topologyStore.restartProbeOverride }
+    set { topologyStore.restartProbeOverride = newValue }
+  }
+  var baseStationRestartStatusTrackerID: UUID? {
+    get { topologyStore.restartStatusTrackerID }
+    set { topologyStore.restartStatusTrackerID = newValue }
   }
   var archiveCompletionMonitorTask: Task<Void, Never>? {
     get { configurationSession.archiveCompletionMonitorTask }

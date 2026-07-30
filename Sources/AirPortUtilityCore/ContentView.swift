@@ -80,6 +80,10 @@ public struct ContentView: View {
         AirPortSetupSheet()
           .environmentObject(model)
       }
+      .sheet(isPresented: $model.isShowingRestartConfirmation) {
+        RestartBaseStationSheet()
+          .environmentObject(model)
+      }
       .sheet(isPresented: $model.isShowingRestoreConfirmation) {
         RestoreDefaultSettingsSheet()
           .environmentObject(model)

@@ -5,7 +5,10 @@ extension AirportAppModel {
     cleanScope != .none
   }
 
-  private func refreshSettingsAfterApply(requestHost: String) async {
+  func refreshSettingsAfterApply(requestHost: String) async {
+    defer {
+      clearBaseStationUpdate(requestHost: requestHost)
+    }
     let deviceName = postApplyDeviceNameForStatus
     status = "Waiting for \(deviceName) to restart."
     var lastError: Error?
@@ -34,6 +37,10 @@ extension AirportAppModel {
         )
       }
     }
+    // The retry operation is over even when the base station could not be
+    // reached. Do not leave its topology node permanently marked Restarting;
+    // a later Bonjour rediscovery should use the device's advertised status.
+    clearBaseStationUpdate(requestHost: requestHost)
     if let lastError {
       let errorDescription = Self.userFacingErrorDescription(lastError.localizedDescription)
       status = "Could not confirm \(deviceName) came back online: \(errorDescription)"
@@ -96,7 +103,10 @@ extension AirportAppModel {
       selectedProductID.isEmpty
       ? baseStation.productID.trimmingCharacters(in: .whitespacesAndNewlines)
       : selectedProductID
-    return productID == "3"
+    // Both of these models are confirmed by captured AirPort Utility traffic
+    // to negotiate the command-0x17 DH/AES transport. Product 102 is the
+    // original 802.11g AirPort Express; product 3 is the "spaceship" Extreme.
+    return productID == "3" || productID == "102"
   }
 
   func appliedWriteArguments(_ args: [String]) -> [String] {

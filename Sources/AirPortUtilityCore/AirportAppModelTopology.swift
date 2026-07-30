@@ -23,7 +23,8 @@ extension AirportAppModel {
   public var canRefreshNetwork: Bool {
     !isBusy && !isEditingDevice && !isShowingPasswords && !isShowingPreferences
       && !isShowingConfigureOther && !isShowingSetup && !isShowingRestoreConfirmation
-      && !isRestorePending && !isRestoringDefaults && !isInternetPopoverPresented
+      && !isShowingRestartConfirmation && !isRestorePending && !isRestoringDefaults
+      && !isInternetPopoverPresented
       && !isConnectionPopoverPresented
   }
 
@@ -51,6 +52,7 @@ extension AirportAppModel {
   }
 
   func updateDiscoveredDevices(_ devices: [AirportDiscoveredDevice]) {
+    reconcileBaseStationRestartTracking(with: devices)
     updateConnectedTopologyDeviceIdentifiers(from: devices)
     discoveredDevices = devices
     completeRestoreIfResetDeviceAvailable()
@@ -153,7 +155,9 @@ extension AirportAppModel {
   }
 
   var shouldShowDeviceConnectionPrompt: Bool {
-    !mockMode && !hasDevicePopoverDetails && !isBusy && !hasTrustedConnectionPassword
+    !mockMode && !isBusy
+      && (!liveCredentialsAvailable
+        || (!hasDevicePopoverDetails && !hasTrustedConnectionPassword))
   }
 
   var shouldShowDeviceLoading: Bool {
@@ -434,20 +438,53 @@ extension AirportAppModel {
     let visibleDeviceResult = topologyDevicesAfterHidingTransientGenericRecords(
       deduplicatedTopologyDevices(discoveredDevices))
     var devices = visibleDeviceResult.devices
+    appendMissingRestartingTopologyDevices(to: &devices)
     restorePreservedTopologyDevicePlacement(in: &devices)
     devices = devices.map(topologyDeviceWithPreservedDisplay)
     let host = AirportConnection.normalizedHost(connection.host)
     if !visibleDeviceResult.hidTransientGenericDevice, hasDevicePopoverDetails, !host.isEmpty,
       !devices.contains(where: { isKnownConnectedTopologyDevice($0, connectionHost: host) })
     {
-      devices.append(
+      let connectedDevice =
         AirportDiscoveredDevice(
           id: "connected-\(host)",
           name: baseStation.name.isEmpty ? host : baseStation.name,
           hostName: host
-        ))
+        )
+      devices.append(topologyDeviceWithPreservedDisplay(connectedDevice))
     }
     return devices
+  }
+
+  private func appendMissingRestartingTopologyDevices(
+    to devices: inout [AirportDiscoveredDevice]
+  ) {
+    let trackers = baseStationRestartTrackers.values.sorted {
+      ($0.displaySnapshot.rootIndex ?? Int.max) < ($1.displaySnapshot.rootIndex ?? Int.max)
+    }
+    for tracker in trackers {
+      guard
+        !devices.contains(where: {
+          baseStationRestartTracker(tracker, matches: $0)
+        })
+      else {
+        continue
+      }
+      let snapshot = tracker.displaySnapshot
+      let host = tracker.connectionHosts.first ?? ""
+      let placeholder = AirportDiscoveredDevice(
+        id: "restarting-\(tracker.id.uuidString.lowercased())",
+        name: snapshot.displayName,
+        hostName: host,
+        identifiers: tracker.stableIdentifiers,
+        modelName: snapshot.modelName,
+        productID: snapshot.productID)
+      if let targetIndex = snapshot.rootIndex {
+        devices.insert(placeholder, at: min(targetIndex, devices.count))
+      } else {
+        devices.append(placeholder)
+      }
+    }
   }
 
   private func topologyDevicesAfterHidingTransientGenericRecords(
@@ -472,6 +509,7 @@ extension AirportAppModel {
     return hasRecentTopologyDisplaySnapshot
       || updatingBaseStationDisplaySnapshot != nil
       || updatingBaseStationHost != nil
+      || !baseStationRestartTrackers.isEmpty
   }
 
   private var hasRecentTopologyDisplaySnapshot: Bool {
@@ -504,10 +542,19 @@ extension AirportAppModel {
       return device
     }
     var device = device
-    if Self.shouldReplaceUpdatingTopologyModelName(device.modelName) {
+    let preservesActiveUpdateIdentity =
+      (updatingBaseStationDisplaySnapshot != nil || isTopologyDeviceRestarting(device))
+      && isTopologyDeviceUpdating(device)
+    if (preservesActiveUpdateIdentity
+      && !Self.shouldReplaceUpdatingTopologyModelName(snapshot.modelName))
+      || Self.shouldReplaceUpdatingTopologyModelName(device.modelName)
+    {
       device.modelName = snapshot.modelName
     }
-    if Self.shouldReplaceUpdatingTopologyProductID(device.productID) {
+    if (preservesActiveUpdateIdentity
+      && !Self.shouldReplaceUpdatingTopologyProductID(snapshot.productID))
+      || Self.shouldReplaceUpdatingTopologyProductID(device.productID)
+    {
       device.productID = snapshot.productID
     }
     return device
@@ -516,6 +563,9 @@ extension AirportAppModel {
   private func preservedTopologyDisplaySnapshot(
     for device: AirportDiscoveredDevice
   ) -> TopologyDeviceDisplaySnapshot? {
+    if let tracker = baseStationRestartTracker(matching: device) {
+      return tracker.displaySnapshot
+    }
     if let snapshot = updatingBaseStationDisplaySnapshot,
       isTopologyDeviceUpdateDisplayCandidate(device, snapshot: snapshot)
     {
@@ -996,6 +1046,9 @@ extension AirportAppModel {
     if device.sharesStableIdentity(with: updatingBaseStationDeviceIdentifiers) {
       score += 2
     }
+    if isTopologyDeviceRestarting(device) {
+      score += 2
+    }
     if !AirportConnection.normalizedHost(device.hostName).isEmpty {
       score += 1
     }
@@ -1150,6 +1203,9 @@ extension AirportAppModel {
   }
 
   func deselectTopologyDevice(_ device: AirportDiscoveredDevice) {
+    // Restart and restore confirmations replace the device popover with a
+    // sheet. Preserve the selected target across that presentation handoff.
+    guard !isShowingRestartConfirmation, !isShowingRestoreConfirmation else { return }
     if selectedTopologyDeviceID == device.id {
       selectedTopologyDeviceID = nil
       selectedTopologyDeviceIdentifiers = []
@@ -1157,6 +1213,9 @@ extension AirportAppModel {
   }
 
   func isTopologyDeviceUpdating(_ device: AirportDiscoveredDevice) -> Bool {
+    if isTopologyDeviceRestarting(device) {
+      return true
+    }
     if let updatingBaseStationDeviceID, updatingBaseStationDeviceID == device.id {
       return true
     }

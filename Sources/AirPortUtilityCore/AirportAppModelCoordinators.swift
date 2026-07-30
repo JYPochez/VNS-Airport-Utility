@@ -21,6 +21,15 @@ final class TopologyStore {
   var displaySnapshotsByHost: [String: TopologyDeviceDisplaySnapshot] = [:]
   var firmwareBadgeSnapshotsByIdentifier: [String: FirmwareBadgeSnapshot] = [:]
   var pendingConnectionHost: String?
+  var restartTrackers: [UUID: BaseStationRestartTracker] = [:]
+  var restartTimeoutTasks: [UUID: Task<Void, Never>] = [:]
+  var restartRecoveryTasks: [UUID: Task<Void, Never>] = [:]
+  var restartTimeoutNanoseconds: UInt64 = 180_000_000_000
+  var restartPollIntervalNanoseconds: UInt64 = 1_000_000_000
+  var restartProbeTimeout: TimeInterval = 3
+  var restartProbeOverride:
+    (@MainActor (AirportConnection, Bool, Bool) async -> Bool)?
+  var restartStatusTrackerID: UUID?
 }
 
 @MainActor

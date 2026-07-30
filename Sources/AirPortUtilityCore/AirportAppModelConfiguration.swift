@@ -55,8 +55,13 @@ extension AirportAppModel {
   }
 
   public func showPasswords() {
+    guard canShowPasswords else { return }
     prepareAuxiliarySheetPresentation()
     isShowingPasswords = true
+  }
+
+  public var canShowPasswords: Bool {
+    selectedTopologyDevice() != nil
   }
 
   public func showPreferences() {
@@ -73,6 +78,8 @@ extension AirportAppModel {
     isEditingDevice = false
     isDevicePopoverPresented = false
     isInternetPopoverPresented = false
+    isShowingRestartConfirmation = false
+    isShowingRestoreConfirmation = false
     clearAuxiliarySheets()
   }
 

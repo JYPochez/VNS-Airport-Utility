@@ -8,6 +8,7 @@ final class AirPortBonjourBrowser: NSObject {
   private let onChange: @MainActor ([AirportDiscoveredDevice]) -> Void
   private var browsers: [NetServiceBrowser] = []
   private var services: [String: NetService] = [:]
+  private var txtRecords: [String: Data] = [:]
 
   init(onChange: @escaping @MainActor ([AirportDiscoveredDevice]) -> Void) {
     self.onChange = onChange
@@ -31,10 +32,12 @@ final class AirPortBonjourBrowser: NSObject {
     }
     browsers.removeAll()
     for service in services.values {
+      service.stopMonitoring()
       service.stop()
       service.delegate = nil
     }
     services.removeAll()
+    txtRecords.removeAll()
     publish()
   }
 
@@ -55,7 +58,9 @@ final class AirPortBonjourBrowser: NSObject {
   }
 
   private func device(from service: NetService) -> AirportDiscoveredDevice {
-    let txtRecord = service.txtRecordData().map(NetService.dictionary(fromTXTRecord:)) ?? [:]
+    let txtRecord =
+      (txtRecords[key(for: service)] ?? service.txtRecordData())
+      .map(NetService.dictionary(fromTXTRecord:)) ?? [:]
     let txtFields = Self.airportTXTFields(from: txtRecord)
     return AirportDiscoveredDevice(
       id: key(for: service),
@@ -161,8 +166,16 @@ extension AirPortBonjourBrowser: NetServiceBrowserDelegate {
   func netServiceBrowser(
     _ browser: NetServiceBrowser, didFind service: NetService, moreComing: Bool
   ) {
-    services[key(for: service)] = service
+    let serviceKey = key(for: service)
+    if let previousService = services[serviceKey], previousService !== service {
+      previousService.stopMonitoring()
+      previousService.stop()
+      previousService.delegate = nil
+      txtRecords.removeValue(forKey: serviceKey)
+    }
+    services[serviceKey] = service
     service.delegate = self
+    service.startMonitoring()
     service.resolve(withTimeout: 5)
     if !moreComing {
       publish()
@@ -172,7 +185,13 @@ extension AirPortBonjourBrowser: NetServiceBrowserDelegate {
   func netServiceBrowser(
     _ browser: NetServiceBrowser, didRemove service: NetService, moreComing: Bool
   ) {
-    services.removeValue(forKey: key(for: service))
+    let serviceKey = key(for: service)
+    guard let storedService = services[serviceKey], storedService === service else { return }
+    services.removeValue(forKey: serviceKey)
+    storedService.stopMonitoring()
+    storedService.stop()
+    storedService.delegate = nil
+    txtRecords.removeValue(forKey: serviceKey)
     if !moreComing {
       publish()
     }
@@ -185,12 +204,21 @@ extension AirPortBonjourBrowser: NetServiceBrowserDelegate {
 
 extension AirPortBonjourBrowser: NetServiceDelegate {
   func netServiceDidResolveAddress(_ sender: NetService) {
-    services[key(for: sender)] = sender
+    let serviceKey = key(for: sender)
+    guard services[serviceKey] === sender else { return }
+    publish()
+  }
+
+  func netService(_ sender: NetService, didUpdateTXTRecord data: Data) {
+    let serviceKey = key(for: sender)
+    guard services[serviceKey] === sender else { return }
+    txtRecords[serviceKey] = data
     publish()
   }
 
   func netService(_ sender: NetService, didNotResolve errorDict: [String: NSNumber]) {
-    services[key(for: sender)] = sender
+    let serviceKey = key(for: sender)
+    guard services[serviceKey] === sender else { return }
     publish()
   }
 }

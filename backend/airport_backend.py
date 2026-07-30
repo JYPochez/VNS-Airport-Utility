@@ -496,6 +496,74 @@ def send_property_stream(
         label, status = first_error
         raise RuntimeError(f"property {label} returned ACP status {status}")
 
+def write_property_stream(
+    host: str,
+    password: str,
+    setting: str,
+    value: bytes,
+    request_flags: int = FIRMWARE_REQUEST_FLAGS,
+) -> None:
+    """Write one property through an authenticated encrypted ACP stream."""
+
+    sock, transport = open_encrypted_transport(host, password)
+    with sock:
+        send_property_stream(
+            transport,
+            setting,
+            value,
+            request_flags=request_flags,
+        )
+
+def modern_property_write_main(argv: list[str] | None = None) -> int:
+    """Send a direct command-0x15 property write over modern encrypted ACP."""
+
+    parser = argparse.ArgumentParser(
+        description="Write one AirPort property through an encrypted ACP stream."
+    )
+    parser.add_argument("host", help="AirPort base station IP address or hostname")
+    parser.add_argument("--password", required=True, help="admin password")
+    parser.add_argument("--setting", required=True, help="four-character ACP setting name")
+    value_group = parser.add_mutually_exclusive_group(required=True)
+    value_group.add_argument("--value", help="raw UTF-8 property value")
+    value_group.add_argument("--value-json", help="typed JSON property value")
+    parser.add_argument(
+        "--request-flags",
+        type=lambda value: int(value, 0),
+        default=FIRMWARE_REQUEST_FLAGS,
+        help="ACP request flags for the property stream; default: 4",
+    )
+    args = parser.parse_args(argv)
+
+    try:
+        validate_setting_name(args.setting)
+        if not 0 <= args.request_flags <= 0xFFFFFFFF:
+            raise ValueError("--request-flags must fit in an unsigned 32-bit integer")
+
+        if args.value_json is not None:
+            try:
+                value = value_from_json_setting(json.loads(args.value_json))
+            except json.JSONDecodeError as exc:
+                raise ValueError(f"--value-json is not valid JSON: {exc}") from None
+            if not isinstance(value, bytes):
+                raise ValueError(
+                    "--value-json must decode to bytes for a direct property-stream write"
+                )
+        else:
+            value = args.value.encode("utf-8")
+
+        write_property_stream(
+            args.host,
+            args.password,
+            args.setting,
+            value,
+            request_flags=args.request_flags,
+        )
+        print(f"encrypted ACP property stream accepted: {args.setting}.")
+        return 0
+    except (OSError, RuntimeError, ValueError, TypeError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
 def prepare_firmware_upload_session(transport: ACPEncryptedTransport) -> dict[str, Any]:
     """Run AirPort Utility's same-session firmware pre-upload probes."""
 
@@ -1570,7 +1638,7 @@ def legacy_write_main(argv: list[str] | None = None) -> int:
 
 def main() -> int:
     argv = sys.argv[1:]
-    commands = {"read", "write", "legacy-read", "legacy-write"}
+    commands = {"read", "write", "property-write", "legacy-read", "legacy-write"}
     if argv and argv[0] not in commands:
         if "--restart" in argv:
             return legacy_write_main(argv)
@@ -1585,6 +1653,8 @@ def main() -> int:
         return modern_read_main(remaining)
     if namespace.command == "write":
         return modern_write_main(remaining)
+    if namespace.command == "property-write":
+        return modern_property_write_main(remaining)
     if namespace.command == "legacy-read":
         return legacy_read_main(remaining)
     if namespace.command == "legacy-write":

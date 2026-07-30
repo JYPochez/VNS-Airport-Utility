@@ -255,7 +255,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     menu.addItem(
       item("Show Passwords…", action: #selector(showPasswords(_:)), target: self))
     menu.addItem(NSMenuItem.separator())
-    menu.addItem(disabledItem("Restart…"))
+    menu.addItem(
+      item("Restart…", action: #selector(restartBaseStation(_:)), target: self))
     menu.addItem(
       item(
         "Restore Default Settings...", action: #selector(restoreDefaultSettings(_:)),
@@ -371,6 +372,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     model.refreshNetwork()
   }
 
+  @objc private func restartBaseStation(_ sender: Any?) {
+    showMainWindow()
+    model.requestRestartBaseStation()
+  }
+
   @objc private func restoreDefaultSettings(_ sender: Any?) {
     showMainWindow()
     model.requestRestoreDefaultSettings()
@@ -379,6 +385,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
   @objc func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
     if menuItem.action == #selector(refreshNetwork(_:)) {
       return model.canRefreshNetwork && windowController?.window?.attachedSheet == nil
+    }
+    if menuItem.action == #selector(showPasswords(_:)) {
+      return model.canShowPasswords
+    }
+    if menuItem.action == #selector(restartBaseStation(_:)) {
+      return model.canRequestRestartBaseStation
     }
     if menuItem.action == #selector(restoreDefaultSettings(_:)) {
       return model.canRequestRestoreDefaultSettings

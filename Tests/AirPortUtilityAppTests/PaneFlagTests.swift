@@ -648,6 +648,64 @@ final class PaneFlagTests: XCTestCase {
     XCTAssertEqual(AirportAppModel().deviceStatusText(for: device), "Default password")
   }
 
+  func testBonjourTXTRecordUpdateClearsTransientProblemWithoutRescan() async throws {
+    var updates: [[AirportDiscoveredDevice]] = []
+    let browser = AirPortBonjourBrowser { devices in
+      updates.append(devices)
+    }
+    defer { browser.stop() }
+    let service = NetService(
+      domain: "local.",
+      type: "_airport._tcp.",
+      name: "airport extreme",
+      port: 5009)
+    let discoveryBrowser = NetServiceBrowser()
+    let identityFields = [
+      "syAP": Data("120".utf8),
+      "waMA": Data("80-EA-96-E7-9E-E3".utf8),
+    ]
+    var warningFields = identityFields
+    warningFields["prob"] = Data("nDNS".utf8)
+
+    browser.netServiceBrowser(
+      discoveryBrowser, didFind: service, moreComing: false)
+    await Task.yield()
+    browser.netService(
+      service,
+      didUpdateTXTRecord: NetService.data(fromTXTRecord: warningFields))
+    await Task.yield()
+
+    let warningDevice = try XCTUnwrap(updates.last?.first)
+    XCTAssertEqual(warningDevice.problemCodes, ["nDNS"])
+    XCTAssertEqual(AirportAppModel().deviceStatusText(for: warningDevice), "No DNS servers configured")
+
+    browser.netService(
+      service,
+      didUpdateTXTRecord: NetService.data(fromTXTRecord: identityFields))
+    await Task.yield()
+
+    let healthyDevice = try XCTUnwrap(updates.last?.first)
+    XCTAssertTrue(healthyDevice.problemCodes.isEmpty)
+    XCTAssertEqual(AirportAppModel().deviceStatusText(for: healthyDevice), "Working normally")
+
+    browser.netServiceBrowser(
+      discoveryBrowser, didRemove: service, moreComing: false)
+    await Task.yield()
+
+    XCTAssertTrue(try XCTUnwrap(updates.last).isEmpty)
+    let updateCountAfterRemoval = updates.count
+
+    browser.netService(
+      service,
+      didUpdateTXTRecord: NetService.data(fromTXTRecord: warningFields))
+    browser.netServiceDidResolveAddress(service)
+    browser.netService(service, didNotResolve: [:])
+    await Task.yield()
+
+    XCTAssertEqual(updates.count, updateCountAfterRemoval)
+    XCTAssertTrue(try XCTUnwrap(updates.last).isEmpty)
+  }
+
   func testVisiblePanesFollowDeviceCapabilities() {
     let express = AirportAppModel()
     express.applyAuthoritativeBaseStationIdentity(
@@ -1604,6 +1662,10 @@ final class PaneFlagTests: XCTestCase {
 
   func testShowPasswordsDismissesOtherMenuSheets() {
     let model = AirportAppModel()
+    let device = AirportDiscoveredDevice(
+      id: "selected", name: "Selected Capsule", hostName: "selected.local.")
+    model.updateDiscoveredDevices([device])
+    model.selectTopologyDevice(device)
     model.isShowingPreferences = true
     model.isShowingConfigureOther = true
 
@@ -3924,6 +3986,85 @@ final class PaneFlagTests: XCTestCase {
     try await waitForIdle(model)
 
     XCTAssertFalse(model.isTopologyDeviceUpdating(device))
+  }
+
+  func testActiveRestartPreservesTowerExtremeIconAgainstPlausibleOlderProductRecord()
+    throws
+  {
+    let model = AirportAppModel()
+    model.connection.host = "192.168.4.20"
+    let stableIdentifiers = [
+      "wama:80-ea-96-e7-9e-e3",
+      "rama:80-ea-96-ed-08-ad",
+    ]
+    let towerExtreme = AirportDiscoveredDevice(
+      id: "local|_airport._tcp.|airport-extreme",
+      name: "airport extreme",
+      hostName: "airport-extreme.local",
+      addresses: ["192.168.4.20"],
+      identifiers: stableIdentifiers,
+      modelName: "AirPort Extreme",
+      productID: "120")
+    model.updateDiscoveredDevices([towerExtreme])
+    model.selectTopologyDevice(towerExtreme)
+    model.beginBaseStationUpdate(requestHost: "192.168.4.20")
+
+    let transientOlderExtreme = AirportDiscoveredDevice(
+      id: "local|_airport._tcp.|airport-extreme-restarting",
+      name: "airport extreme",
+      hostName: "airport-extreme.local",
+      addresses: ["192.168.4.20"],
+      identifiers: stableIdentifiers,
+      modelName: "AirPort Extreme",
+      productID: "117")
+    model.updateDiscoveredDevices([transientOlderExtreme])
+
+    let updatingDevice = try XCTUnwrap(model.visibleTopologyDevices.first)
+    XCTAssertTrue(model.isTopologyDeviceUpdating(updatingDevice))
+    XCTAssertEqual(updatingDevice.productID, "120")
+    XCTAssertEqual(updatingDevice.topologyImageName, "AirPort-8-3D-cropped~mac.tiff")
+
+    model.clearBaseStationUpdate(requestHost: "192.168.4.20")
+    model.updateDiscoveredDevices([towerExtreme])
+
+    let recoveredDevice = try XCTUnwrap(model.visibleTopologyDevices.first)
+    XCTAssertFalse(model.isTopologyDeviceUpdating(recoveredDevice))
+    XCTAssertEqual(recoveredDevice.productID, "120")
+    XCTAssertEqual(recoveredDevice.topologyImageName, "AirPort-8-3D-cropped~mac.tiff")
+  }
+
+  func testActiveRestartPreservesTowerExtremeIconWhenBonjourDeviceDisappears() throws {
+    let model = AirportAppModel()
+    model.connection.host = "192.168.4.20"
+    model.applyAuthoritativeBaseStationIdentity(
+      readName: "airport extreme",
+      serialNumber: "C86TEST123",
+      version: "7.9.1",
+      productID: "120")
+    let towerExtreme = AirportDiscoveredDevice(
+      id: "local|_airport._tcp.|airport-extreme",
+      name: "airport extreme",
+      hostName: "airport-extreme.local",
+      addresses: ["192.168.4.20"],
+      identifiers: [
+        "wama:80-ea-96-e7-9e-e3",
+        "rama:80-ea-96-ed-08-ad",
+      ],
+      modelName: "AirPort Extreme",
+      productID: "120")
+    model.updateDiscoveredDevices([towerExtreme])
+    model.selectTopologyDevice(towerExtreme)
+    model.beginBaseStationUpdate(requestHost: "192.168.4.20")
+
+    model.updateDiscoveredDevices([])
+
+    let connectedDevice = try XCTUnwrap(model.visibleTopologyDevices.first)
+    XCTAssertEqual(connectedDevice.id, "connected-192.168.4.20")
+    XCTAssertTrue(model.isTopologyDeviceUpdating(connectedDevice))
+    XCTAssertEqual(connectedDevice.displayName, "airport extreme")
+    XCTAssertEqual(connectedDevice.modelName, "AirPort Extreme")
+    XCTAssertEqual(connectedDevice.productID, "120")
+    XCTAssertEqual(connectedDevice.topologyImageName, "AirPort-8-3D-cropped~mac.tiff")
   }
 
   func testUpdatingTopologyDevicePreservesIconAndPlacementDuringRestartDiscoveryChurn()

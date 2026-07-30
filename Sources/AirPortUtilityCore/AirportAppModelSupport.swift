@@ -16,6 +16,16 @@ struct TopologyDeviceDisplaySnapshot {
   var expiresAt: Date?
 }
 
+struct BaseStationRestartTracker {
+  var id: UUID
+  var deviceID: String
+  var stableIdentifiers: [String]
+  var connectionHosts: [String]
+  var displaySnapshot: TopologyDeviceDisplaySnapshot
+  var didDisappearFromBonjour: Bool
+  var didFailActiveProbe: Bool
+}
+
 struct CachedConnectionPassword {
   var password: String
   var rememberPassword: Bool

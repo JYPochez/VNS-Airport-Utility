@@ -58,7 +58,7 @@ struct AirPortSetupState: Equatable {
 extension AirportAppModel {
   public var canRequestRestoreDefaultSettings: Bool {
     !isBusy && !isRestorePending && !isRestoringDefaults && !isShowingSetup
-      && (selectedTopologyDevice() != nil || !connection.host.isEmpty)
+      && !isShowingRestartConfirmation && selectedTopologyDevice() != nil
   }
 
   var setupDeviceModelName: String {
@@ -99,6 +99,7 @@ extension AirportAppModel {
       progressText: "Examining the base station…")
     isDevicePopoverPresented = false
     isEditingDevice = false
+    isShowingRestartConfirmation = false
     isShowingRestoreConfirmation = false
     isWaitingForSetupRestart = false
     didSetupDeviceDisappear = false
@@ -177,12 +178,21 @@ extension AirportAppModel {
 
   public func requestRestoreDefaultSettings() {
     guard canRequestRestoreDefaultSettings else { return }
-    isDevicePopoverPresented = false
+    guard mockMode || liveCredentialsAvailable else {
+      presentSelectedDeviceConnectionPrompt()
+      return
+    }
     isShowingRestoreConfirmation = true
+    isDevicePopoverPresented = false
+    clearAuxiliarySheets()
   }
 
   public func restoreDefaultSettings() {
     guard !isRestoringDefaults, !isRestorePending else { return }
+    guard mockMode || liveCredentialsAvailable else {
+      presentSelectedDeviceConnectionPrompt()
+      return
+    }
     let activeConnection = connection
     let deviceIdentifiers =
       selectedTopologyDeviceIdentifiers.isEmpty
@@ -807,6 +817,31 @@ struct AirPortSetupSheet: View {
       else { TextField("", text: text).textFieldStyle(.roundedBorder) }
     }
     .frame(width: 455)
+  }
+}
+
+struct RestartBaseStationSheet: View {
+  @EnvironmentObject private var model: AirportAppModel
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 16) {
+      Text("Restart Base Station?").font(.system(size: 15, weight: .semibold))
+      Text(
+        "The device and its network services will be temporarily unavailable. Are you sure you want to continue?"
+      )
+      .font(.system(size: 13))
+      .fixedSize(horizontal: false, vertical: true)
+      HStack {
+        Spacer()
+        Button("Cancel") { model.isShowingRestartConfirmation = false }
+          .accessibilityIdentifier("restart.cancel")
+        Button("Continue") { model.restartBaseStation() }
+          .keyboardShortcut(.defaultAction)
+          .accessibilityIdentifier("restart.continue")
+      }
+    }
+    .padding(20)
+    .frame(width: 430)
   }
 }
 

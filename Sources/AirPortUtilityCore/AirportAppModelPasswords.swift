@@ -10,6 +10,18 @@ extension AirportAppModel {
       && !connection.password.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
   }
 
+  func presentSelectedDeviceConnectionPrompt() {
+    isShowingRestartConfirmation = false
+    isShowingRestoreConfirmation = false
+    isDevicePopoverPresented = true
+    isInternetPopoverPresented = false
+    clearAuxiliarySheets()
+    if connection.password.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+      hasTrustedConnectionPassword = false
+    }
+    updateIdleConnectionStatus()
+  }
+
   func loadSavedPasswordForConnectionHost() {
     loadSavedPasswordForConnectionHost(device: selectedTopologyDevice(), fallbackHosts: [])
   }

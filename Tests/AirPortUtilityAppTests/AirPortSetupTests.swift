@@ -90,21 +90,469 @@ final class AirPortSetupTests: XCTestCase {
     XCTAssertTrue(model.isShowingSetup)
   }
 
-  func testRestoreConfirmationRequiresAConnectedOrSelectedDevice() {
+  func testBaseStationMenuCommandsRequireASelectedDevice() {
     let model = AirportAppModel()
-    model.connection.host = ""
+
+    XCTAssertFalse(model.canShowPasswords)
+    XCTAssertFalse(model.canRequestRestartBaseStation)
+    XCTAssertFalse(model.canRequestRestoreDefaultSettings)
+    model.showPasswords()
+    model.requestRestartBaseStation()
     model.requestRestoreDefaultSettings()
+    XCTAssertFalse(model.isShowingPasswords)
+    XCTAssertFalse(model.isShowingRestartConfirmation)
     XCTAssertFalse(model.isShowingRestoreConfirmation)
 
     model.connection.host = "192.0.2.1"
+    XCTAssertFalse(model.canShowPasswords)
+    XCTAssertFalse(model.canRequestRestartBaseStation)
+    XCTAssertFalse(model.canRequestRestoreDefaultSettings)
+
+    let device = AirportDiscoveredDevice(
+      id: "selected", name: "Selected AirPort", hostName: "192.0.2.1")
+    model.updateDiscoveredDevices([device])
+    model.selectTopologyDevice(device)
+
+    XCTAssertTrue(model.canShowPasswords)
+    XCTAssertTrue(model.canRequestRestartBaseStation)
+    XCTAssertTrue(model.canRequestRestoreDefaultSettings)
+    model.connection.password = "password"
+    model.hasTrustedConnectionPassword = true
+    model.isDevicePopoverPresented = true
+    model.requestRestartBaseStation()
+    XCTAssertTrue(model.isShowingRestartConfirmation)
+    XCTAssertFalse(model.isDevicePopoverPresented)
+    model.deselectTopologyDevice(device)
+    XCTAssertEqual(model.selectedTopologyDeviceID, device.id)
+    model.isShowingRestartConfirmation = false
+    model.isDevicePopoverPresented = true
     model.requestRestoreDefaultSettings()
     XCTAssertTrue(model.isShowingRestoreConfirmation)
+    XCTAssertFalse(model.isDevicePopoverPresented)
+    model.deselectTopologyDevice(device)
+    XCTAssertEqual(model.selectedTopologyDeviceID, device.id)
 
     model.isRestoringDefaults = true
     XCTAssertFalse(model.canRequestRestoreDefaultSettings)
     model.isRestoringDefaults = false
     model.isShowingSetup = true
     XCTAssertFalse(model.canRequestRestoreDefaultSettings)
+  }
+
+  func testRestartAndRestoreRedirectToCredentialPromptBeforeSendingCommands() {
+    let model = AirportAppModel()
+    let device = AirportDiscoveredDevice(
+      id: "selected", name: "Selected AirPort", hostName: "192.0.2.1")
+    model.updateDiscoveredDevices([device])
+    model.selectTopologyDevice(device)
+
+    XCTAssertTrue(model.canRequestRestartBaseStation)
+    XCTAssertTrue(model.canRequestRestoreDefaultSettings)
+
+    model.requestRestartBaseStation()
+
+    XCTAssertFalse(model.isShowingRestartConfirmation)
+    XCTAssertTrue(model.isDevicePopoverPresented)
+    XCTAssertTrue(model.shouldShowDeviceConnectionPrompt)
+    XCTAssertEqual(model.status, "Enter base station password to load settings.")
+
+    model.connection.password = "password"
+    model.hasTrustedConnectionPassword = true
+    model.requestRestartBaseStation()
+    XCTAssertTrue(model.isShowingRestartConfirmation)
+
+    model.connection.password = ""
+    model.restartBaseStation()
+
+    XCTAssertFalse(model.isShowingRestartConfirmation)
+    XCTAssertTrue(model.isDevicePopoverPresented)
+    XCTAssertTrue(model.shouldShowDeviceConnectionPrompt)
+    XCTAssertTrue(model.baseStationRestartTrackers.isEmpty)
+    XCTAssertFalse(model.isBusy)
+
+    model.requestRestoreDefaultSettings()
+
+    XCTAssertFalse(model.isShowingRestoreConfirmation)
+    XCTAssertTrue(model.isDevicePopoverPresented)
+
+    model.connection.password = "password"
+    model.hasTrustedConnectionPassword = true
+    model.requestRestoreDefaultSettings()
+    XCTAssertTrue(model.isShowingRestoreConfirmation)
+
+    model.connection.password = ""
+    model.restoreDefaultSettings()
+
+    XCTAssertFalse(model.isShowingRestoreConfirmation)
+    XCTAssertTrue(model.isDevicePopoverPresented)
+    XCTAssertTrue(model.shouldShowDeviceConnectionPrompt)
+    XCTAssertFalse(model.isRestoringDefaults)
+    XCTAssertFalse(model.isRestorePending)
+  }
+
+  func testModernRestartUsesCapturedEncryptedEmptyRebootProperty() throws {
+    let model = AirportAppModel()
+    let device = AirportDiscoveredDevice(
+      id: "capsule", name: "Time Capsule", hostName: "time-capsule.local.",
+      productID: "119")
+    model.updateDiscoveredDevices([device])
+    model.selectTopologyDevice(device)
+    model.connection.password = "password"
+
+    let command = model.restartCommand(connection: model.connection)
+
+    XCTAssertEqual(command.first, "property-write")
+    XCTAssertEqual(value(after: "--setting", in: command), "acRB")
+    XCTAssertEqual(value(after: "--password", in: command), "password")
+    XCTAssertEqual(value(after: "--value-json", in: command), #"{"type":"bytes","hex":""}"#)
+    XCTAssertEqual(value(after: "--request-flags", in: command), "0")
+    XCTAssertFalse(command.contains("--streaming"))
+    XCTAssertFalse(command.contains("--acp17"))
+  }
+
+  func testLegacyRestartUsesCapturedStreamingEmptyRebootProperty() {
+    let model = AirportAppModel()
+    model.usesLegacyACP = true
+    let device = AirportDiscoveredDevice(
+      id: "express", name: "AirPort Express", hostName: "airport-express.local.")
+    model.updateDiscoveredDevices([device])
+    model.selectTopologyDevice(device)
+
+    let command = model.restartCommand(connection: model.connection)
+
+    XCTAssertEqual(command.first, "legacy-write")
+    XCTAssertEqual(value(after: "--setting", in: command), "acRB")
+    XCTAssertEqual(value(after: "--request-flags", in: command), "0")
+    XCTAssertTrue(command.contains("--streaming"))
+    XCTAssertFalse(command.contains("--acp17"))
+  }
+
+  func testProductThreeRestartUsesEncryptedLegacyTransport() {
+    let model = AirportAppModel()
+    let device = AirportDiscoveredDevice(
+      id: "spaceship", name: "Graphite AirPort", hostName: "graphite.local.",
+      productID: "3")
+    model.updateDiscoveredDevices([device])
+    model.selectTopologyDevice(device)
+
+    let command = model.restartCommand(connection: model.connection)
+
+    XCTAssertEqual(command.first, "legacy-write")
+    XCTAssertTrue(command.contains("--streaming"))
+    XCTAssertTrue(command.contains("--acp17"))
+  }
+
+  func testOriginalExpressRestartUsesEncryptedLegacyTransport() {
+    let model = AirportAppModel()
+    model.usesLegacyACP = true
+    let device = AirportDiscoveredDevice(
+      id: "express-g", name: "Original AirPort Express", hostName: "express-g.local.",
+      productID: "102")
+    model.updateDiscoveredDevices([device])
+    model.selectTopologyDevice(device)
+
+    let command = model.restartCommand(connection: model.connection)
+
+    XCTAssertEqual(command.first, "legacy-write")
+    XCTAssertTrue(command.contains("--streaming"))
+    XCTAssertTrue(command.contains("--acp17"))
+  }
+
+  func testRestartConfirmationExecutesSelectedDeviceReboot() async throws {
+    let model = AirportAppModel()
+    model.mockMode = true
+    let device = AirportDiscoveredDevice(
+      id: "express", name: "Office Express", hostName: "office-express.local.",
+      identifiers: ["wama:00-11-22-33-44-55"], productID: "115")
+    model.updateDiscoveredDevices([device])
+    model.selectTopologyDevice(device)
+    model.connection.password = "password"
+
+    model.isDevicePopoverPresented = true
+    model.requestRestartBaseStation()
+    model.deselectTopologyDevice(device)
+    model.restartBaseStation()
+
+    for _ in 0..<50 where model.isBusy {
+      try await Task.sleep(nanoseconds: 10_000_000)
+    }
+
+    XCTAssertFalse(model.isShowingRestartConfirmation)
+    XCTAssertFalse(model.isBusy)
+    XCTAssertTrue(model.logs.joined(separator: "\n").contains("acRB"))
+    XCTAssertEqual(model.status, "Office Express restarted. Mock mode.")
+    XCTAssertNil(model.updatingBaseStationDeviceID)
+    XCTAssertTrue(model.updatingBaseStationDeviceIdentifiers.isEmpty)
+  }
+
+  func testPostRestartRefreshFailureClearsStaleUpdatingIndicator() async {
+    let model = AirportAppModel()
+    let device = AirportDiscoveredDevice(
+      id: "express", name: "Office Express", hostName: "office-express.local.",
+      identifiers: ["rama:00-11-22-33-44-55"], productID: "102")
+    model.updateDiscoveredDevices([device])
+    model.selectTopologyDevice(device)
+    let requestHost = AirportConnection.normalizedHost(model.connection.host)
+    model.beginBaseStationUpdate(requestHost: requestHost)
+
+    XCTAssertTrue(model.isTopologyDeviceUpdating(device))
+    XCTAssertEqual(model.deviceStatusText(for: device), "Restarting")
+
+    let refreshTask = Task {
+      await model.refreshSettingsAfterApply(requestHost: requestHost)
+    }
+    await Task.yield()
+    refreshTask.cancel()
+    await refreshTask.value
+
+    XCTAssertNil(model.updatingBaseStationDeviceID)
+    XCTAssertTrue(model.updatingBaseStationDeviceIdentifiers.isEmpty)
+    XCTAssertFalse(model.isTopologyDeviceUpdating(device))
+    XCTAssertEqual(model.deviceStatusText(for: device), "Working normally")
+  }
+
+  func testOverlappingDeviceRestartsTrackEachBonjourLifecycleIndependently() throws {
+    let model = AirportAppModel()
+    let extreme = AirportDiscoveredDevice(
+      id: "extreme",
+      name: "Office Extreme",
+      hostName: "office-extreme.local.",
+      addresses: ["192.168.4.20"],
+      identifiers: ["wama:80-ea-96-e7-9e-e3"],
+      modelName: "AirPort Extreme",
+      productID: "120")
+    let express = AirportDiscoveredDevice(
+      id: "express",
+      name: "Office Express",
+      hostName: "office-express.local.",
+      addresses: ["10.0.1.1"],
+      identifiers: ["wama:00-1b-63-21-f5-8e"],
+      modelName: "AirPort Express",
+      productID: "102")
+    model.updateDiscoveredDevices([extreme, express])
+    model.selectTopologyDevice(extreme)
+    model.connection.password = "password"
+    model.hasLoadedSettings = true
+    let extremeRestartID = model.beginBaseStationRestartTracking(
+      device: extreme, requestHost: extreme.connectionHost)
+    model.markBaseStationRestartCommandAccepted(
+      id: extremeRestartID,
+      requestHost: AirportConnection.normalizedHost(extreme.connectionHost))
+
+    XCTAssertEqual(model.status, "Waiting for Office Extreme to come back online.")
+
+    model.updateDiscoveredDevices([express])
+
+    let restartingExtreme = try XCTUnwrap(
+      model.visibleTopologyDevices.first { $0.displayName == extreme.displayName })
+    XCTAssertTrue(model.isTopologyDeviceRestarting(restartingExtreme))
+    XCTAssertEqual(restartingExtreme.productID, "120")
+    XCTAssertFalse(model.canRequestRestartBaseStation)
+
+    model.selectTopologyDevice(express)
+
+    XCTAssertTrue(model.canRequestRestartBaseStation)
+    model.connection.password = "password"
+    model.hasLoadedSettings = true
+    let expressRestartID = model.beginBaseStationRestartTracking(
+      device: express, requestHost: express.connectionHost)
+    model.markBaseStationRestartCommandAccepted(
+      id: expressRestartID,
+      requestHost: AirportConnection.normalizedHost(express.connectionHost))
+    model.updateDiscoveredDevices([])
+
+    let bothRestarting = model.visibleTopologyDevices
+    XCTAssertEqual(Set(bothRestarting.map(\.displayName)), ["Office Extreme", "Office Express"])
+    XCTAssertTrue(bothRestarting.allSatisfy(model.isTopologyDeviceRestarting))
+    XCTAssertEqual(
+      bothRestarting.first { $0.displayName == extreme.displayName }?.productID, "120")
+    XCTAssertEqual(
+      bothRestarting.first { $0.displayName == express.displayName }?.productID, "102")
+    XCTAssertEqual(model.status, "Waiting for Office Express to come back online.")
+
+    var initializingExpress = express
+    initializingExpress.txtFields = ["prob": "waNI"]
+    model.updateDiscoveredDevices([extreme, initializingExpress])
+
+    let returnedExtreme = try XCTUnwrap(
+      model.visibleTopologyDevices.first { $0.displayName == extreme.displayName })
+    let initializingExpressDevice = try XCTUnwrap(
+      model.visibleTopologyDevices.first { $0.displayName == express.displayName })
+    XCTAssertFalse(model.isTopologyDeviceRestarting(returnedExtreme))
+    XCTAssertTrue(model.isTopologyDeviceRestarting(initializingExpressDevice))
+    XCTAssertEqual(model.status, "Waiting for Office Express to come back online.")
+
+    model.updateDiscoveredDevices([extreme, express])
+
+    XCTAssertTrue(model.baseStationRestartTrackers.isEmpty)
+    XCTAssertTrue(model.visibleTopologyDevices.allSatisfy {
+      !model.isTopologyDeviceRestarting($0)
+    })
+    XCTAssertNil(model.baseStationRestartStatusTrackerID)
+    XCTAssertEqual(model.status, "Connected to office-express.local")
+  }
+
+  func testActiveRestartPollingRequiresOfflineThenOnlineIdentityReads() async throws {
+    let model = AirportAppModel()
+    let device = AirportDiscoveredDevice(
+      id: "extreme",
+      name: "Office Extreme",
+      hostName: "office-extreme.local.",
+      addresses: ["192.168.4.20"],
+      identifiers: ["wama:80-ea-96-e7-9e-e3"],
+      modelName: "AirPort Extreme",
+      productID: "120")
+    model.updateDiscoveredDevices([device])
+    model.selectTopologyDevice(device)
+    model.connection.password = "password"
+    model.hasLoadedSettings = true
+    model.baseStationRestartPollIntervalNanoseconds = 1_000_000
+    var results = [true, false, true]
+    var probedHosts: [String] = []
+    model.baseStationRestartProbeOverride = { connection, usesLegacy, usesACP17 in
+      XCTAssertFalse(usesLegacy)
+      XCTAssertFalse(usesACP17)
+      probedHosts.append(connection.host)
+      return results.removeFirst()
+    }
+    let restartID = model.beginBaseStationRestartTracking(
+      device: device, requestHost: device.connectionHost)
+    model.markBaseStationRestartCommandAccepted(
+      id: restartID,
+      requestHost: AirportConnection.normalizedHost(device.connectionHost))
+    model.startBaseStationRestartRecoveryPolling(
+      id: restartID,
+      connection: model.connection,
+      usesLegacyTransport: false,
+      usesACP17Transport: false)
+
+    for _ in 0..<100 where !model.baseStationRestartTrackers.isEmpty {
+      try await Task.sleep(nanoseconds: 2_000_000)
+    }
+
+    XCTAssertTrue(model.baseStationRestartTrackers.isEmpty)
+    XCTAssertTrue(model.baseStationRestartRecoveryTasks.isEmpty)
+    XCTAssertEqual(probedHosts, Array(repeating: "192.168.4.20", count: 3))
+    XCTAssertEqual(model.status, "Connected to 192.168.4.20")
+    XCTAssertTrue(
+      model.logs.contains("Confirmed Office Extreme went offline while restarting."))
+    XCTAssertTrue(model.logs.contains("Confirmed Office Extreme came back online."))
+  }
+
+  func testStaleBonjourRecordCannotCompleteAnActiveProbeLifecycle() {
+    let model = AirportAppModel()
+    let device = AirportDiscoveredDevice(
+      id: "express",
+      name: "Office Express",
+      hostName: "office-express.local.",
+      identifiers: ["wama:00-1b-63-21-f5-8e"],
+      productID: "102")
+    model.updateDiscoveredDevices([device])
+    let restartID = model.beginBaseStationRestartTracking(
+      device: device, requestHost: device.connectionHost)
+
+    model.recordBaseStationRestartProbeResult(id: restartID, isReachable: false)
+    model.updateDiscoveredDevices([device])
+
+    XCTAssertNotNil(model.baseStationRestartTrackers[restartID])
+    XCTAssertFalse(
+      model.baseStationRestartTrackers[restartID]?.didDisappearFromBonjour ?? true)
+    XCTAssertTrue(model.baseStationRestartTrackers[restartID]?.didFailActiveProbe ?? false)
+
+    model.recordBaseStationRestartProbeResult(id: restartID, isReachable: true)
+
+    XCTAssertNil(model.baseStationRestartTrackers[restartID])
+  }
+
+  func testOverlappingActiveRestartPollersKeepCapturedTransportAndConnection() async throws {
+    let model = AirportAppModel()
+    let extreme = AirportDiscoveredDevice(
+      id: "extreme",
+      name: "Office Extreme",
+      hostName: "office-extreme.local.",
+      identifiers: ["wama:80-ea-96-e7-9e-e3"],
+      productID: "120")
+    let express = AirportDiscoveredDevice(
+      id: "express",
+      name: "Office Express",
+      hostName: "office-express.local.",
+      identifiers: ["wama:00-1b-63-21-f5-8e"],
+      productID: "102")
+    model.updateDiscoveredDevices([extreme, express])
+    model.baseStationRestartPollIntervalNanoseconds = 1_000_000
+    var probesByHost: [String: [(Bool, Bool)]] = [:]
+    model.baseStationRestartProbeOverride = { connection, usesLegacy, usesACP17 in
+      probesByHost[connection.host, default: []].append((usesLegacy, usesACP17))
+      return probesByHost[connection.host, default: []].count > 1
+    }
+    let extremeConnection = AirportConnection(
+      host: extreme.connectionHost, password: "extreme-password")
+    let expressConnection = AirportConnection(
+      host: express.connectionHost, password: "express-password")
+    let extremeID = model.beginBaseStationRestartTracking(
+      device: extreme, requestHost: extreme.connectionHost)
+    let expressID = model.beginBaseStationRestartTracking(
+      device: express, requestHost: express.connectionHost)
+
+    model.startBaseStationRestartRecoveryPolling(
+      id: extremeID,
+      connection: extremeConnection,
+      usesLegacyTransport: false,
+      usesACP17Transport: false)
+    model.startBaseStationRestartRecoveryPolling(
+      id: expressID,
+      connection: expressConnection,
+      usesLegacyTransport: true,
+      usesACP17Transport: true)
+
+    for _ in 0..<100 where !model.baseStationRestartTrackers.isEmpty {
+      try await Task.sleep(nanoseconds: 2_000_000)
+    }
+
+    XCTAssertTrue(model.baseStationRestartTrackers.isEmpty)
+    XCTAssertTrue(model.baseStationRestartRecoveryTasks.isEmpty)
+    XCTAssertEqual(probesByHost["office-extreme.local"]?.count, 2)
+    XCTAssertTrue(
+      probesByHost["office-extreme.local"]?.allSatisfy { !$0.0 && !$0.1 } ?? false)
+    XCTAssertEqual(probesByHost["office-express.local"]?.count, 2)
+    XCTAssertTrue(
+      probesByHost["office-express.local"]?.allSatisfy { $0.0 && $0.1 } ?? false)
+  }
+
+  func testRestartTimeoutReplacesOwnedWaitingStatus() async throws {
+    let model = AirportAppModel()
+    model.baseStationRestartTimeoutNanoseconds = 1_000_000
+    let device = AirportDiscoveredDevice(
+      id: "express", name: "Office Express", hostName: "office-express.local.",
+      identifiers: ["wama:00-1b-63-21-f5-8e"], productID: "102")
+    model.updateDiscoveredDevices([device])
+    model.selectTopologyDevice(device)
+    model.connection.password = "password"
+    model.hasLoadedSettings = true
+    let restartID = model.beginBaseStationRestartTracking(
+      device: device, requestHost: device.connectionHost)
+    model.markBaseStationRestartCommandAccepted(
+      id: restartID,
+      requestHost: AirportConnection.normalizedHost(device.connectionHost))
+    model.baseStationRestartProbeOverride = { _, _, _ in false }
+    model.startBaseStationRestartRecoveryPolling(
+      id: restartID,
+      connection: model.connection,
+      usesLegacyTransport: true,
+      usesACP17Transport: true)
+
+    XCTAssertNotNil(model.baseStationRestartRecoveryTasks[restartID])
+
+    for _ in 0..<50 where !model.baseStationRestartTrackers.isEmpty {
+      try await Task.sleep(nanoseconds: 2_000_000)
+    }
+
+    XCTAssertTrue(model.baseStationRestartTrackers.isEmpty)
+    XCTAssertTrue(model.baseStationRestartRecoveryTasks.isEmpty)
+    XCTAssertNil(model.baseStationRestartStatusTrackerID)
+    XCTAssertEqual(model.status, "Could not confirm Office Express came back online.")
+    XCTAssertTrue(
+      model.logs.contains("Stopped waiting for Office Express to finish restarting."))
   }
 
   func testRestoreUsesCapturedEmptyFactoryResetThenRebootProperties() throws {

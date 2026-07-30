@@ -719,6 +719,70 @@ class ModernPropertyTests(unittest.TestCase):
         self.assertEqual(write.call_args.args[1], "public")
         self.assertEqual(write.call_args.args[2], {"syNm": "spaceship", "acRB": b""})
 
+    def test_modern_property_write_uses_authenticated_encrypted_stream(self):
+        class FakeSocket:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, exc_type, exc, traceback):
+                return False
+
+        transport = object()
+        with mock.patch.object(
+            airport_backend,
+            "open_encrypted_transport",
+            return_value=(FakeSocket(), transport),
+        ) as open_transport, mock.patch.object(
+            airport_backend,
+            "send_property_stream",
+        ) as send_stream:
+            airport_backend.write_property_stream(
+                "extreme.local",
+                "secret",
+                "acRB",
+                b"",
+                request_flags=0,
+            )
+
+        open_transport.assert_called_once_with("extreme.local", "secret")
+        send_stream.assert_called_once_with(
+            transport,
+            "acRB",
+            b"",
+            request_flags=0,
+        )
+
+    def test_modern_property_write_command_decodes_empty_bytes_and_flags(self):
+        with mock.patch.object(
+            airport_backend,
+            "write_property_stream",
+        ) as write, mock.patch(
+            "sys.argv",
+            [
+                "airport_backend.py",
+                "property-write",
+                "extreme.local",
+                "--password",
+                "secret",
+                "--setting",
+                "acRB",
+                "--value-json",
+                '{"type":"bytes","hex":""}',
+                "--request-flags",
+                "0",
+            ],
+        ):
+            result = airport_backend.main()
+
+        self.assertEqual(result, 0)
+        write.assert_called_once_with(
+            "extreme.local",
+            "secret",
+            "acRB",
+            b"",
+            request_flags=0,
+        )
+
     def test_legacy_nonzero_wds_flags_omit_stale_peer_list_from_base_snapshot(self):
         base = (
             '{"wdLs":{"type":"bytes","hex":"00000000000000000000000000000000"},'
