@@ -12,7 +12,7 @@
 #   ./make-app.sh --sign --notarize --zip      + distributable .zip
 #
 # Configuration (environment variables):
-#   BUNDLE_ID                 default VNS.airport.utility
+#   BUNDLE_ID                 overrides Packaging/Local.xcconfig
 #   MARKETING_VERSION         default 0.1.0
 #   CURRENT_PROJECT_VERSION   default 1
 #   SIGN_IDENTITY             default "Developer ID Application" (first match)
@@ -29,7 +29,19 @@ cd "$SCRIPT_DIR"
 
 APP_NAME="AirPort Utility"
 EXECUTABLE_NAME="AirPort Utility"
-BUNDLE_ID=${BUNDLE_ID:-VNS.airport.utility}
+# Bundle identifier resolution, in precedence order:
+#   1. BUNDLE_ID in the environment
+#   2. PRODUCT_BUNDLE_IDENTIFIER in Packaging/Local.xcconfig (gitignored, so a
+#      fork can set its own without modifying a committed file). Xcode reads the
+#      same file, which keeps the two build paths in agreement.
+#   3. the neutral default below
+local_bundle_id() {
+  [ -f Packaging/Local.xcconfig ] || return 0
+  sed -n 's/^[[:space:]]*PRODUCT_BUNDLE_IDENTIFIER[[:space:]]*=[[:space:]]*//p' \
+    Packaging/Local.xcconfig | tail -1 | tr -d '[:space:]'
+}
+BUNDLE_ID=${BUNDLE_ID:-$(local_bundle_id)}
+BUNDLE_ID=${BUNDLE_ID:-io.github.jackhumphries.airport-utility}
 MARKETING_VERSION=${MARKETING_VERSION:-0.1.0}
 CURRENT_PROJECT_VERSION=${CURRENT_PROJECT_VERSION:-1}
 OUTPUT_DIR=${OUTPUT_DIR:-dist}
