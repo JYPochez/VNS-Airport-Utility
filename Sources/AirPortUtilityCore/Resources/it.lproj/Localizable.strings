@@ -39,6 +39,7 @@
 "AirPlay Speaker Name:" = "Nome altoparlante AirPlay:";
 "AirPlay Speaker Password:" = "Password altoparlante AirPlay:";
 "AirPlay passwords do not match." = "Le password AirPlay non corrispondono.";
+"AirPort Base Station" = "Stazione base AirPort";
 "AirPort Configuration" = "Configurazione AirPort";
 "AirPort Express" = "AirPort Express";
 "AirPort Extreme" = "AirPort Extreme";
@@ -56,6 +57,7 @@
 "Allow this network to be extended" = "Consenti l’estensione di questa rete";
 "Alternate" = "Alternativo";
 "Alternate Number:" = "Numero alternativo:";
+"Always On" = "Sempre attiva";
 "Another router appears to be providing NAT upstream of this base station." = "Sembra che un altro router fornisca il NAT a monte di questa stazione base.";
 "Answer on ring must be between 1 and 255." = "Rispondi allo squillo deve essere tra 1 e 255.";
 "Answer on ring:" = "Rispondi allo squillo:";
@@ -90,6 +92,7 @@
 "Choose..." = "Scegli…";
 "Chosen Firmware" = "Firmware scelto";
 "Close" = "Chiudi";
+"Command Log" = "Log dei comandi";
 "Configuration problem" = "Problema di configurazione";
 "Configure IPv6" = "Configura IPv6";
 "Configure IPv6 must be link-local, automatic, or manual." = "Configura IPv6 deve essere link-local, automatico o manuale.";
@@ -112,6 +115,7 @@
 "Could not encode disk account settings." = "Impossibile codificare le impostazioni degli account disco.";
 "Could not encode local access-control settings." = "Impossibile codificare le impostazioni locali di controllo accessi.";
 "Could not encode the combined legacy settings update." = "Impossibile codificare l’aggiornamento combinato delle impostazioni legacy.";
+"Could not find the Time Capsule. Check that it is on this network, or enter its IP address instead of the .local name." = "Time Capsule non trovata. Verifica che sia su questa rete oppure inserisci il suo indirizzo IP anziché il nome .local.";
 "Could not read the base station setup profile." = "Impossibile leggere il profilo di configurazione della stazione base.";
 "Country Code:" = "Codice paese:";
 "Create a new network" = "Crea una rete";
@@ -125,6 +129,7 @@
 "DHCP Lease unit is not supported." = "L’unità di assegnazione DHCP non è supportato.";
 "DHCP Lease:" = "Assegnazione DHCP:";
 "DHCP Message:" = "Messaggio DHCP:";
+"DHCP Only" = "Solo DHCP";
 "DHCP Range Beginning and Ending must use the same supported private subnet, with Ending not before Beginning." = "L’inizio e la fine dell’intervallo DHCP devono usare la stessa sottorete privata supportata e la fine non può precedere l’inizio.";
 "DHCP Range Beginning cannot be empty." = "L’inizio dell’intervallo DHCP non può essere vuoto.";
 "DHCP Range Beginning must be an IPv4 address." = "L’inizio dell’intervallo DHCP deve essere un indirizzo IPv4.";
@@ -132,6 +137,7 @@
 "DHCP Range Ending must be an IPv4 address." = "La fine dell’intervallo DHCP deve essere un indirizzo IPv4.";
 "DHCP Range:" = "Intervallo DHCP:";
 "DHCP Reservations:" = "Prenotazioni DHCP:";
+"DHCP and NAT" = "DHCP e NAT";
 "DNS Server must be an IPv4 address." = "Il server DNS deve essere un indirizzo IPv4.";
 "DNS Servers accepts at most two IPv4 DNS servers." = "Server DNS accetta al massimo due server DNS IPv4.";
 "DNS Servers contains an empty value." = "Server DNS contiene un valore vuoto.";
@@ -151,6 +157,7 @@
 "Disk Password cannot be empty." = "La password del disco non può essere vuota.";
 "Disk Password:" = "Password disco:";
 "Disk Sharing" = "Condivisione disco";
+"Disk information is not available yet." = "Le informazioni sul disco non sono ancora disponibili.";
 "Disk needs repair" = "Il disco necessita riparazione";
 "Disk password" = "Password disco";
 "Disk passwords do not match." = "Le password del disco non corrispondono.";
@@ -159,6 +166,8 @@
 "Domain Name:" = "Nome dominio:";
 "Done" = "Fine";
 "Double NAT" = "NAT doppio";
+"Downloading from Apple" = "Download da Apple";
+"Dry-run completed without output." = "Simulazione completata senza output.";
 "Each local access-control entry must contain a valid MAC address." = "Ogni voce locale di controllo accessi deve contenere un indirizzo MAC valido.";
 "Edit" = "Modifica";
 "Enable AirPlay" = "Attiva AirPlay";
@@ -189,6 +198,7 @@
 "Firmware list loaded. Mock mode." = "Elenco firmware caricato. Modalità simulata.";
 "Firmware update available" = "Aggiornamento firmware disponibile";
 "Firmware upload accepted. Waiting for restart." = "Caricamento firmware accettato. In attesa del riavvio.";
+"Firmware upload completed, but the base station reboot command was not sent." = "Il caricamento del firmware è completato, ma il comando di riavvio della stazione base non è stato inviato.";
 "Firmware uploaded. Restart requested." = "Firmware caricato. Riavvio richiesto.";
 "Gathering information about your network…" = "Raccolta di informazioni sulla rete…";
 "Global Hostname cannot be empty." = "Il nome host globale non può essere vuoto.";
@@ -259,6 +269,7 @@
 "Multicast Rate" = "Velocità multicast";
 "Multicast Rate is not supported." = "La velocità multicast non è supportata.";
 "Multicast Rate:" = "Velocità multicast:";
+"NAT Only" = "Solo NAT";
 "Name" = "Nome";
 "Name:" = "Nome:";
 "Network" = "Rete";
@@ -269,6 +280,7 @@
 "Network Options..." = "Opzioni di rete…";
 "Network Setup" = "Configurazione di rete";
 "Network name" = "Nome rete";
+"Never Disconnect" = "Non disconnettere mai";
 "New AirPort base station" = "Nuova stazione base AirPort";
 "New password" = "Nuova password";
 "New wireless password" = "Nuova password wireless";
@@ -438,6 +450,7 @@
 "Type" = "Tipo";
 "Undo" = "Annulla";
 "Unknown" = "Sconosciuto";
+"Update" = "Aggiorna";
 "Use AOL" = "Usa AOL";
 "Use a single password" = "Usa un’unica password";
 "Use dynamic global hostname" = "Usa nome host globale dinamico";

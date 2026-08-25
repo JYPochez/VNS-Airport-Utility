@@ -80,11 +80,11 @@ struct ConfigurationSheet<Content: View>: View {
         } else {
           Spacer()
         }
-        SheetFooterButton("Cancel", width: 70, identifier: "sheet.cancel") {
+        SheetFooterButton(localized("Cancel"), width: 70, identifier: "sheet.cancel") {
           model.cancelEditing()
         }
         SheetFooterButton(
-          "Update",
+          localized("Update"),
           width: 73,
           isDefault: true,
           isEnabled: model.canApplyPendingChanges,
@@ -116,11 +116,15 @@ struct ConfigurationSheet<Content: View>: View {
     AirPortLayout.configurationSheetWidth(for: model.visiblePanes)
   }
 
+  /// NOTE: `status` is display text, so these comparisons must use the same
+  /// localized values the status was built from. "Connected to ..." and
+  /// "Ready to connect to ..." are still English because they interpolate the
+  /// host; localize those and these prefixes must change with them.
   private var footerStatus: String? {
     let status = model.status.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !status.isEmpty else { return nil }
     guard !status.hasPrefix("Connected"), !status.hasPrefix("Ready to connect"),
-      status != "Not connected"
+      status != localized("Not connected")
     else {
       return nil
     }
@@ -518,7 +522,7 @@ struct CommandPreviewView: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 8) {
       HStack {
-        Text(model.preview?.title ?? "Command Log")
+        Text(model.preview?.title ?? localized("Command Log"))
           .font(.subheadline.weight(.semibold))
         Spacer()
         if model.isBusy {
@@ -530,7 +534,7 @@ struct CommandPreviewView: View {
         Text(AirportCommand.display(AirportCommand.writeScript, preview.redactedArguments))
           .font(.system(.caption, design: .monospaced))
           .textSelection(.enabled)
-        Text(preview.output.isEmpty ? "Dry-run completed without output." : preview.output)
+        Text(preview.output.isEmpty ? localized("Dry-run completed without output.") : preview.output)
           .font(.system(.caption, design: .monospaced))
           .foregroundStyle(.secondary)
           .lineLimit(4)

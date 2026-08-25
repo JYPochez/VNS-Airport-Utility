@@ -74,7 +74,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
       backing: .buffered,
       defer: false
     )
-    window.title = "AirPort Utility"
+    window.title = localized("AirPort Utility")
     window.minSize = window.frameRect(
       forContentRect: NSRect(origin: .zero, size: AirPortMainWindowMetrics.contentSize)
     ).size

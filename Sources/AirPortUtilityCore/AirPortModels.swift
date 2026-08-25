@@ -232,9 +232,9 @@ enum RouterMode: String, CaseIterable, Identifiable, Sendable, Codable {
   var id: String { rawValue }
   var label: String {
     switch self {
-    case .dhcpAndNat: "DHCP and NAT"
-    case .dhcpOnly: "DHCP Only"
-    case .natOnly: "NAT Only"
+    case .dhcpAndNat: localized("DHCP and NAT")
+    case .dhcpOnly: localized("DHCP Only")
+    case .natOnly: localized("NAT Only")
     case .bridge: "Off (Bridge Mode)"
     }
   }
@@ -407,7 +407,7 @@ struct PPPoEConnectionOption: Identifiable, Equatable, Sendable {
   let label: String
 
   static let allCases: [PPPoEConnectionOption] = [
-    PPPoEConnectionOption(value: "always-on", label: "Always On"),
+    PPPoEConnectionOption(value: "always-on", label: localized("Always On")),
     PPPoEConnectionOption(value: "automatic", label: "Automatic"),
     PPPoEConnectionOption(value: "manual", label: "Manual"),
   ]
@@ -884,7 +884,7 @@ struct PPPDialInMaximumConnectOption: Identifiable, Equatable, Sendable {
   let label: String
 
   static let allCases = [
-    PPPDialInMaximumConnectOption(seconds: 0, label: "Never Disconnect"),
+    PPPDialInMaximumConnectOption(seconds: 0, label: localized("Never Disconnect")),
     PPPDialInMaximumConnectOption(seconds: 900, label: "15 minutes"),
     PPPDialInMaximumConnectOption(seconds: 1_800, label: "30 minutes"),
     PPPDialInMaximumConnectOption(seconds: 3_600, label: "1 hour"),
@@ -1069,7 +1069,7 @@ enum FirmwareTransferPhase: String, Equatable, Sendable {
     case .none:
       ""
     case .download:
-      "Downloading from Apple"
+      localized("Downloading from Apple")
     case .upload:
       "Uploading to AirPort"
     case .program:
@@ -1233,7 +1233,7 @@ struct AirportDiscoveredDevice: Identifiable, Equatable, Sendable {
   var displayModelName: String {
     let modelName = modelName.trimmingCharacters(in: .whitespacesAndNewlines)
     if !modelName.isEmpty { return modelName }
-    return "AirPort Base Station"
+    return localized("AirPort Base Station")
   }
 
   var connectionHost: String {

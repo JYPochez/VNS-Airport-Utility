@@ -39,6 +39,7 @@
 "AirPlay Speaker Name:" = "AirPlay Speaker Name:";
 "AirPlay Speaker Password:" = "AirPlay Speaker Password:";
 "AirPlay passwords do not match." = "AirPlay passwords do not match.";
+"AirPort Base Station" = "AirPort Base Station";
 "AirPort Configuration" = "AirPort Configuration";
 "AirPort Express" = "AirPort Express";
 "AirPort Extreme" = "AirPort Extreme";
@@ -56,6 +57,7 @@
 "Allow this network to be extended" = "Allow this network to be extended";
 "Alternate" = "Alternate";
 "Alternate Number:" = "Alternate Number:";
+"Always On" = "Always On";
 "Another router appears to be providing NAT upstream of this base station." = "Another router appears to be providing NAT upstream of this base station.";
 "Answer on ring must be between 1 and 255." = "Answer on ring must be between 1 and 255.";
 "Answer on ring:" = "Answer on ring:";
@@ -90,6 +92,7 @@
 "Choose..." = "Choose...";
 "Chosen Firmware" = "Chosen Firmware";
 "Close" = "Close";
+"Command Log" = "Command Log";
 "Configuration problem" = "Configuration problem";
 "Configure IPv6" = "Configure IPv6";
 "Configure IPv6 must be link-local, automatic, or manual." = "Configure IPv6 must be link-local, automatic, or manual.";
@@ -112,6 +115,7 @@
 "Could not encode disk account settings." = "Could not encode disk account settings.";
 "Could not encode local access-control settings." = "Could not encode local access-control settings.";
 "Could not encode the combined legacy settings update." = "Could not encode the combined legacy settings update.";
+"Could not find the Time Capsule. Check that it is on this network, or enter its IP address instead of the .local name." = "Could not find the Time Capsule. Check that it is on this network, or enter its IP address instead of the .local name.";
 "Could not read the base station setup profile." = "Could not read the base station setup profile.";
 "Country Code:" = "Country Code:";
 "Create a new network" = "Create a new network";
@@ -125,6 +129,7 @@
 "DHCP Lease unit is not supported." = "DHCP Lease unit is not supported.";
 "DHCP Lease:" = "DHCP Lease:";
 "DHCP Message:" = "DHCP Message:";
+"DHCP Only" = "DHCP Only";
 "DHCP Range Beginning and Ending must use the same supported private subnet, with Ending not before Beginning." = "DHCP Range Beginning and Ending must use the same supported private subnet, with Ending not before Beginning.";
 "DHCP Range Beginning cannot be empty." = "DHCP Range Beginning cannot be empty.";
 "DHCP Range Beginning must be an IPv4 address." = "DHCP Range Beginning must be an IPv4 address.";
@@ -132,6 +137,7 @@
 "DHCP Range Ending must be an IPv4 address." = "DHCP Range Ending must be an IPv4 address.";
 "DHCP Range:" = "DHCP Range:";
 "DHCP Reservations:" = "DHCP Reservations:";
+"DHCP and NAT" = "DHCP and NAT";
 "DNS Server must be an IPv4 address." = "DNS Server must be an IPv4 address.";
 "DNS Servers accepts at most two IPv4 DNS servers." = "DNS Servers accepts at most two IPv4 DNS servers.";
 "DNS Servers contains an empty value." = "DNS Servers contains an empty value.";
@@ -151,6 +157,7 @@
 "Disk Password cannot be empty." = "Disk Password cannot be empty.";
 "Disk Password:" = "Disk Password:";
 "Disk Sharing" = "Disk Sharing";
+"Disk information is not available yet." = "Disk information is not available yet.";
 "Disk needs repair" = "Disk needs repair";
 "Disk password" = "Disk password";
 "Disk passwords do not match." = "Disk passwords do not match.";
@@ -159,6 +166,8 @@
 "Domain Name:" = "Domain Name:";
 "Done" = "Done";
 "Double NAT" = "Double NAT";
+"Downloading from Apple" = "Downloading from Apple";
+"Dry-run completed without output." = "Dry-run completed without output.";
 "Each local access-control entry must contain a valid MAC address." = "Each local access-control entry must contain a valid MAC address.";
 "Edit" = "Edit";
 "Enable AirPlay" = "Enable AirPlay";
@@ -189,6 +198,7 @@
 "Firmware list loaded. Mock mode." = "Firmware list loaded. Mock mode.";
 "Firmware update available" = "Firmware update available";
 "Firmware upload accepted. Waiting for restart." = "Firmware upload accepted. Waiting for restart.";
+"Firmware upload completed, but the base station reboot command was not sent." = "Firmware upload completed, but the base station reboot command was not sent.";
 "Firmware uploaded. Restart requested." = "Firmware uploaded. Restart requested.";
 "Gathering information about your network…" = "Gathering information about your network…";
 "Global Hostname cannot be empty." = "Global Hostname cannot be empty.";
@@ -259,6 +269,7 @@
 "Multicast Rate" = "Multicast Rate";
 "Multicast Rate is not supported." = "Multicast Rate is not supported.";
 "Multicast Rate:" = "Multicast Rate:";
+"NAT Only" = "NAT Only";
 "Name" = "Name";
 "Name:" = "Name:";
 "Network" = "Network";
@@ -269,6 +280,7 @@
 "Network Options..." = "Network Options...";
 "Network Setup" = "Network Setup";
 "Network name" = "Network name";
+"Never Disconnect" = "Never Disconnect";
 "New AirPort base station" = "New AirPort base station";
 "New password" = "New password";
 "New wireless password" = "New wireless password";
@@ -438,6 +450,7 @@
 "Type" = "Type";
 "Undo" = "Undo";
 "Unknown" = "Unknown";
+"Update" = "Update";
 "Use AOL" = "Use AOL";
 "Use a single password" = "Use a single password";
 "Use dynamic global hostname" = "Use dynamic global hostname";
