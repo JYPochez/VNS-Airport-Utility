@@ -70,7 +70,7 @@ extension AirportAppModel {
       connection: connection,
       firmwarePath: image.location.absoluteString,
       dryRun: true)
-    dryRun(title: "Firmware", args: args, connection: connection)
+    dryRun(title: localized("Firmware"), args: args, connection: connection)
   }
 
   func installSelectedFirmware() {

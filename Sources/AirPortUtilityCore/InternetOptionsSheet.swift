@@ -108,13 +108,22 @@ struct InternetOptionsSheet: View {
         }
       }
 
-      InternetOptionsButton(localized("Cancel"), identifier: "internet.options.cancel") { dismiss() }
-        .offset(x: 348, y: 283)
-      InternetOptionsButton(localized("Save"), isDefault: true, identifier: "internet.options.save") {
-        model.internet = draft
-        dismiss()
+      // Right-anchored rather than fixed x offsets: a wider translated label
+      // ("Abbrechen") would otherwise grow rightward into the Save button.
+      // The trailing edge and 12pt gap reproduce the English layout exactly.
+      HStack(spacing: 12) {
+        InternetOptionsButton(localized("Cancel"), identifier: "internet.options.cancel") {
+          dismiss()
+        }
+        InternetOptionsButton(
+          localized("Save"), isDefault: true, identifier: "internet.options.save"
+        ) {
+          model.internet = draft
+          dismiss()
+        }
       }
-      .offset(x: 430, y: 283)
+      .frame(width: 500, alignment: .trailing)
+      .offset(x: 0, y: 283)
     }
     .onAppear {
       if !loaded {

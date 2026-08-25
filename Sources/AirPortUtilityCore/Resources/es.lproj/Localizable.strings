@@ -478,7 +478,7 @@
 "WINS Server must be an IPv4 address." = "El servidor WINS debe ser una dirección IPv4.";
 "WPA Group Key Timeout" = "Tiempo de espera de la clave de grupo WPA";
 "WPA Group Key Timeout must be between 60 seconds and 24 hours." = "El tiempo de espera de la clave de grupo WPA debe estar entre 60 segundos y 24 horas.";
-"WPA Group Key Timeout:" = "Tiempo de espera de la clave de grupo WPA:";
+"WPA Group Key Timeout:" = "Caducidad clave grupo WPA:";
 "Wait for the current base station operation to finish, then try again." = "Espera a que finalice la operación actual de la estación base e inténtalo de nuevo.";
 "Waiting for this base station to apply its settings and restart…" = "Esperando a que esta estación base aplique sus ajustes y se reinicie…";
 "Waiting for this base station to restart with default settings." = "Esperando a que esta estación base se reinicie con los ajustes por omisión.";

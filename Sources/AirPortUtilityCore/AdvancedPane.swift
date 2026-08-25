@@ -261,7 +261,7 @@ struct AdvancedPane: View {
       VStack(alignment: .leading, spacing: 12) {
         FormRow(title: localized("RADIUS Type:")) {
           Picker("", selection: $model.legacyDeviceOptions.accessControl.radiusType) {
-            Text("Default").tag("default")
+            Text(localized("Default")).tag("default")
             Text(localized("Alternate")).tag("alternate")
           }
           .pickerStyle(.menu)

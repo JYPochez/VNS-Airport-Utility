@@ -108,11 +108,11 @@ struct WirelessClient: Codable, Equatable, Identifiable, Sendable {
 
   private var detailMACAddress: String {
     let address = macAddress.trimmingCharacters(in: .whitespacesAndNewlines)
-    return address.isEmpty ? "Unknown" : address.uppercased()
+    return address.isEmpty ? localized("Unknown") : address.uppercased()
   }
 
   private var qualityLabel: String {
-    guard let rssi = normalizedRSSI else { return "Unknown" }
+    guard let rssi = normalizedRSSI else { return localized("Unknown") }
     switch rssi {
     case ..<(-99): return "Poor"
     case -99...(-90): return "Fair"
@@ -129,7 +129,7 @@ struct WirelessClient: Codable, Equatable, Identifiable, Sendable {
       dataRateMbps >= 0,
       dataRateMbps < Double(Int.max)
     else {
-      return "Unknown"
+      return localized("Unknown")
     }
     let value =
       dataRateMbps.rounded() == dataRateMbps
@@ -139,13 +139,13 @@ struct WirelessClient: Codable, Equatable, Identifiable, Sendable {
   }
 
   private var rssiLabel: String {
-    guard let rssi = normalizedRSSI else { return "Unknown" }
+    guard let rssi = normalizedRSSI else { return localized("Unknown") }
     return "\(rssi) dBm"
   }
 
   private var phyModeLabel: String {
     let mode = phyMode?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-    return mode.isEmpty ? "Unknown" : mode
+    return mode.isEmpty ? localized("Unknown") : mode
   }
 }
 
@@ -250,9 +250,9 @@ enum EraseMethod: String, CaseIterable, Identifiable, Sendable {
   var label: String {
     switch self {
     case .quick: "Quick Erase"
-    case .zero: "Zero Out Data"
-    case .sevenPass: "7-Pass Erase"
-    case .thirtyFivePass: "35-Pass Erase"
+    case .zero: localized("Zero Out Data")
+    case .sevenPass: localized("7-Pass Erase")
+    case .thirtyFivePass: localized("35-Pass Erase")
     }
   }
 }
@@ -381,9 +381,9 @@ struct ModemIdleOption: Identifiable, Equatable, Sendable {
     ModemIdleOption(seconds: 120, label: "2 minutes"),
     ModemIdleOption(seconds: 300, label: "5 minutes"),
     ModemIdleOption(seconds: 600, label: "10 minutes"),
-    ModemIdleOption(seconds: 900, label: "15 minutes"),
+    ModemIdleOption(seconds: 900, label: localized("15 minutes")),
     ModemIdleOption(seconds: 1_200, label: "20 minutes"),
-    ModemIdleOption(seconds: 1_800, label: "30 minutes"),
+    ModemIdleOption(seconds: 1_800, label: localized("30 minutes")),
   ]
 }
 
@@ -409,7 +409,7 @@ struct PPPoEConnectionOption: Identifiable, Equatable, Sendable {
 
   static let allCases: [PPPoEConnectionOption] = [
     PPPoEConnectionOption(value: "always-on", label: localized("Always On")),
-    PPPoEConnectionOption(value: "automatic", label: "Automatic"),
+    PPPoEConnectionOption(value: "automatic", label: localized("Automatic")),
     PPPoEConnectionOption(value: "manual", label: "Manual"),
   ]
 }
@@ -886,12 +886,12 @@ struct PPPDialInMaximumConnectOption: Identifiable, Equatable, Sendable {
 
   static let allCases = [
     PPPDialInMaximumConnectOption(seconds: 0, label: localized("Never Disconnect")),
-    PPPDialInMaximumConnectOption(seconds: 900, label: "15 minutes"),
-    PPPDialInMaximumConnectOption(seconds: 1_800, label: "30 minutes"),
-    PPPDialInMaximumConnectOption(seconds: 3_600, label: "1 hour"),
-    PPPDialInMaximumConnectOption(seconds: 7_200, label: "2 hours"),
-    PPPDialInMaximumConnectOption(seconds: 14_400, label: "4 hours"),
-    PPPDialInMaximumConnectOption(seconds: 28_800, label: "8 hours"),
+    PPPDialInMaximumConnectOption(seconds: 900, label: localized("15 minutes")),
+    PPPDialInMaximumConnectOption(seconds: 1_800, label: localized("30 minutes")),
+    PPPDialInMaximumConnectOption(seconds: 3_600, label: localized("1 hour")),
+    PPPDialInMaximumConnectOption(seconds: 7_200, label: localized("2 hours")),
+    PPPDialInMaximumConnectOption(seconds: 14_400, label: localized("4 hours")),
+    PPPDialInMaximumConnectOption(seconds: 28_800, label: localized("8 hours")),
   ]
 }
 

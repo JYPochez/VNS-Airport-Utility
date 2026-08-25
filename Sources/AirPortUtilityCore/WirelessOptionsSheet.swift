@@ -20,8 +20,8 @@ struct WirelessOptionsSheet: View {
         .frame(width: 432, height: 1)
         .offset(x: 24, y: 61)
 
-      optionLabel(localized("Region:"), width: 94)
-        .offset(x: 96, y: 84)
+      optionLabel(localized("Region:"), width: 172)
+        .offset(x: 18, y: 84)
       Picker(localized("Region"), selection: $draft.regionCode) {
         ForEach(WirelessRegionOption.allCases) { region in
           Text(region.localizedName).tag(region.code)
@@ -40,8 +40,8 @@ struct WirelessOptionsSheet: View {
         .frame(width: 264, height: 18, alignment: .leading)
         .offset(x: 195, y: 115)
 
-      optionLabel(localized("Radio Mode:"), width: 94)
-        .offset(x: 96, y: 140)
+      optionLabel(localized("Radio Mode:"), width: 172)
+        .offset(x: 18, y: 140)
       Picker(localized("Radio Mode"), selection: $draft.radioMode) {
         ForEach(Self.radioModeOptions(for: draft.radioMode)) { option in
           Text(option.label).tag(option.value)
@@ -53,8 +53,8 @@ struct WirelessOptionsSheet: View {
       .frame(width: 264, height: 23)
       .offset(x: 195, y: 136)
 
-      optionLabel(localized("Radio Channel:"), width: 94)
-        .offset(x: 96, y: 171)
+      optionLabel(localized("Radio Channel:"), width: 172)
+        .offset(x: 18, y: 171)
       Picker(localized("Radio Channel"), selection: $draft.radioChannel) {
         Text(localized("Automatic")).tag("automatic")
         ForEach(Self.radioChannels, id: \.self) { channel in
@@ -68,8 +68,8 @@ struct WirelessOptionsSheet: View {
       .offset(x: 195, y: 167)
 
       if model.capabilities.supportsLegacyWirelessOptions {
-        optionLabel(localized("Multicast Rate:"), width: 94)
-          .offset(x: 96, y: 202)
+        optionLabel(localized("Multicast Rate:"), width: 172)
+          .offset(x: 18, y: 202)
         Picker(localized("Multicast Rate"), selection: $legacyDraft.multicastRate) {
           ForEach(MulticastRateOption.allCases) { option in
             Text(option.label).tag(option.value)
@@ -81,8 +81,8 @@ struct WirelessOptionsSheet: View {
         .frame(width: 264, height: 23)
         .offset(x: 195, y: 198)
 
-        optionLabel(localized("Transmit Power:"), width: 94)
-          .offset(x: 96, y: 233)
+        optionLabel(localized("Transmit Power:"), width: 172)
+          .offset(x: 18, y: 233)
         Picker(localized("Transmit Power"), selection: $legacyDraft.transmitPower) {
           ForEach(TransmitPowerOption.allCases) { option in
             Text(option.label).tag(option.percent)
@@ -94,8 +94,8 @@ struct WirelessOptionsSheet: View {
         .frame(width: 264, height: 23)
         .offset(x: 195, y: 229)
 
-        optionLabel(localized("WPA Group Key Timeout:"), width: 160)
-          .offset(x: 30, y: 264)
+        optionLabel(localized("WPA Group Key Timeout:"), width: 172)
+          .offset(x: 18, y: 264)
         Picker(localized("WPA Group Key Timeout"), selection: $legacyDraft.groupKeyTimeoutSeconds) {
           ForEach(Self.groupKeyTimeoutOptions, id: \.seconds) { option in
             Text(option.label).tag(option.seconds)
@@ -115,19 +115,27 @@ struct WirelessOptionsSheet: View {
           .offset(x: 195, y: 295)
       }
 
-      WirelessOptionsButton("Cancel", identifier: "wireless.options.cancel") { dismiss() }
-        .offset(x: 308, y: actionButtonY)
-      WirelessOptionsButton(
-        "Save", isDefault: true, isEnabled: hasChanges,
-        identifier: "wireless.options.save"
-      ) {
-        model.wireless = draft
-        if model.capabilities.supportsLegacyWirelessOptions {
-          model.legacyDeviceOptions.wireless = legacyDraft
+      // Right-anchored rather than placed at fixed x offsets: a wider translated
+      // label ("Abbrechen") would otherwise grow rightward into the Save button.
+      // The trailing edge and 12pt gap reproduce the previous English layout
+      // exactly (Cancel 308-378, Save 390-460).
+      HStack(spacing: 12) {
+        WirelessOptionsButton(localized("Cancel"), identifier: "wireless.options.cancel") {
+          dismiss()
         }
-        dismiss()
+        WirelessOptionsButton(
+          localized("Save"), isDefault: true, isEnabled: hasChanges,
+          identifier: "wireless.options.save"
+        ) {
+          model.wireless = draft
+          if model.capabilities.supportsLegacyWirelessOptions {
+            model.legacyDeviceOptions.wireless = legacyDraft
+          }
+          dismiss()
+        }
       }
-      .offset(x: 390, y: actionButtonY)
+      .frame(width: 460, alignment: .trailing)
+      .offset(x: 0, y: actionButtonY)
     }
     .onAppear {
       if !loaded {
@@ -178,6 +186,9 @@ struct WirelessOptionsSheet: View {
     )
   }
 
+  /// Right-aligned label ending at the control column. The width extends
+  /// leftward to the sheet margin so longer translations have room; English is
+  /// unaffected because the text is right-aligned.
   private func optionLabel(_ title: String, width: CGFloat) -> some View {
     Text(title)
       .font(.system(size: 13))

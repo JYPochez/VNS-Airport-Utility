@@ -84,7 +84,7 @@ struct InternetPane: View {
                 .frame(height: 24)
             }
             .internetEditableRow()
-            InternetFormRow(title: "Verify Password:") {
+            InternetFormRow(title: localized("Verify Password:")) {
               AirPortSecureField(
                 text: $model.internet.modemVerifyPassword,
                 identifier: "internet.modem.verify.password")

@@ -8,7 +8,7 @@ struct BaseStationPane: View {
       FormRow(title: localized("Base Station Name:")) {
         AirPortTextField(
           text: $model.baseStation.name,
-          placeholder: "Name",
+          placeholder: localized("Name"),
           selectOnAppear: true,
           identifier: "base.station.name")
       }

@@ -74,7 +74,7 @@ struct DevicePopover: View {
       ("status", model.selectedDeviceStatusText()),
       ("network", model.wireless.networkName),
       (localized("IP address"), model.internet.ipv4Address),
-      ("LAN IP address", model.network.lanIPAddress),
+      (localized("LAN IP address"), model.network.lanIPAddress),
       (localized("serial number"), model.baseStation.serialNumber),
       ("version", model.baseStation.version),
     ]
@@ -408,7 +408,7 @@ private struct PopoverEditButton: NSViewRepresentable {
 
   func makeNSView(context: Context) -> NSButton {
     let button = PopoverEditNSButton(
-      title: "Edit", target: context.coordinator, action: #selector(Coordinator.press))
+      title: localized("Edit"), target: context.coordinator, action: #selector(Coordinator.press))
     button.bezelStyle = .rounded
     button.controlSize = .small
     button.font = .systemFont(ofSize: 13)
@@ -461,19 +461,19 @@ struct ConnectionPopover: View {
       if mode == .full {
         AirPortTextField(
           text: $model.connection.host,
-          placeholder: "Host",
+          placeholder: localized("Host"),
           identifier: "connection.popover.host")
           .frame(width: 220, height: 24)
       }
       AirPortSecureField(
         text: $model.connection.password,
-        placeholder: "Password",
+        placeholder: localized("Password"),
         identifier: "connection.popover.password",
         onSubmit: submitConnection)
         .frame(width: 220, height: 24)
       if mode == .passwordOnly {
         Toggle(
-          "Remember this password in my keychain",
+          localized("Remember this password in my keychain"),
           isOn: Binding(
             get: { model.rememberConnectionPassword },
             set: { model.updateRememberConnectionPassword($0) }))

@@ -122,10 +122,15 @@ struct NetworkOptionsSheet: View {
         .opacity(defaultHostEnabled ? 1 : 0.58)
         .offset(x: 211, y: 172 + legacyVerticalOffset)
 
-      NetworkOptionsButton(localized("Cancel"), identifier: "network.options.cancel") { dismiss() }
+      // Right-anchored rather than fixed x offsets: a wider translated label
+      // ("Abbrechen") would otherwise grow rightward into the Save button.
+      // The trailing edge and 12pt gap reproduce the English layout exactly.
+      HStack(spacing: 12) {
+        NetworkOptionsButton(localized("Cancel"), identifier: "network.options.cancel") {
+          dismiss()
+        }
         .frame(width: 70, height: 22)
-        .offset(x: 339, y: 220 + legacyVerticalOffset)
-      NetworkOptionsButton(
+        NetworkOptionsButton(
         localized("Save"), isDefault: true, isEnabled: canSave,
         identifier: "network.options.save"
       ) {
@@ -139,8 +144,10 @@ struct NetworkOptionsSheet: View {
         }
         dismiss()
       }
-      .frame(width: 70, height: 22)
-      .offset(x: 421, y: 220 + legacyVerticalOffset)
+        .frame(width: 70, height: 22)
+      }
+      .frame(width: 491, alignment: .trailing)
+      .offset(x: 0, y: 220 + legacyVerticalOffset)
     }
     .onAppear {
       if !loaded {
