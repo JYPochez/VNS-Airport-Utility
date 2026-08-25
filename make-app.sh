@@ -12,7 +12,7 @@
 #   ./make-app.sh --sign --notarize --zip      + distributable .zip
 #
 # Configuration (environment variables):
-#   BUNDLE_ID                 default io.github.jackhumphries.airport-utility
+#   BUNDLE_ID                 default VNS.airport.utility
 #   MARKETING_VERSION         default 0.1.0
 #   CURRENT_PROJECT_VERSION   default 1
 #   SIGN_IDENTITY             default "Developer ID Application" (first match)
@@ -29,7 +29,7 @@ cd "$SCRIPT_DIR"
 
 APP_NAME="AirPort Utility"
 EXECUTABLE_NAME="AirPort Utility"
-BUNDLE_ID=${BUNDLE_ID:-io.github.jackhumphries.airport-utility}
+BUNDLE_ID=${BUNDLE_ID:-VNS.airport.utility}
 MARKETING_VERSION=${MARKETING_VERSION:-0.1.0}
 CURRENT_PROJECT_VERSION=${CURRENT_PROJECT_VERSION:-1}
 OUTPUT_DIR=${OUTPUT_DIR:-dist}

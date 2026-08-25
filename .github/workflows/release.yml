@@ -87,7 +87,7 @@ jobs:
         env:
           MARKETING_VERSION: ${{ steps.version.outputs.version }}
           CURRENT_PROJECT_VERSION: ${{ github.run_number }}
-          BUNDLE_ID: ${{ secrets.BUNDLE_ID || 'io.github.jackhumphries.airport-utility' }}
+          BUNDLE_ID: ${{ secrets.BUNDLE_ID || 'VNS.airport.utility' }}
           NOTARY_APPLE_ID: ${{ secrets.NOTARY_APPLE_ID }}
           NOTARY_TEAM_ID: ${{ secrets.NOTARY_TEAM_ID }}
           NOTARY_PASSWORD: ${{ secrets.NOTARY_PASSWORD }}

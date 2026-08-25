@@ -222,7 +222,7 @@
 				INFOPLIST_FILE = Packaging/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
 				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.github.jackhumphries.airport-utility;
+				PRODUCT_BUNDLE_IDENTIFIER = VNS.airport.utility;
 				PRODUCT_NAME = "AirPort Utility";
 			};
 			name = Debug;
@@ -240,7 +240,7 @@
 				INFOPLIST_FILE = Packaging/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
 				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.github.jackhumphries.airport-utility;
+				PRODUCT_BUNDLE_IDENTIFIER = VNS.airport.utility;
 				PRODUCT_NAME = "AirPort Utility";
 			};
 			name = Release;
