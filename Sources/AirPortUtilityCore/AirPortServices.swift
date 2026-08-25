@@ -5,7 +5,7 @@ import SwiftUI
 public final class AirportAppModel: ObservableObject {
   @Published var connection = AirportConnection()
   @Published var selectedPane: Pane = .baseStation
-  @Published var status = "Not connected"
+  @Published var status = localized("Not connected")
   @Published var isBusy = false
   @Published var logs: [String] = []
   @Published var preview: CommandPreview?

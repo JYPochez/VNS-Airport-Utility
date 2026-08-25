@@ -1,0 +1,60 @@
+/* AirPort Utility - de
+   Keys are the English source strings. Untranslated keys fall back to
+   English automatically, so this table may be incomplete.
+   Do NOT add ACP keys, backend flags or persisted raw values here. */
+
+"About AirPort Utility" = "Über AirPort-Dienstprogramm";
+"Add WPS Printer…" = "WPS-Drucker hinzufügen…";
+"Advanced" = "Erweitert";
+"AirPlay" = "AirPlay";
+"AirPort Utility" = "AirPort-Dienstprogramm";
+"AirPort Utility Help" = "AirPort-Dienstprogramm-Hilfe";
+"Allow setup over Ethernet WAN port" = "Konfiguration über Ethernet-WAN erlauben";
+"Base Station" = "Basisstation";
+"Base Station Name:" = "Name der Basisstation:";
+"Base Station Password:" = "Kennwort der Basisstation:";
+"Bring All to Front" = "Alle nach vorne bringen";
+"Close" = "Schließen";
+"Configure Other..." = "Andere konfigurieren…";
+"Contact:" = "Kontakt:";
+"Copy" = "Kopieren";
+"Cut" = "Ausschneiden";
+"Delete" = "Löschen";
+"Disks" = "Volumes";
+"Edit" = "Bearbeiten";
+"Export Configuration File" = "Konfigurationsdatei exportieren";
+"Export Configuration File..." = "Konfigurationsdatei exportieren…";
+"File" = "Ablage";
+"Firmware" = "Firmware";
+"Help" = "Hilfe";
+"Hide AirPort Utility" = "AirPort-Dienstprogramm ausblenden";
+"Hide Others" = "Andere ausblenden";
+"Import Configuration File" = "Konfigurationsdatei importieren";
+"Import Configuration File..." = "Konfigurationsdatei importieren…";
+"Internet" = "Internet";
+"Location:" = "Ort:";
+"Minimize" = "Im Dock ablegen";
+"Name" = "Name";
+"Network" = "Netzwerk";
+"New password" = "Neues Kennwort";
+"Not connected" = "Nicht verbunden";
+"Paste" = "Einsetzen";
+"Preferences..." = "Einstellungen…";
+"Quit AirPort Utility" = "AirPort-Dienstprogramm beenden";
+"Redo" = "Wiederholen";
+"Refresh" = "Aktualisieren";
+"Remember this password in my keychain" = "Kennwort im Schlüsselbund sichern";
+"Restart…" = "Neustart…";
+"Restore Default Settings..." = "Standardeinstellungen wiederherstellen…";
+"Select All" = "Alles auswählen";
+"Services" = "Dienste";
+"Set time automatically" = "Uhrzeit automatisch einstellen";
+"Show All" = "Alle einblenden";
+"Show Passwords…" = "Kennwörter anzeigen…";
+"Time Server:" = "Zeitserver:";
+"Undo" = "Widerrufen";
+"Verify Password:" = "Kennwort bestätigen:";
+"Verify password" = "Kennwort bestätigen";
+"Window" = "Fenster";
+"Wireless" = "WLAN";
+"Zoom" = "Zoomen";

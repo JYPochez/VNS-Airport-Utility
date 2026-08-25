@@ -323,7 +323,7 @@ private final class TopTabsNSView: NSView {
 
   init(action: TopTabsControl.Coordinator) {
     self.control = NSSegmentedControl(
-      labels: Pane.allCases.map(\.rawValue),
+      labels: Pane.allCases.map(\.displayName),
       trackingMode: .selectOne,
       target: action,
       action: #selector(TopTabsControl.Coordinator.selectPane(_:)))
@@ -383,7 +383,7 @@ private final class TopTabsNSView: NSView {
     control.segmentCount = panes.count
     tabElements = []
     for (index, pane) in panes.enumerated() {
-      control.setLabel(pane.rawValue, forSegment: index)
+      control.setLabel(pane.displayName, forSegment: index)
       control.setWidth(Self.width(for: pane), forSegment: index)
       let element = TopTabAccessibilityElement(owner: self, pane: pane)
       element.setAccessibilityParent(self)
@@ -424,7 +424,7 @@ private final class TopTabAccessibilityElement: NSAccessibilityElement {
   }
 
   override func accessibilityTitle() -> String? {
-    pane.rawValue
+    pane.displayName
   }
 
   override func accessibilityIdentifier() -> String? {

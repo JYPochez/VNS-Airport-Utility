@@ -111,6 +111,39 @@ notarizes, staples and attaches the zip to a GitHub release.
 
 ---
 
+### Localization
+
+The app ships English, French, German, Spanish and Italian. Tables live in
+`Sources/AirPortUtilityCore/Resources/<lang>.lproj/Localizable.strings` and are
+reached through `AirPortLocalization`.
+
+Keys are the English source strings, so an untranslated string falls back to
+readable English rather than a symbolic key, and English behaviour is
+unchanged.
+
+To check another language without changing your system settings:
+
+```sh
+swift run "AirPort Utility" -AppleLanguages '(fr)'
+```
+
+Three rules when adding strings:
+
+- **Never localize protocol text.** ACP keys (`syNm`), backend flags
+  (`--router-mode`), JSON keys, and any `Codable`-persisted raw value are wire
+  format. `Pane.rawValue` stays English for that reason — it is persisted, used
+  for snapshot file names, and used to build accessibility identifiers; the
+  localized title is `Pane.displayName`.
+- **Budget the length.** The window is a fixed 800×504, and German and French
+  run 20–30% longer than English. `LocalizationTests` catches missing and
+  untranslated keys, but not overflow — render the pane and look at it.
+- **Language resolution goes through `Locale.preferredLanguages`,** not the
+  one-argument `Bundle.preferredLocalizations(from:)`. That variant matches
+  against the *main* bundle's localizations, which are empty in command-line
+  and test builds, and would silently pin every lookup to English.
+
+---
+
 ### Testing
 
 Run the Swift unit tests from the root of the repository:

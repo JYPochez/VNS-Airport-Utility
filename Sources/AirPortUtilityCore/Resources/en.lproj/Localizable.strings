@@ -1,0 +1,60 @@
+/* AirPort Utility - en
+   Keys are the English source strings. Untranslated keys fall back to
+   English automatically, so this table may be incomplete.
+   Do NOT add ACP keys, backend flags or persisted raw values here. */
+
+"About AirPort Utility" = "About AirPort Utility";
+"Add WPS Printer…" = "Add WPS Printer…";
+"Advanced" = "Advanced";
+"AirPlay" = "AirPlay";
+"AirPort Utility" = "AirPort Utility";
+"AirPort Utility Help" = "AirPort Utility Help";
+"Allow setup over Ethernet WAN port" = "Allow setup over Ethernet WAN port";
+"Base Station" = "Base Station";
+"Base Station Name:" = "Base Station Name:";
+"Base Station Password:" = "Base Station Password:";
+"Bring All to Front" = "Bring All to Front";
+"Close" = "Close";
+"Configure Other..." = "Configure Other...";
+"Contact:" = "Contact:";
+"Copy" = "Copy";
+"Cut" = "Cut";
+"Delete" = "Delete";
+"Disks" = "Disks";
+"Edit" = "Edit";
+"Export Configuration File" = "Export Configuration File";
+"Export Configuration File..." = "Export Configuration File...";
+"File" = "File";
+"Firmware" = "Firmware";
+"Help" = "Help";
+"Hide AirPort Utility" = "Hide AirPort Utility";
+"Hide Others" = "Hide Others";
+"Import Configuration File" = "Import Configuration File";
+"Import Configuration File..." = "Import Configuration File...";
+"Internet" = "Internet";
+"Location:" = "Location:";
+"Minimize" = "Minimize";
+"Name" = "Name";
+"Network" = "Network";
+"New password" = "New password";
+"Not connected" = "Not connected";
+"Paste" = "Paste";
+"Preferences..." = "Preferences...";
+"Quit AirPort Utility" = "Quit AirPort Utility";
+"Redo" = "Redo";
+"Refresh" = "Refresh";
+"Remember this password in my keychain" = "Remember this password in my keychain";
+"Restart…" = "Restart…";
+"Restore Default Settings..." = "Restore Default Settings...";
+"Select All" = "Select All";
+"Services" = "Services";
+"Set time automatically" = "Set time automatically";
+"Show All" = "Show All";
+"Show Passwords…" = "Show Passwords…";
+"Time Server:" = "Time Server:";
+"Undo" = "Undo";
+"Verify Password:" = "Verify Password:";
+"Verify password" = "Verify password";
+"Window" = "Window";
+"Wireless" = "Wireless";
+"Zoom" = "Zoom";

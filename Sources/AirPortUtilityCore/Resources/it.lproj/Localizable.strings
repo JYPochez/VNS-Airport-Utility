@@ -1,0 +1,60 @@
+/* AirPort Utility - it
+   Keys are the English source strings. Untranslated keys fall back to
+   English automatically, so this table may be incomplete.
+   Do NOT add ACP keys, backend flags or persisted raw values here. */
+
+"About AirPort Utility" = "Informazioni su Utility AirPort";
+"Add WPS Printer…" = "Aggiungi stampante WPS…";
+"Advanced" = "Avanzate";
+"AirPlay" = "AirPlay";
+"AirPort Utility" = "Utility AirPort";
+"AirPort Utility Help" = "Aiuto Utility AirPort";
+"Allow setup over Ethernet WAN port" = "Consenti la configurazione tramite la porta WAN Ethernet";
+"Base Station" = "Stazione base";
+"Base Station Name:" = "Nome stazione base:";
+"Base Station Password:" = "Password stazione base:";
+"Bring All to Front" = "Porta tutto in primo piano";
+"Close" = "Chiudi";
+"Configure Other..." = "Configura altro…";
+"Contact:" = "Contatto:";
+"Copy" = "Copia";
+"Cut" = "Taglia";
+"Delete" = "Elimina";
+"Disks" = "Dischi";
+"Edit" = "Modifica";
+"Export Configuration File" = "Esporta file di configurazione";
+"Export Configuration File..." = "Esporta file di configurazione…";
+"File" = "Archivio";
+"Firmware" = "Firmware";
+"Help" = "Aiuto";
+"Hide AirPort Utility" = "Nascondi Utility AirPort";
+"Hide Others" = "Nascondi altre";
+"Import Configuration File" = "Importa file di configurazione";
+"Import Configuration File..." = "Importa file di configurazione…";
+"Internet" = "Internet";
+"Location:" = "Posizione:";
+"Minimize" = "Riduci a icona";
+"Name" = "Nome";
+"Network" = "Rete";
+"New password" = "Nuova password";
+"Not connected" = "Non connesso";
+"Paste" = "Incolla";
+"Preferences..." = "Preferenze…";
+"Quit AirPort Utility" = "Esci da Utility AirPort";
+"Redo" = "Ripristina";
+"Refresh" = "Aggiorna";
+"Remember this password in my keychain" = "Ricorda questa password nel portachiavi";
+"Restart…" = "Riavvia…";
+"Restore Default Settings..." = "Ripristina impostazioni di default…";
+"Select All" = "Seleziona tutto";
+"Services" = "Servizi";
+"Set time automatically" = "Imposta ora automaticamente";
+"Show All" = "Mostra tutto";
+"Show Passwords…" = "Mostra password…";
+"Time Server:" = "Server ora:";
+"Undo" = "Annulla";
+"Verify Password:" = "Verifica password:";
+"Verify password" = "Verifica password";
+"Window" = "Finestra";
+"Wireless" = "Wireless";
+"Zoom" = "Zoom";

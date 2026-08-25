@@ -197,6 +197,13 @@ enum Pane: String, CaseIterable, Identifiable, Sendable, Codable {
   case firmware = "Firmware"
 
   var id: String { rawValue }
+
+  /// Localized tab title.
+  ///
+  /// `rawValue` deliberately stays English: it is persisted through `Codable`,
+  /// used to build snapshot file names, and used for accessibility
+  /// identifiers, none of which may shift with the user's language.
+  var displayName: String { localized(rawValue) }
 }
 
 enum ConnectUsing: String, CaseIterable, Identifiable, Sendable, Codable {

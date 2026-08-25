@@ -1,0 +1,83 @@
+import Foundation
+import XCTest
+
+@testable import AirPortUtilityCore
+
+/// Guards the localization tables as strings are migrated pane by pane.
+final class LocalizationTests: XCTestCase {
+  private static let expectedLanguages = ["de", "en", "es", "fr", "it"]
+
+  private func table(_ language: String) throws -> [String: String] {
+    let bundle = AirPortLocalization.resourceBundle
+    let url = try XCTUnwrap(
+      bundle.url(forResource: "Localizable", withExtension: "strings", subdirectory: "\(language).lproj"),
+      "missing \(language).lproj/Localizable.strings")
+    return try XCTUnwrap(NSDictionary(contentsOf: url) as? [String: String])
+  }
+
+  func testAllExpectedLanguagesShip() {
+    XCTAssertEqual(AirPortLocalization.availableLanguages, Self.expectedLanguages)
+  }
+
+  /// Every English key must exist in every other table, or that string silently
+  /// falls back to English for those users.
+  func testTranslationsCoverEveryEnglishKey() throws {
+    let english = try table("en")
+    XCTAssertFalse(english.isEmpty)
+
+    for language in Self.expectedLanguages where language != "en" {
+      let translated = try table(language)
+      let missing = Set(english.keys).subtracting(translated.keys).sorted()
+      XCTAssertTrue(
+        missing.isEmpty,
+        "\(language) is missing \(missing.count) key(s): \(missing.prefix(10))")
+    }
+  }
+
+  /// A translated value that still equals the English source is usually an
+  /// untranslated placeholder. Proper nouns are the legitimate exception.
+  func testTranslationsDifferFromEnglish() throws {
+    let untranslatable: Set<String> = [
+      "AirPlay", "Internet", "Firmware", "Name", "Zoom", "Services", "Wireless",
+      "AirPort Utility",
+    ]
+    let english = try table("en")
+
+    for language in Self.expectedLanguages where language != "en" {
+      let translated = try table(language)
+      for (key, value) in translated
+      where !untranslatable.contains(key) && value == english[key] {
+        XCTFail("\(language): \"\(key)\" is identical to English")
+      }
+    }
+  }
+
+  /// Protocol text must never be localized: ACP keys, backend flags and
+  /// persisted raw values are wire format, not display strings.
+  func testTablesContainNoProtocolTokens() throws {
+    for language in Self.expectedLanguages {
+      for key in try table(language).keys {
+        XCTAssertFalse(key.hasPrefix("--"), "\(language): backend flag \"\(key)\" localized")
+        // ACP keys are four characters shaped lowercase-lowercase-UPPER-alnum
+        // (syNm, raCr, peSC, wdFl). Plain four-letter words like "Help" or
+        // "Edit" are ordinary UI text and must not trip this.
+        XCTAssertNil(
+          key.range(of: "^[a-z]{2}[A-Z0-9][A-Za-z0-9]$", options: .regularExpression),
+          "\(language): possible ACP key \"\(key)\" localized")
+      }
+    }
+  }
+
+  /// Pane raw values stay English because they are persisted, used for snapshot
+  /// file names, and used to build accessibility identifiers.
+  func testPaneRawValuesRemainEnglish() {
+    XCTAssertEqual(Pane.baseStation.rawValue, "Base Station")
+    XCTAssertEqual(Pane.disks.rawValue, "Disks")
+    XCTAssertEqual(Pane.advanced.rawValue, "Advanced")
+  }
+
+  func testLookupFallsBackToTheKeyWhenUntranslated() {
+    let key = "A string that is deliberately absent from every table"
+    XCTAssertEqual(AirPortLocalization.text(key), key)
+  }
+}
