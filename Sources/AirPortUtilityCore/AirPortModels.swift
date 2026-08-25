@@ -262,7 +262,8 @@ struct BaseStationState: Equatable, Codable {
   var serialNumber = ""
   var version = ""
   var productID = ""
-  var statusText = "Working normally"
+  // Must match DeviceStatusMessage.text([]) -- the topology compares them.
+  var statusText = localized("Working normally")
   var problemCodes: [String] = []
   var newAdminPassword = ""
   var verifyAdminPassword = ""
@@ -275,7 +276,7 @@ struct BaseStationState: Equatable, Codable {
     serialNumber: String = "",
     version: String = "",
     productID: String = "",
-    statusText: String = "Working normally",
+    statusText: String = localized("Working normally"),
     problemCodes: [String] = [],
     newAdminPassword: String = "",
     verifyAdminPassword: String = "",
@@ -317,7 +318,7 @@ struct BaseStationState: Equatable, Codable {
     version = try container.decodeIfPresent(String.self, forKey: .version) ?? ""
     productID = try container.decodeIfPresent(String.self, forKey: .productID) ?? ""
     statusText =
-      try container.decodeIfPresent(String.self, forKey: .statusText) ?? "Working normally"
+      try container.decodeIfPresent(String.self, forKey: .statusText) ?? localized("Working normally")
     problemCodes = try container.decodeIfPresent([String].self, forKey: .problemCodes) ?? []
     newAdminPassword = try container.decodeIfPresent(String.self, forKey: .newAdminPassword) ?? ""
     verifyAdminPassword =

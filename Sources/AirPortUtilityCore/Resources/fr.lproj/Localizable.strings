@@ -382,6 +382,7 @@
 "Restore Default Settings..." = "Rétablir les réglages par défaut…";
 "Restore Default Settings?" = "Rétablir les réglages par défaut ?";
 "Restore Factory Defaults" = "Rétablir les réglages d’usine";
+"Restoring" = "Restauration";
 "Restoring Base Station…" = "Restauration de la borne d’accès…";
 "Restoring this Base Station to factory defaults erases its settings." = "Rétablir les réglages d’usine de cette borne d’accès efface ses réglages.";
 "Router" = "Routeur";

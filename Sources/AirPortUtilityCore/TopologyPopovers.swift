@@ -490,15 +490,18 @@ struct ConnectionPopover: View {
       }
       HStack {
         Spacer()
-        Button(model.isBusy ? "Working" : "Connect") {
+        Button(model.isBusy ? localized("Working") : localized("Connect")) {
           submitConnection()
         }
-        .accessibilityLabel("Connect")
+        .accessibilityLabel(localized("Connect"))
         .accessibilityIdentifier("connection.popover.connect")
         .keyboardShortcut(.defaultAction)
         .disabled(!model.canAttemptConnection)
       }
-      if !model.status.hasPrefix(localized("Connected")) {
+      // model.status is "Connected to <host>", which interpolates the host and
+      // is therefore still English. Do not localize this prefix without also
+      // localizing the status it is matching.
+      if !model.status.hasPrefix("Connected") {
         Text(model.status)
           .font(.caption)
           .foregroundStyle(.secondary)

@@ -122,6 +122,15 @@ final class LocalizationTests: XCTestCase {
     XCTAssertEqual(Locale(identifier: "es").localizedString(forRegionCode: "DE"), "Alemania")
   }
 
+  /// The topology decides a device's status colour by comparing display text.
+  /// The "no problems" default and the message the status builder produces for
+  /// an empty problem list must therefore be the same string, in every
+  /// language -- otherwise every device renders as if it had a problem.
+  @MainActor
+  func testDefaultStatusMatchesTheNoProblemStatusMessage() {
+    XCTAssertEqual(BaseStationState().statusText, DeviceStatusMessage.text(problemCodes: []))
+  }
+
   func testLookupFallsBackToTheKeyWhenUntranslated() {
     let key = "A string that is deliberately absent from every table"
     XCTAssertEqual(AirPortLocalization.text(key), key)

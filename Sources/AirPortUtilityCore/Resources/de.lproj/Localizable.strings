@@ -382,6 +382,7 @@
 "Restore Default Settings..." = "Standardeinstellungen wiederherstellen…";
 "Restore Default Settings?" = "Standardeinstellungen wiederherstellen?";
 "Restore Factory Defaults" = "Werkseinstellungen wiederherstellen";
+"Restoring" = "Wiederherstellung";
 "Restoring Base Station…" = "Basisstation wird wiederhergestellt…";
 "Restoring this Base Station to factory defaults erases its settings." = "Beim Wiederherstellen der Werkseinstellungen werden die Einstellungen dieser Basisstation gelöscht.";
 "Router" = "Router";

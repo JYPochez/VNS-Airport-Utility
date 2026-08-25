@@ -256,10 +256,10 @@ extension AirportAppModel {
 
   func deviceStatusText(for device: AirportDiscoveredDevice? = nil) -> String {
     if let device, isTopologyDeviceRestoring(device) {
-      return "Restoring"
+      return localized("Restoring")
     }
     if let device, isTopologyDeviceUpdating(device) {
-      return "Restarting"
+      return localized("Restarting")
     }
     if let device, device.requiresSetup {
       return localized("New AirPort base station")
