@@ -19,5 +19,5 @@ Build/
 *.xcuserdatad
 xcuserdata/
 
-# Local build overrides (bundle identifier, signing)
+# Local build overrides (bundle identifier, signing team) -- never committed
 Packaging/Local.xcconfig
