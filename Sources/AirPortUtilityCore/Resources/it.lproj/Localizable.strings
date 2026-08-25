@@ -253,7 +253,7 @@
 "Join or extend a Wi-Fi network that is already available." = "Accedi a una rete Wi-Fi già disponibile o estendila.";
 "LAN IP Address must be an IPv4 address." = "L’indirizzo IP LAN deve essere un indirizzo IPv4.";
 "LAN IP Address:" = "Indirizzo IP LAN:";
-"LAN IP address" = "Indirizzo IP LAN";
+"LAN IP address" = "IP LAN";
 "LDAP Server:" = "Server LDAP:";
 "Link-local only" = "Solo link-local";
 "Loading Internet Settings" = "Caricamento impostazioni Internet";
@@ -520,9 +520,12 @@
 "day" = "giorno";
 "firmware update" = "aggiornamento firmware";
 "hour" = "ora";
+"menu.Edit" = "Modifica";
 "minute" = "minuto";
+"network" = "rete";
 "router address" = "indirizzo router";
 "second" = "secondo";
 "serial number" = "numero di serie";
+"status" = "stato";
 "week" = "settimana";
 "wireless clients" = "client wireless";

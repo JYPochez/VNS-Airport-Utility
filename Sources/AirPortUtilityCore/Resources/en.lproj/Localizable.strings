@@ -520,9 +520,12 @@
 "day" = "day";
 "firmware update" = "firmware update";
 "hour" = "hour";
+"menu.Edit" = "menu.Edit";
 "minute" = "minute";
+"network" = "network";
 "router address" = "router address";
 "second" = "second";
 "serial number" = "serial number";
+"status" = "status";
 "week" = "week";
 "wireless clients" = "wireless clients";

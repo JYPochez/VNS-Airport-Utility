@@ -45,13 +45,13 @@ struct DevicePopover: View {
       PopoverTitleLabel(
         text: model.baseStation.name.isEmpty ? "time capsule" : model.baseStation.name
       )
-      .frame(width: 283, height: 19)
+      .frame(width: 303, height: 19)
       .padding(.bottom, 6)
       PopoverDetailsRows(
         rows: deviceDetailRows,
         wirelessClients: model.wirelessClients,
         viewportHeight: deviceDetailsHeight)
-        .frame(width: 274, height: deviceDetailsHeight)
+        .frame(width: 294, height: deviceDetailsHeight)
       HStack {
         Spacer()
         PopoverEditButton {
@@ -61,18 +61,19 @@ struct DevicePopover: View {
             model.beginEditing()
           }
         }
-        .frame(width: 47, height: 18)
+        .fixedSize()
+        .frame(height: 18)
       }
       .padding(.top, 7)
     }
     .padding(13)
-    .frame(width: 300, height: devicePopoverHeight, alignment: .leading)
+    .frame(width: 320, height: devicePopoverHeight, alignment: .leading)
   }
 
   private var deviceDetailRows: [(String, String)] {
     var rows = [
-      ("status", model.selectedDeviceStatusText()),
-      ("network", model.wireless.networkName),
+      (localized("status"), model.selectedDeviceStatusText()),
+      (localized("network"), model.wireless.networkName),
       (localized("IP address"), model.internet.ipv4Address),
       (localized("LAN IP address"), model.network.lanIPAddress),
       (localized("serial number"), model.baseStation.serialNumber),
@@ -157,7 +158,7 @@ struct InternetPopover: View {
   private var internetDetails: some View {
     VStack(alignment: .leading, spacing: 0) {
       PopoverTitleLabel(text: "Internet")
-        .frame(width: 283, height: 19)
+        .frame(width: 303, height: 19)
         .padding(.bottom, 6)
       PopoverDetailsRows(
         rows: [
@@ -201,7 +202,7 @@ private struct PopoverDetailsRows: NSViewRepresentable {
 
   func makeNSView(context: Context) -> NSScrollView {
     let scrollView = PopoverDetailsScrollView(
-      frame: NSRect(x: 0, y: 0, width: 274, height: viewportHeight))
+      frame: NSRect(x: 0, y: 0, width: 294, height: viewportHeight))
     scrollView.drawsBackground = false
     scrollView.borderType = .noBorder
     scrollView.hasVerticalScroller = false
@@ -240,7 +241,7 @@ private final class PopoverDetailsDocumentView: NSView {
 
   override init(frame frameRect: NSRect) {
     super.init(frame: frameRect)
-    self.frame = NSRect(x: 0, y: 0, width: 274, height: 107)
+    self.frame = NSRect(x: 0, y: 0, width: 294, height: 107)
     wirelessClientDetailsPanel.presentationDidEnd = {
       [weak self] clientID in
       self?.wirelessClientPresentationDidEnd(clientID: clientID)
@@ -274,7 +275,7 @@ private final class PopoverDetailsDocumentView: NSView {
       addSubview(
         textField(
           row.1.isEmpty ? "--" : row.1,
-          frame: NSRect(x: 122, y: y, width: 152, height: 19),
+          frame: NSRect(x: 122, y: y, width: 172, height: 19),
           label: false))
     }
 
@@ -291,7 +292,7 @@ private final class PopoverDetailsDocumentView: NSView {
         frame: NSRect(
           x: 122,
           y: y + CGFloat(index) * DevicePopoverLayout.rowHeight,
-          width: 152,
+          width: 172,
           height: 19))
       clientField.setAccessibilityIdentifier("popover.wirelessClients.client")
       clientField.presentationChanged = {
@@ -440,8 +441,11 @@ private struct PopoverEditButton: NSViewRepresentable {
 }
 
 private final class PopoverEditNSButton: NSButton {
+  /// 47pt is the measured English width. A longer translation ("Modifier",
+  /// "Bearbeiten") needs more, and the button is right-aligned behind a Spacer,
+  /// so growing widens it leftward without disturbing anything.
   override var intrinsicContentSize: NSSize {
-    NSSize(width: 47, height: 18)
+    NSSize(width: max(47, super.intrinsicContentSize.width), height: 18)
   }
 }
 

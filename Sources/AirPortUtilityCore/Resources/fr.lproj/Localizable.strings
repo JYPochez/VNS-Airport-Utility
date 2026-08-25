@@ -179,7 +179,7 @@
 "Downloading from Apple" = "Téléchargement depuis Apple";
 "Dry-run completed without output." = "Simulation terminée sans sortie.";
 "Each local access-control entry must contain a valid MAC address." = "Chaque entrée locale de contrôle d’accès doit contenir une adresse MAC valide.";
-"Edit" = "Édition";
+"Edit" = "Modifier";
 "Enable AirPlay" = "Activer AirPlay";
 "Enable AirPlay over WAN" = "Activer AirPlay via le WAN";
 "Enable NAT Port Mapping Protocol" = "Activer le protocole NAT-PMP";
@@ -253,7 +253,7 @@
 "Join or extend a Wi-Fi network that is already available." = "Rejoindre ou étendre un réseau Wi-Fi déjà disponible.";
 "LAN IP Address must be an IPv4 address." = "L’adresse IP du réseau local doit être une adresse IPv4.";
 "LAN IP Address:" = "Adresse IP du réseau local :";
-"LAN IP address" = "Adresse IP du réseau local";
+"LAN IP address" = "IP réseau local";
 "LDAP Server:" = "Serveur LDAP :";
 "Link-local only" = "Lien-local uniquement";
 "Loading Internet Settings" = "Chargement des réglages Internet";
@@ -520,9 +520,12 @@
 "day" = "jour";
 "firmware update" = "mise à jour du micrologiciel";
 "hour" = "heure";
+"menu.Edit" = "Édition";
 "minute" = "minute";
+"network" = "réseau";
 "router address" = "adresse du routeur";
 "second" = "seconde";
 "serial number" = "numéro de série";
+"status" = "état";
 "week" = "semaine";
 "wireless clients" = "clients sans fil";

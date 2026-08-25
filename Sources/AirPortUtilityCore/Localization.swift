@@ -58,8 +58,22 @@ public enum AirPortLocalization {
   }()
 
   /// Looks up `key`, falling back to the key itself when untranslated.
-  public static func text(_ key: String) -> String {
-    bundle.localizedString(forKey: key, value: key, table: nil)
+  ///
+  /// `context` disambiguates one English word that needs different translations
+  /// in different places. "Edit" is the Edit *menu* in the menu bar ("Édition")
+  /// but a verb on a button ("Modifier"); with the English source as the key
+  /// there is otherwise no way to tell them apart. A contextual entry is stored
+  /// as "context.key" and falls back to the plain key when absent.
+  public static func text(_ key: String, context: String? = nil) -> String {
+    if let context {
+      let qualified = "\(context).\(key)"
+      let sentinel = "\u{0}"
+      let value = bundle.localizedString(forKey: qualified, value: sentinel, table: nil)
+      if value != sentinel {
+        return value
+      }
+    }
+    return bundle.localizedString(forKey: key, value: key, table: nil)
   }
 
   /// The resource bundle holding the `.lproj` tables.
@@ -72,6 +86,6 @@ public enum AirPortLocalization {
 }
 
 /// Shorthand for ``AirPortLocalization/text(_:)`` inside this module.
-func localized(_ key: String) -> String {
-  AirPortLocalization.text(key)
+func localized(_ key: String, context: String? = nil) -> String {
+  AirPortLocalization.text(key, context: context)
 }

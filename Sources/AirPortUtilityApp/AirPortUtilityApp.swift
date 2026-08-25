@@ -5,8 +5,8 @@ import UniformTypeIdentifiers
 
 /// Menu titles live in the app target, so they reach the shared table through
 /// AirPortUtilityCore's public entry point.
-private func localized(_ key: String) -> String {
-  AirPortLocalization.text(key)
+private func localized(_ key: String, context: String? = nil) -> String {
+  AirPortLocalization.text(key, context: context)
 }
 
 @main
@@ -181,7 +181,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let mainMenu = NSMenu()
     mainMenu.addItem(menu("AirPort Utility", submenu: applicationMenu()))
     mainMenu.addItem(menu(localized("File"), submenu: fileMenu()))
-    mainMenu.addItem(menu(localized("Edit"), submenu: editMenu()))
+    mainMenu.addItem(menu(localized("Edit", context: "menu"), submenu: editMenu()))
     mainMenu.addItem(menu("Base Station", submenu: baseStationMenu()))
     mainMenu.addItem(menu(localized("Window"), submenu: windowMenu()))
     mainMenu.addItem(menu(localized("Help"), submenu: helpMenu()))
