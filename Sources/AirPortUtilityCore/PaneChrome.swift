@@ -570,7 +570,10 @@ struct AirPortButtonStyle: ButtonStyle {
       .foregroundStyle(
         emphasized && isEnabled ? Color.white : Color.primary.opacity(isEnabled ? 1 : 0.45)
       )
-      .frame(width: width, height: 22)
+      // minWidth, not width: the fixed widths throughout these panes were
+      // measured against English labels. A minimum keeps English pixel-identical
+      // while letting longer translations grow instead of truncating.
+      .frame(minWidth: width).frame(height: 22)
       .background(backgroundColor)
       .clipShape(RoundedRectangle(cornerRadius: 5))
       .overlay(RoundedRectangle(cornerRadius: 5).stroke(Color.black.opacity(0.20), lineWidth: 1))

@@ -127,7 +127,7 @@ struct InternetPane: View {
                 ) {
                   model.renewDHCPLease()
                 }
-                .frame(width: 148, height: 22)
+                .frame(minWidth: 148).frame(height: 22)
               }
             }
           }
@@ -236,7 +236,11 @@ private struct InternetPaneButton: NSViewRepresentable {
     button.setButtonType(.momentaryPushIn)
     button.alignment = .center
     button.translatesAutoresizingMaskIntoConstraints = false
-    button.widthAnchor.constraint(equalToConstant: width).isActive = true
+    // A minimum, not an exact width: these widths were measured against English
+    // labels, and an exact constraint truncates longer translations
+    // ("Rinnova DHCP assegnato"). English keeps its measured width because its
+    // intrinsic size is smaller than the minimum.
+    button.widthAnchor.constraint(greaterThanOrEqualToConstant: width).isActive = true
     button.heightAnchor.constraint(equalToConstant: 22).isActive = true
     button.setAccessibilityTitle(title)
     button.identifier = identifier.map { NSUserInterfaceItemIdentifier($0) }

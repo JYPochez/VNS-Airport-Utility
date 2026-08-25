@@ -193,7 +193,7 @@
 "Reinstall" = "Reinstalla";
 "Remember this password in my keychain" = "Aggiungi questa password al portachiavi";
 "Remove access-control entry" = "Rimuovi voce di controllo accessi";
-"Renew DHCP Lease" = "Rinnova assegnazione DHCP";
+"Renew DHCP Lease" = "Rinnova DHCP assegnato";
 "Repository" = "Repository";
 "Repository:" = "Repository:";
 "Restart…" = "Riavvia…";
