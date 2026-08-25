@@ -35,19 +35,49 @@ final class LocalizationTests: XCTestCase {
   }
 
   /// A translated value that still equals the English source is usually an
-  /// untranslated placeholder. Proper nouns are the legitimate exception.
+  /// untranslated placeholder. The exceptions are per language, not global: a
+  /// term that is genuinely identical in German may still be a real word in
+  /// French, and a global allowlist would stop catching a lazy French entry.
+  ///
+  /// Every entry below is a brand name or a loanword the target language
+  /// actually uses. Add to it only after checking the term in that language.
+  private static let identicalByDesign: [String: Set<String>] = [
+    "fr": [
+      "15 minutes", "30 minutes", "AirPlay", "Description", "Destination", "Internet", "Local", "Services", "Tunnel", "Type", "Zoom",
+    ],
+    "de": [
+      "Accounts:", "AirPlay", "Firmware", "Host", "Host:", "Hostname:", "Internet", "Name", "Name:", "Region", "Region:", "Repository", "Repository:", "Router", "Tunnel", "Version:",
+    ],
+    "es": [
+      "AirPlay", "Firmware", "Host", "Host:", "Internet", "Local", "Router", "Zoom",
+    ],
+    "it": [
+      "AirPlay", "Default", "Firmware", "Host", "Host:", "Internet", "Password", "Password:", "Repository", "Repository:", "Router", "Tunnel", "Wireless", "Zoom",
+    ],
+  ]
+
   func testTranslationsDifferFromEnglish() throws {
-    let untranslatable: Set<String> = [
-      "AirPlay", "Internet", "Firmware", "Name", "Zoom", "Services", "Wireless",
-      "AirPort Utility",
-    ]
     let english = try table("en")
 
     for language in Self.expectedLanguages where language != "en" {
+      let allowed = Self.identicalByDesign[language] ?? []
       let translated = try table(language)
       for (key, value) in translated
-      where !untranslatable.contains(key) && value == english[key] {
+      where !allowed.contains(key) && value == english[key] {
         XCTFail("\(language): \"\(key)\" is identical to English")
+      }
+    }
+  }
+
+  /// Guards the allowlist itself: an entry that is no longer identical has been
+  /// translated since, and should be removed so the check stays meaningful.
+  func testIdenticalAllowlistHasNoStaleEntries() throws {
+    let english = try table("en")
+
+    for (language, allowed) in Self.identicalByDesign {
+      let translated = try table(language)
+      for key in allowed.sorted() where translated[key] != english[key] {
+        XCTFail("\(language): \"\(key)\" is translated now; drop it from the allowlist")
       }
     }
   }

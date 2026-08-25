@@ -21,7 +21,7 @@ public enum AirPortLocalization {
   static let bundle: Bundle = {
     let available = Bundle.module.localizations
     let preferred = Bundle.preferredLocalizations(
-      from: available, forPreferences: Locale.preferredLanguages)
+      from: available, forPreferences: preferredLanguages)
     for language in preferred {
       if let url = Bundle.module.url(forResource: language, withExtension: "lproj"),
         let bundle = Bundle(url: url)
@@ -31,6 +31,19 @@ public enum AirPortLocalization {
     }
     return .module
   }()
+
+  /// The language preference used to pick a table.
+  ///
+  /// Under XCTest this is pinned to the development language. Many tests assert
+  /// on English UI strings, and without pinning, the same test passes on an
+  /// English machine and fails on a French one -- so a developer's system
+  /// language would decide whether the suite is green.
+  private static var preferredLanguages: [String] {
+    if NSClassFromString("XCTest") != nil {
+      return ["en"]
+    }
+    return Locale.preferredLanguages
+  }
 
   /// Looks up `key`, falling back to the key itself when untranslated.
   public static func text(_ key: String) -> String {

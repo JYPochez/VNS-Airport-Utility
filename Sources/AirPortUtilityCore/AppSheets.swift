@@ -6,14 +6,14 @@ struct PasswordsSheet: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 0) {
-      Text("Passwords")
+      Text(localized("Passwords"))
         .font(.system(size: 13, weight: .semibold))
         .padding(.bottom, 13)
 
       VStack(alignment: .leading, spacing: 8) {
-        passwordRow("Base Station Password:", value: baseStationPassword)
+        passwordRow(localized("Base Station Password:"), value: baseStationPassword)
         if shouldShowDiskPassword {
-          passwordRow("Disk Password:", value: diskPassword)
+          passwordRow(localized("Disk Password:"), value: diskPassword)
         }
       }
       .padding(.bottom, 20)
@@ -37,7 +37,7 @@ struct PasswordsSheet: View {
       Text(label)
         .font(.system(size: 13))
         .frame(width: 145, alignment: .trailing)
-      Text(value.isEmpty ? "Not available" : value)
+      Text(value.isEmpty ? localized("Not available") : value)
         .font(.system(size: 13))
         .textSelection(.enabled)
         .accessibilityIdentifier(
@@ -71,11 +71,11 @@ struct PreferencesSheet: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 18) {
-      Text("Preferences")
+      Text(localized("Preferences"))
         .font(.system(size: 13, weight: .semibold))
 
       Toggle(
-        "Show connection details in the Other Wi-Fi Devices menu",
+        localized("Show connection details in the Other Wi-Fi Devices menu"),
         isOn: $model.showConnectionDetails
       )
       .toggleStyle(.checkbox)
@@ -103,36 +103,36 @@ struct ConfigureOtherSheet: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 14) {
-      Text("Configure Other")
+      Text(localized("Configure Other"))
         .font(.system(size: 13, weight: .semibold))
 
       VStack(alignment: .leading, spacing: 10) {
-        labeledField("Host:") {
+        labeledField(localized("Host:")) {
           AirPortTextField(
             text: $model.connection.host,
             placeholder: "Host",
             identifier: "configure.other.host")
             .frame(width: 240, height: 24)
         }
-        labeledField("Password:") {
+        labeledField(localized("Password:")) {
           AirPortSecureField(
             text: $model.connection.password,
-            placeholder: "Password",
+            placeholder: localized("Password"),
             identifier: "configure.other.password",
             onSubmit: submitConnection)
             .frame(width: 240, height: 24)
         }
         if !model.mockMode {
-          labeledField("Repository:") {
+          labeledField(localized("Repository:")) {
             AirPortTextField(
               text: $model.connection.repoPath,
-              placeholder: "Repository",
+              placeholder: localized("Repository"),
               identifier: "configure.other.repository")
               .frame(width: 240, height: 24)
           }
         }
         Toggle(
-          "Remember this password in my keychain",
+          localized("Remember this password in my keychain"),
           isOn: Binding(
             get: { model.rememberConnectionPassword },
             set: { model.updateRememberConnectionPassword($0) }))
@@ -152,12 +152,12 @@ struct ConfigureOtherSheet: View {
 
       HStack {
         Spacer()
-        Button("Cancel") {
+        Button(localized("Cancel")) {
           dismiss()
         }
         .accessibilityIdentifier("configure.other.cancel")
         .frame(width: 70)
-        Button(model.isBusy ? "Working" : "Connect") {
+        Button(model.isBusy ? localized("Working") : localized("Connect")) {
           submitConnection()
         }
         .accessibilityIdentifier("configure.other.connect")

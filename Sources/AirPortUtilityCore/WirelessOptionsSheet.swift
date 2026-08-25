@@ -10,7 +10,7 @@ struct WirelessOptionsSheet: View {
 
   var body: some View {
     ZStack(alignment: .topLeading) {
-      Text("Wireless Options")
+      Text(localized("Wireless Options"))
         .font(.system(size: 13, weight: .semibold))
         .frame(width: 150, alignment: .leading)
         .offset(x: 18, y: 15)
@@ -20,9 +20,9 @@ struct WirelessOptionsSheet: View {
         .frame(width: 432, height: 1)
         .offset(x: 24, y: 61)
 
-      optionLabel("Region:", width: 94)
+      optionLabel(localized("Region:"), width: 94)
         .offset(x: 96, y: 84)
-      Picker("Region", selection: $draft.regionCode) {
+      Picker(localized("Region"), selection: $draft.regionCode) {
         ForEach(WirelessRegionOption.allCases) { region in
           Text(region.name).tag(region.code)
         }
@@ -34,15 +34,15 @@ struct WirelessOptionsSheet: View {
       .offset(x: 195, y: 80)
 
       WirelessOptionsCheckbox(
-        "Create hidden network",
+        localized("Create hidden network"),
         isOn: $draft.hiddenNetwork,
         identifier: "wireless.options.hidden.network")
         .frame(width: 264, height: 18, alignment: .leading)
         .offset(x: 195, y: 115)
 
-      optionLabel("Radio Mode:", width: 94)
+      optionLabel(localized("Radio Mode:"), width: 94)
         .offset(x: 96, y: 140)
-      Picker("Radio Mode", selection: $draft.radioMode) {
+      Picker(localized("Radio Mode"), selection: $draft.radioMode) {
         ForEach(Self.radioModeOptions(for: draft.radioMode)) { option in
           Text(option.label).tag(option.value)
         }
@@ -53,10 +53,10 @@ struct WirelessOptionsSheet: View {
       .frame(width: 264, height: 23)
       .offset(x: 195, y: 136)
 
-      optionLabel("Radio Channel:", width: 94)
+      optionLabel(localized("Radio Channel:"), width: 94)
         .offset(x: 96, y: 171)
-      Picker("Radio Channel", selection: $draft.radioChannel) {
-        Text("Automatic").tag("automatic")
+      Picker(localized("Radio Channel"), selection: $draft.radioChannel) {
+        Text(localized("Automatic")).tag("automatic")
         ForEach(Self.radioChannels, id: \.self) { channel in
           Text(channel).tag(channel)
         }
@@ -68,9 +68,9 @@ struct WirelessOptionsSheet: View {
       .offset(x: 195, y: 167)
 
       if model.capabilities.supportsLegacyWirelessOptions {
-        optionLabel("Multicast Rate:", width: 94)
+        optionLabel(localized("Multicast Rate:"), width: 94)
           .offset(x: 96, y: 202)
-        Picker("Multicast Rate", selection: $legacyDraft.multicastRate) {
+        Picker(localized("Multicast Rate"), selection: $legacyDraft.multicastRate) {
           ForEach(MulticastRateOption.allCases) { option in
             Text(option.label).tag(option.value)
           }
@@ -81,9 +81,9 @@ struct WirelessOptionsSheet: View {
         .frame(width: 264, height: 23)
         .offset(x: 195, y: 198)
 
-        optionLabel("Transmit Power:", width: 94)
+        optionLabel(localized("Transmit Power:"), width: 94)
           .offset(x: 96, y: 233)
-        Picker("Transmit Power", selection: $legacyDraft.transmitPower) {
+        Picker(localized("Transmit Power"), selection: $legacyDraft.transmitPower) {
           ForEach(TransmitPowerOption.allCases) { option in
             Text(option.label).tag(option.percent)
           }
@@ -94,9 +94,9 @@ struct WirelessOptionsSheet: View {
         .frame(width: 264, height: 23)
         .offset(x: 195, y: 229)
 
-        optionLabel("WPA Group Key Timeout:", width: 160)
+        optionLabel(localized("WPA Group Key Timeout:"), width: 160)
           .offset(x: 30, y: 264)
-        Picker("WPA Group Key Timeout", selection: $legacyDraft.groupKeyTimeoutSeconds) {
+        Picker(localized("WPA Group Key Timeout"), selection: $legacyDraft.groupKeyTimeoutSeconds) {
           ForEach(Self.groupKeyTimeoutOptions, id: \.seconds) { option in
             Text(option.label).tag(option.seconds)
           }
@@ -108,7 +108,7 @@ struct WirelessOptionsSheet: View {
         .offset(x: 195, y: 260)
 
         WirelessOptionsCheckbox(
-          "Use interference robustness",
+          localized("Use interference robustness"),
           isOn: $legacyDraft.interferenceRobustness,
           identifier: "wireless.options.interference.robustness")
           .frame(width: 264, height: 18, alignment: .leading)
@@ -142,13 +142,13 @@ struct WirelessOptionsSheet: View {
 
   private static let radioChannels = (1...11).map(String.init)
   private static let groupKeyTimeoutOptions = [
-    (seconds: 900, label: "15 minutes"),
-    (seconds: 1_800, label: "30 minutes"),
-    (seconds: 3_600, label: "1 hour"),
-    (seconds: 7_200, label: "2 hours"),
-    (seconds: 14_400, label: "4 hours"),
-    (seconds: 28_800, label: "8 hours"),
-    (seconds: 86_400, label: "24 hours"),
+    (seconds: 900, label: localized("15 minutes")),
+    (seconds: 1_800, label: localized("30 minutes")),
+    (seconds: 3_600, label: localized("1 hour")),
+    (seconds: 7_200, label: localized("2 hours")),
+    (seconds: 14_400, label: localized("4 hours")),
+    (seconds: 28_800, label: localized("8 hours")),
+    (seconds: 86_400, label: localized("24 hours")),
   ]
 
   private var actionButtonY: CGFloat {
