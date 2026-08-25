@@ -45,6 +45,18 @@ public enum AirPortLocalization {
     return Locale.preferredLanguages
   }
 
+  /// The locale matching the resolved table.
+  ///
+  /// Foundation-provided text (region names, for example) must agree with the
+  /// rest of the UI, and must follow the same XCTest pinning -- otherwise a
+  /// test sees English labels beside French country names.
+  static let locale: Locale = {
+    let available = Bundle.module.localizations
+    let preferred = Bundle.preferredLocalizations(
+      from: available, forPreferences: preferredLanguages)
+    return Locale(identifier: preferred.first ?? "en")
+  }()
+
   /// Looks up `key`, falling back to the key itself when untranslated.
   public static func text(_ key: String) -> String {
     bundle.localizedString(forKey: key, value: key, table: nil)

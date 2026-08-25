@@ -495,10 +495,50 @@ struct WirelessRadioModeOption: Identifiable, Equatable, Sendable {
 }
 
 struct WirelessRegionOption: Identifiable, Equatable, Sendable {
+  /// ACP region index. Wire value -- never localized.
   var code: String
+  /// English region name. Doubles as the lookup key and the fallback.
   var name: String
 
   var id: String { code }
+
+  /// The region name in the user's language.
+  ///
+  /// Foundation is the source of truth here: hand-translating 172 country
+  /// names into four languages would be redundant, and Locale already carries
+  /// authoritative names for every one of them. Only the names Apple spells
+  /// differently from the current ISO English need an alias.
+  /// The ISO region this option maps to, if any. Internal so a test can assert
+  /// the whole list maps; an unmapped entry silently falls back to English.
+  var isoRegionCode: String? { Self.isoRegionCodesByEnglishName[name.lowercased()] }
+
+  var localizedName: String {
+    guard let region = Self.isoRegionCodesByEnglishName[name.lowercased()] else {
+      return name
+    }
+    return AirPortLocalization.locale.localizedString(forRegionCode: region) ?? name
+  }
+
+  /// Names this list spells differently from Foundation's current English.
+  private static let isoRegionAliases: [String: String] = [
+    "czech republic": "CZ", "slovak republic": "SK", "hong kong s.a.r., china": "HK",
+    "china": "CN", "antigua and barbuda": "AG", "bosnia herzegovina": "BA",
+    "british indian ocean territory": "IO", "cocos islands": "CC", "congo": "CG",
+    "ivory coast": "CI", "east timor": "TL", "guinea bissau": "GW", "macau": "MO",
+    "macedonia": "MK", "trinidad and tobago": "TT", "turkey": "TR",
+    "us virgin islands": "VI", "myanmar": "MM",
+  ]
+
+  private static let isoRegionCodesByEnglishName: [String: String] = {
+    let english = Locale(identifier: "en_US")
+    var map: [String: String] = [:]
+    for region in Locale.Region.isoRegions.map(\.identifier) {
+      if let name = english.localizedString(forRegionCode: region) {
+        map[name.lowercased()] = region
+      }
+    }
+    return map.merging(isoRegionAliases) { _, alias in alias }
+  }()
 
   static let allCases = [
     WirelessRegionOption(code: "0", name: "United States"),

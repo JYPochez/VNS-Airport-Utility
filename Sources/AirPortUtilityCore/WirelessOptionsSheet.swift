@@ -24,7 +24,7 @@ struct WirelessOptionsSheet: View {
         .offset(x: 96, y: 84)
       Picker(localized("Region"), selection: $draft.regionCode) {
         ForEach(WirelessRegionOption.allCases) { region in
-          Text(region.name).tag(region.code)
+          Text(region.localizedName).tag(region.code)
         }
       }
       .labelsHidden()

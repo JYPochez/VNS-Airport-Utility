@@ -106,6 +106,22 @@ final class LocalizationTests: XCTestCase {
     XCTAssertEqual(Pane.advanced.rawValue, "Advanced")
   }
 
+  /// Region names come from Foundation rather than the .strings tables.
+  /// An entry that maps to no ISO region silently falls back to English in all
+  /// four languages, so the whole list must map.
+  func testEveryRegionMapsToAnISORegion() {
+    let unmapped = WirelessRegionOption.allCases.filter { $0.isoRegionCode == nil }
+    XCTAssertTrue(unmapped.isEmpty, "unmapped regions: \(unmapped.map(\.name))")
+  }
+
+  func testRegionNamesTranslate() {
+    let france = WirelessRegionOption.allCases.first { $0.name == "Germany" }
+    let code = try? XCTUnwrap(france?.isoRegionCode)
+    XCTAssertEqual(code, "DE")
+    XCTAssertEqual(Locale(identifier: "fr").localizedString(forRegionCode: "DE"), "Allemagne")
+    XCTAssertEqual(Locale(identifier: "es").localizedString(forRegionCode: "DE"), "Alemania")
+  }
+
   func testLookupFallsBackToTheKeyWhenUntranslated() {
     let key = "A string that is deliberately absent from every table"
     XCTAssertEqual(AirPortLocalization.text(key), key)
