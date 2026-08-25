@@ -236,11 +236,13 @@ private struct InternetPaneButton: NSViewRepresentable {
     button.setButtonType(.momentaryPushIn)
     button.alignment = .center
     button.translatesAutoresizingMaskIntoConstraints = false
-    // A minimum, not an exact width: these widths were measured against English
-    // labels, and an exact constraint truncates longer translations
-    // ("Rinnova DHCP assegnato"). English keeps its measured width because its
-    // intrinsic size is smaller than the minimum.
-    button.widthAnchor.constraint(greaterThanOrEqualToConstant: width).isActive = true
+    // Exact width, but never narrower than the label needs. The constants were
+    // measured against English and truncate longer translations; a plain
+    // greaterThanOrEqual constraint instead lets the button expand to fill,
+    // which changes the English layout.
+    button.widthAnchor.constraint(
+      equalToConstant: max(width, button.intrinsicContentSize.width)
+    ).isActive = true
     button.heightAnchor.constraint(equalToConstant: 22).isActive = true
     button.setAccessibilityTitle(title)
     button.identifier = identifier.map { NSUserInterfaceItemIdentifier($0) }

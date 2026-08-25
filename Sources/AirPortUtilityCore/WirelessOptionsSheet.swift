@@ -222,7 +222,13 @@ private struct WirelessOptionsButton: NSViewRepresentable {
     button.setButtonType(.momentaryPushIn)
     button.alignment = .center
     button.translatesAutoresizingMaskIntoConstraints = false
-    button.widthAnchor.constraint(equalToConstant: 70).isActive = true
+    // Exact width, but never narrower than the label needs. The constants were
+    // measured against English and truncate longer translations; a plain
+    // greaterThanOrEqual constraint instead lets the button expand to fill,
+    // which changes the English layout.
+    button.widthAnchor.constraint(
+      equalToConstant: max(70, button.intrinsicContentSize.width)
+    ).isActive = true
     button.heightAnchor.constraint(equalToConstant: 22).isActive = true
     configure(button)
     return button
