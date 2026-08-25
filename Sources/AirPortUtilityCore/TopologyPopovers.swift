@@ -73,15 +73,15 @@ struct DevicePopover: View {
     var rows = [
       ("status", model.selectedDeviceStatusText()),
       ("network", model.wireless.networkName),
-      ("IP address", model.internet.ipv4Address),
+      (localized("IP address"), model.internet.ipv4Address),
       ("LAN IP address", model.network.lanIPAddress),
-      ("serial number", model.baseStation.serialNumber),
+      (localized("serial number"), model.baseStation.serialNumber),
       ("version", model.baseStation.version),
     ]
     let firmwareUpdate = model.selectedDeviceFirmwareUpdateDetail
       .trimmingCharacters(in: .whitespacesAndNewlines)
     if !firmwareUpdate.isEmpty {
-      rows.insert(("firmware update", firmwareUpdate), at: 1)
+      rows.insert((localized("firmware update"), firmwareUpdate), at: 1)
     }
     let statusDetails = model.selectedDeviceStatusDetails()
       .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
@@ -110,14 +110,14 @@ struct DeviceLoadingPopover: View {
     SettingsLoadingPopover(
       title:
         model.hasLoadedSettings && !model.hasLoadedWirelessClients
-        ? "Loading Wireless Clients"
-        : "Connecting to Base Station")
+        ? localized("Loading Wireless Clients")
+        : localized("Connecting to Base Station"))
   }
 }
 
 private struct InternetLoadingPopover: View {
   var body: some View {
-    SettingsLoadingPopover(title: "Loading Internet Settings")
+    SettingsLoadingPopover(title: localized("Loading Internet Settings"))
   }
 }
 
@@ -162,8 +162,8 @@ struct InternetPopover: View {
       PopoverDetailsRows(
         rows: [
           ("connection", model.internetPopoverConnectionStatus),
-          ("router address", model.hostInternet.routerAddress),
-          ("DNS servers", model.hostInternet.dnsServers),
+          (localized("router address"), model.hostInternet.routerAddress),
+          (localized("DNS servers"), model.hostInternet.dnsServers),
         ])
         .frame(width: 274, height: 54)
     }
@@ -282,7 +282,7 @@ private final class PopoverDetailsDocumentView: NSView {
     let y = CGFloat(rows.count) * DevicePopoverLayout.rowHeight
     addSubview(
       textField(
-        "wireless clients",
+        localized("wireless clients"),
         frame: NSRect(x: 0, y: y, width: 108, height: 19),
         label: true))
     for (index, client) in wirelessClients.enumerated() {
@@ -456,7 +456,7 @@ struct ConnectionPopover: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 10) {
-      Text("Connect to Base Station")
+      Text(localized("Connect to Base Station"))
         .font(.system(size: 13, weight: .semibold))
       if mode == .full {
         AirPortTextField(
@@ -484,7 +484,7 @@ struct ConnectionPopover: View {
       if mode == .full && !model.mockMode {
         AirPortTextField(
           text: $model.connection.repoPath,
-          placeholder: "Repo",
+          placeholder: localized("Repo"),
           identifier: "connection.popover.repository")
           .frame(width: 220, height: 24)
       }
@@ -498,7 +498,7 @@ struct ConnectionPopover: View {
         .keyboardShortcut(.defaultAction)
         .disabled(!model.canAttemptConnection)
       }
-      if !model.status.hasPrefix("Connected") {
+      if !model.status.hasPrefix(localized("Connected")) {
         Text(model.status)
           .font(.caption)
           .foregroundStyle(.secondary)
