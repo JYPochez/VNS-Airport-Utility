@@ -1,0 +1,8 @@
+// Local, uncommitted overrides. See Base.xcconfig.
+//
+// Xcode needs a team to archive and distribute; without one the Organizer
+// reports "No Team Found in Archive". Both values are fork-specific, so they
+// live here rather than in the committed project.
+
+PRODUCT_BUNDLE_IDENTIFIER = VNS.airport.utility
+DEVELOPMENT_TEAM = ZZUH8HNYE6

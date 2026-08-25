@@ -323,22 +323,14 @@ extension AirportAppModel {
   ) -> [String] {
     var accounts = fallbackHosts
     if let device {
-      accounts += device.normalizedStableIdentifiers.compactMap {
-        Self.passwordStoreAccount(for: $0)
-      }
+      accounts += device.normalizedStableIdentifiers.compactMap(Self.passwordStoreAccount)
       accounts.append(device.connectionHost)
       accounts += device.normalizedConnectionHosts
     }
     if includeCurrentIdentityAccounts {
-      accounts += selectedTopologyDeviceIdentifiers.compactMap {
-        Self.passwordStoreAccount(for: $0)
-      }
-      accounts += connectedTopologyDeviceIdentifiers.compactMap {
-        Self.passwordStoreAccount(for: $0)
-      }
-      accounts += updatingBaseStationDeviceIdentifiers.compactMap {
-        Self.passwordStoreAccount(for: $0)
-      }
+      accounts += selectedTopologyDeviceIdentifiers.compactMap(Self.passwordStoreAccount)
+      accounts += connectedTopologyDeviceIdentifiers.compactMap(Self.passwordStoreAccount)
+      accounts += updatingBaseStationDeviceIdentifiers.compactMap(Self.passwordStoreAccount)
     }
     return Self.uniquePasswordStoreAccounts(accounts)
   }
