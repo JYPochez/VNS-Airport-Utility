@@ -2,6 +2,28 @@
 
 Apple's AirPort Utility is not guaranteed to run on macOS 27 and newer, so I reverse engineered the application and have reimplemented it for macOS 27 and newer with Swift (front-end code) and Python (backend protocol code). I leveraged Codex to accelerate this work.
 
+## Download
+
+**[Download AirPort Utility 0.1.0](https://github.com/JYPochez/VNS-Airport-Utility/releases/tag/v0.1.0)**
+— signed, notarized, and localized into English, French, German, Spanish and
+Italian. Universal (Apple Silicon and Intel), macOS 13 or later.
+
+Unzip and drag **AirPort Utility.app** to your Applications folder. Because the
+build is notarized by Apple, it opens without a Gatekeeper warning.
+
+Two things on first launch:
+
+- **Approve the Local Network prompt.** Base stations are found over Bonjour and
+  configured over ACP on port 5009, both of which count as local network access.
+  Declining it means no devices are discovered.
+- **Python 3 must be present.** The app drives a Python backend bundled inside
+  it, run with the interpreter already on your Mac. The system `python3` works.
+
+This is a fork of [jackhumphries/airport-utility](https://github.com/jackhumphries/airport-utility)
+adding a double-clickable app bundle and localization. Not affiliated with Apple.
+
+---
+
 ![AirPort Utility network topology](docs/images/airport-utility-topology.png)
 
 ![AirPort Utility Internet settings](docs/images/airport-utility-internet-settings.png)
