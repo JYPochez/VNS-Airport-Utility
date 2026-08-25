@@ -43,16 +43,16 @@ final class LocalizationTests: XCTestCase {
   /// actually uses. Add to it only after checking the term in that language.
   private static let identicalByDesign: [String: Set<String>] = [
     "fr": [
-      "15 minutes", "30 minutes", "AirPlay", "Description", "Destination", "Double NAT", "Internet", "Local", "Services", "Tunnel", "Type", "Zoom",
+      "15 minutes", "30 minutes", "AirPlay", "AirPort Express", "AirPort Extreme", "Description", "Destination", "Double NAT", "Internet", "Local", "Services", "Time Capsule", "Tunnel", "Type", "Zoom",
     ],
     "de": [
-      "Accounts:", "AirPlay", "Firmware", "Host", "Host:", "Hostname:", "Internet", "Name", "Name:", "Region", "Region:", "Repo", "Repository", "Repository:", "Router", "Tunnel", "Version:",
+      "Accounts:", "AirPlay", "AirPort Express", "AirPort Extreme", "Firmware", "Host", "Host:", "Hostname:", "Internet", "Name", "Name:", "Region", "Region:", "Repo", "Repository", "Repository:", "Router", "Time Capsule", "Tunnel", "Version:",
     ],
     "es": [
-      "AirPlay", "Firmware", "Host", "Host:", "Internet", "Local", "Repo", "Router", "Zoom",
+      "AirPlay", "AirPort Express", "AirPort Extreme", "Firmware", "Host", "Host:", "Internet", "Local", "Repo", "Router", "Time Capsule", "Zoom",
     ],
     "it": [
-      "AirPlay", "Default", "Firmware", "Host", "Host:", "Internet", "Password", "Password:", "Repo", "Repository", "Repository:", "Router", "Tunnel", "Wireless", "Zoom",
+      "AirPlay", "AirPort Express", "AirPort Extreme", "Default", "Firmware", "Host", "Host:", "Internet", "Password", "Password:", "Repo", "Repository", "Repository:", "Router", "Time Capsule", "Tunnel", "Wireless", "Zoom",
     ],
   ]
 
