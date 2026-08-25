@@ -3,13 +3,21 @@
    English automatically, so this table may be incomplete.
    Do NOT add ACP keys, backend flags or persisted raw values here. */
 
+"0 - Emergency" = "0 – Notfall";
+"1 - Alert" = "1 – Alarm";
 "1 hour" = "1 Stunde";
 "15 minutes" = "15 Minuten";
+"2 - Critical" = "2 – Kritisch";
 "2 hours" = "2 Stunden";
 "24 hours" = "24 Stunden";
+"3 - Error" = "3 – Fehler";
 "30 minutes" = "30 Minuten";
 "35-Pass Erase" = "35-fach überschreiben";
+"4 - Warning" = "4 – Warnung";
 "4 hours" = "4 Stunden";
+"5 - Notice" = "5 – Hinweis";
+"6 - Informational" = "6 – Information";
+"7 - Debug" = "7 – Debug";
 "7-Pass Erase" = "7-fach überschreiben";
 "8 hours" = "8 Stunden";
 "About AirPort Utility" = "Über AirPort-Dienstprogramm";
@@ -71,6 +79,8 @@
 "Archive Disk…" = "Volume archivieren…";
 "Archive the AirPort Time Capsule disk to back up your data." = "Archivieren Sie das AirPort Time Capsule-Volume, um Ihre Daten zu sichern.";
 "Archiving disk" = "Volume wird archiviert";
+"Are you sure you want to archive the AirPort Time Capsule disk to a disk connected using USB?" = "Möchten Sie das AirPort Time Capsule-Volume wirklich auf ein per USB angeschlossenes Volume archivieren?";
+"Are you sure you want to erase the AirPort Time Capsule disk?" = "Möchten Sie das AirPort Time Capsule-Volume wirklich löschen?";
 "Automatic" = "Automatisch";
 "Automatically" = "Automatisch";
 "Automatically Dial" = "Automatisch wählen";
@@ -252,7 +262,7 @@
 "Loading firmware list" = "Firmware-Liste wird geladen";
 "Local" = "Lokal";
 "Location:" = "Ort:";
-"Logging & Statistics" = "Protokolle & Statistiken";
+"Logging & Statistics" = "Protokolle";
 "Make sure the storage device has enough space for the archive before connecting it to the base station’s USB Port." = "Stellen Sie sicher, dass das Speichergerät genügend Platz für das Archiv bietet, bevor Sie es an den USB-Anschluss der Basisstation anschließen.";
 "Manually" = "Manuell";
 "Maximum Connect Time has an unsupported value." = "Die maximale Verbindungsdauer hat einen nicht unterstützten Wert.";
@@ -507,7 +517,12 @@
 "Writes zeros over all data on the disk. This option provides better security than a quick erase, but takes longer." = "Überschreibt alle Daten auf dem Volume mit Nullen. Diese Option ist sicherer als ein schnelles Löschen, dauert aber länger.";
 "Zero Out Data" = "Mit Nullen überschreiben";
 "Zoom" = "Zoomen";
+"day" = "Tag";
 "firmware update" = "Firmware-Update";
+"hour" = "Stunde";
+"minute" = "Minute";
 "router address" = "Router-Adresse";
+"second" = "Sekunde";
 "serial number" = "Seriennummer";
+"week" = "Woche";
 "wireless clients" = "WLAN-Clients";

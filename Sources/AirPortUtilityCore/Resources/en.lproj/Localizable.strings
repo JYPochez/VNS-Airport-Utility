@@ -3,13 +3,21 @@
    English automatically, so this table may be incomplete.
    Do NOT add ACP keys, backend flags or persisted raw values here. */
 
+"0 - Emergency" = "0 - Emergency";
+"1 - Alert" = "1 - Alert";
 "1 hour" = "1 hour";
 "15 minutes" = "15 minutes";
+"2 - Critical" = "2 - Critical";
 "2 hours" = "2 hours";
 "24 hours" = "24 hours";
+"3 - Error" = "3 - Error";
 "30 minutes" = "30 minutes";
 "35-Pass Erase" = "35-Pass Erase";
+"4 - Warning" = "4 - Warning";
 "4 hours" = "4 hours";
+"5 - Notice" = "5 - Notice";
+"6 - Informational" = "6 - Informational";
+"7 - Debug" = "7 - Debug";
 "7-Pass Erase" = "7-Pass Erase";
 "8 hours" = "8 hours";
 "About AirPort Utility" = "About AirPort Utility";
@@ -71,6 +79,8 @@
 "Archive Disk…" = "Archive Disk…";
 "Archive the AirPort Time Capsule disk to back up your data." = "Archive the AirPort Time Capsule disk to back up your data.";
 "Archiving disk" = "Archiving disk";
+"Are you sure you want to archive the AirPort Time Capsule disk to a disk connected using USB?" = "Are you sure you want to archive the AirPort Time Capsule disk to a disk connected using USB?";
+"Are you sure you want to erase the AirPort Time Capsule disk?" = "Are you sure you want to erase the AirPort Time Capsule disk?";
 "Automatic" = "Automatic";
 "Automatically" = "Automatically";
 "Automatically Dial" = "Automatically Dial";
@@ -507,7 +517,12 @@
 "Writes zeros over all data on the disk. This option provides better security than a quick erase, but takes longer." = "Writes zeros over all data on the disk. This option provides better security than a quick erase, but takes longer.";
 "Zero Out Data" = "Zero Out Data";
 "Zoom" = "Zoom";
+"day" = "day";
 "firmware update" = "firmware update";
+"hour" = "hour";
+"minute" = "minute";
 "router address" = "router address";
+"second" = "second";
 "serial number" = "serial number";
+"week" = "week";
 "wireless clients" = "wireless clients";

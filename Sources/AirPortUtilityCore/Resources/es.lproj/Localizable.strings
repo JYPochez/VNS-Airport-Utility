@@ -3,13 +3,21 @@
    English automatically, so this table may be incomplete.
    Do NOT add ACP keys, backend flags or persisted raw values here. */
 
+"0 - Emergency" = "0 – Emergencia";
+"1 - Alert" = "1 – Alerta";
 "1 hour" = "1 hora";
 "15 minutes" = "15 minutos";
+"2 - Critical" = "2 – Crítico";
 "2 hours" = "2 horas";
 "24 hours" = "24 horas";
+"3 - Error" = "3 – Error";
 "30 minutes" = "30 minutos";
 "35-Pass Erase" = "Borrado de 35 pasadas";
+"4 - Warning" = "4 – Advertencia";
 "4 hours" = "4 horas";
+"5 - Notice" = "5 – Aviso";
+"6 - Informational" = "6 – Información";
+"7 - Debug" = "7 – Depuración";
 "7-Pass Erase" = "Borrado de 7 pasadas";
 "8 hours" = "8 horas";
 "About AirPort Utility" = "Acerca de Utilidad AirPort";
@@ -71,6 +79,8 @@
 "Archive Disk…" = "Archivar disco…";
 "Archive the AirPort Time Capsule disk to back up your data." = "Archiva el disco AirPort Time Capsule para respaldar tus datos.";
 "Archiving disk" = "Archivando disco";
+"Are you sure you want to archive the AirPort Time Capsule disk to a disk connected using USB?" = "¿Seguro que quieres archivar el disco AirPort Time Capsule en un disco conectado por USB?";
+"Are you sure you want to erase the AirPort Time Capsule disk?" = "¿Seguro que quieres borrar el disco AirPort Time Capsule?";
 "Automatic" = "Automático";
 "Automatically" = "Automáticamente";
 "Automatically Dial" = "Marcar automáticamente";
@@ -252,7 +262,7 @@
 "Loading firmware list" = "Cargando la lista de firmware";
 "Local" = "Local";
 "Location:" = "Ubicación:";
-"Logging & Statistics" = "Registro y estadísticas";
+"Logging & Statistics" = "Registro";
 "Make sure the storage device has enough space for the archive before connecting it to the base station’s USB Port." = "Asegúrate de que el dispositivo de almacenamiento tenga espacio suficiente para el archivo antes de conectarlo al puerto USB de la estación base.";
 "Manually" = "Manualmente";
 "Maximum Connect Time has an unsupported value." = "El tiempo máximo de conexión tiene un valor no admitido.";
@@ -317,7 +327,7 @@
 "Open wireless network" = "Red inalámbrica abierta";
 "Other Options" = "Otras opciones";
 "Other Wi-Fi Devices" = "Otros dispositivos Wi-Fi";
-"PPP Dial-in" = "Acceso telefónico PPP";
+"PPP Dial-in" = "Acceso PPP";
 "PPP Dial-in is not allowed when configured to connect to the Internet via the Modem or AOL." = "El acceso telefónico PPP no está permitido cuando la conexión a Internet es por módem o AOL.";
 "PPP Dial-in is not allowed when configured to share a range of addresses." = "El acceso telefónico PPP no está permitido cuando se comparte un rango de direcciones.";
 "PPP Dial-in passwords do not match." = "Las contraseñas de acceso telefónico PPP no coinciden.";
@@ -507,7 +517,12 @@
 "Writes zeros over all data on the disk. This option provides better security than a quick erase, but takes longer." = "Escribe ceros sobre todos los datos del disco. Esta opción es más segura que un borrado rápido, pero tarda más.";
 "Zero Out Data" = "Rellenar con ceros";
 "Zoom" = "Zoom";
+"day" = "día";
 "firmware update" = "actualización de firmware";
+"hour" = "hora";
+"minute" = "minuto";
 "router address" = "dirección del router";
+"second" = "segundo";
 "serial number" = "número de serie";
+"week" = "semana";
 "wireless clients" = "clientes inalámbricos";

@@ -3,13 +3,21 @@
    English automatically, so this table may be incomplete.
    Do NOT add ACP keys, backend flags or persisted raw values here. */
 
+"0 - Emergency" = "0 – Emergenza";
+"1 - Alert" = "1 – Allerta";
 "1 hour" = "1 ora";
 "15 minutes" = "15 minuti";
+"2 - Critical" = "2 – Critico";
 "2 hours" = "2 ore";
 "24 hours" = "24 ore";
+"3 - Error" = "3 – Errore";
 "30 minutes" = "30 minuti";
 "35-Pass Erase" = "Inizializzazione a 35 passaggi";
+"4 - Warning" = "4 – Avviso";
 "4 hours" = "4 ore";
+"5 - Notice" = "5 – Nota";
+"6 - Informational" = "6 – Informazione";
+"7 - Debug" = "7 – Debug";
 "7-Pass Erase" = "Inizializzazione a 7 passaggi";
 "8 hours" = "8 ore";
 "About AirPort Utility" = "Informazioni su Utility AirPort";
@@ -71,6 +79,8 @@
 "Archive Disk…" = "Archivia disco…";
 "Archive the AirPort Time Capsule disk to back up your data." = "Archivia il disco AirPort Time Capsule per eseguire il backup dei dati.";
 "Archiving disk" = "Archiviazione disco";
+"Are you sure you want to archive the AirPort Time Capsule disk to a disk connected using USB?" = "Vuoi davvero archiviare il disco AirPort Time Capsule su un disco collegato via USB?";
+"Are you sure you want to erase the AirPort Time Capsule disk?" = "Vuoi davvero inizializzare il disco AirPort Time Capsule?";
 "Automatic" = "Automatico";
 "Automatically" = "Automaticamente";
 "Automatically Dial" = "Composizione automatica";
@@ -252,7 +262,7 @@
 "Loading firmware list" = "Caricamento elenco firmware";
 "Local" = "Locale";
 "Location:" = "Posizione:";
-"Logging & Statistics" = "Log e statistiche";
+"Logging & Statistics" = "Log";
 "Make sure the storage device has enough space for the archive before connecting it to the base station’s USB Port." = "Assicurati che il dispositivo di archiviazione abbia spazio sufficiente per l’archivio prima di collegarlo alla porta USB della stazione base.";
 "Manually" = "Manualmente";
 "Maximum Connect Time has an unsupported value." = "Il tempo massimo di connessione ha un valore non supportato.";
@@ -507,7 +517,12 @@
 "Writes zeros over all data on the disk. This option provides better security than a quick erase, but takes longer." = "Scrive zeri su tutti i dati del disco. Questa opzione è più sicura di un’inizializzazione rapida, ma richiede più tempo.";
 "Zero Out Data" = "Azzera dati";
 "Zoom" = "Zoom";
+"day" = "giorno";
 "firmware update" = "aggiornamento firmware";
+"hour" = "ora";
+"minute" = "minuto";
 "router address" = "indirizzo router";
+"second" = "secondo";
 "serial number" = "numero di serie";
+"week" = "settimana";
 "wireless clients" = "client wireless";

@@ -747,11 +747,11 @@ struct DHCPLeaseUnitOption: Identifiable, Equatable, Sendable {
   let label: String
 
   static let allCases: [DHCPLeaseUnitOption] = [
-    DHCPLeaseUnitOption(value: "seconds", label: "second"),
-    DHCPLeaseUnitOption(value: "minutes", label: "minute"),
-    DHCPLeaseUnitOption(value: "hours", label: "hour"),
-    DHCPLeaseUnitOption(value: "days", label: "day"),
-    DHCPLeaseUnitOption(value: "weeks", label: "week"),
+    DHCPLeaseUnitOption(value: "seconds", label: localized("second")),
+    DHCPLeaseUnitOption(value: "minutes", label: localized("minute")),
+    DHCPLeaseUnitOption(value: "hours", label: localized("hour")),
+    DHCPLeaseUnitOption(value: "days", label: localized("day")),
+    DHCPLeaseUnitOption(value: "weeks", label: localized("week")),
   ]
 }
 
@@ -868,14 +868,14 @@ struct SyslogLevelOption: Identifiable, Equatable, Sendable {
   let label: String
 
   static let allCases = [
-    SyslogLevelOption(level: 0, label: "0 - Emergency"),
-    SyslogLevelOption(level: 1, label: "1 - Alert"),
-    SyslogLevelOption(level: 2, label: "2 - Critical"),
-    SyslogLevelOption(level: 3, label: "3 - Error"),
-    SyslogLevelOption(level: 4, label: "4 - Warning"),
-    SyslogLevelOption(level: 5, label: "5 - Notice"),
-    SyslogLevelOption(level: 6, label: "6 - Informational"),
-    SyslogLevelOption(level: 7, label: "7 - Debug"),
+    SyslogLevelOption(level: 0, label: localized("0 - Emergency")),
+    SyslogLevelOption(level: 1, label: localized("1 - Alert")),
+    SyslogLevelOption(level: 2, label: localized("2 - Critical")),
+    SyslogLevelOption(level: 3, label: localized("3 - Error")),
+    SyslogLevelOption(level: 4, label: localized("4 - Warning")),
+    SyslogLevelOption(level: 5, label: localized("5 - Notice")),
+    SyslogLevelOption(level: 6, label: localized("6 - Informational")),
+    SyslogLevelOption(level: 7, label: localized("7 - Debug")),
   ]
 }
 

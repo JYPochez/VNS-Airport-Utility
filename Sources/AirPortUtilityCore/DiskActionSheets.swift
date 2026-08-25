@@ -12,14 +12,14 @@ struct EraseDiskSheet: View {
       diskIcon
         .offset(x: 14, y: 19)
 
-      Text("Are you sure you want to erase the AirPort Time\nCapsule disk? ")
+      Text(localized("Are you sure you want to erase the AirPort Time Capsule disk?"))
         .font(.system(size: 13, weight: .semibold))
         .frame(width: 401, height: 36, alignment: .topLeading)
         .offset(x: 101, y: 19)
 
       Text(localized("Erasing the AirPort Time Capsule disk deletes all files from the disk."))
         .font(.system(size: 13))
-        .frame(width: 430, height: 31, alignment: .topLeading)
+        .frame(width: 430, height: 36, alignment: .topLeading)
         .offset(x: 101, y: 64)
 
       sheetLabel(localized("Name:"))
@@ -50,16 +50,21 @@ struct EraseDiskSheet: View {
         .disabled(true)
         .offset(x: 101, y: 166)
 
-      DiskSheetButton(
-        localized("Cancel"), width: 70, isDefault: true,
-        identifier: "erase.disk.cancel"
-      ) { dismiss() }
-        .offset(x: 356, y: 245)
-      DiskSheetButton(localized("Erase"), width: 62, identifier: "erase.disk.confirm") {
-        model.applyErase(method: method, volumeName: diskName)
-        dismiss()
+      // Right-anchored: a wider translated label would otherwise grow into the
+      // neighbouring button. Trailing edge (500) and 12pt gap match the English
+      // layout exactly (Cancel 356-426, Erase 438-500).
+      HStack(spacing: 12) {
+        DiskSheetButton(
+          localized("Cancel"), width: 70, isDefault: true,
+          identifier: "erase.disk.cancel"
+        ) { dismiss() }
+        DiskSheetButton(localized("Erase"), width: 62, identifier: "erase.disk.confirm") {
+          model.applyErase(method: method, volumeName: diskName)
+          dismiss()
+        }
       }
-      .offset(x: 438, y: 245)
+      .frame(width: 500, alignment: .trailing)
+      .offset(x: 0, y: 245)
     }
     .onAppear {
       if diskName.isEmpty {
@@ -87,7 +92,9 @@ struct ArchiveDiskSheet: View {
         .offset(x: 14, y: 19)
 
       Text(
-        "Are you sure you want to archive the AirPort Time Capsule\ndisk to a disk connected using USB? "
+        localized(
+          "Are you sure you want to archive the AirPort Time Capsule disk to a disk connected using USB?"
+        )
       )
       .font(.system(size: 13, weight: .semibold))
       .frame(width: 402, height: 44, alignment: .topLeading)
@@ -95,7 +102,7 @@ struct ArchiveDiskSheet: View {
 
       Text(localized("Archive the AirPort Time Capsule disk to back up your data."))
         .font(.system(size: 13))
-        .frame(width: 401, height: 19, alignment: .topLeading)
+        .frame(width: 401, height: 36, alignment: .topLeading)
         .offset(x: 101, y: 69)
 
       sheetLabel(localized("Destination:"))
@@ -116,35 +123,40 @@ struct ArchiveDiskSheet: View {
       )
       .font(.system(size: 13))
       .foregroundStyle(Color.primary.opacity(0.82))
-      .frame(width: 402, height: 42, alignment: .topLeading)
+      .frame(width: 402, height: 52, alignment: .topLeading)
       .disabled(true)
       .offset(x: 101, y: 148)
 
-      if destinationName == nil {
-        DiskSheetButton(
-          localized("Cancel"), width: 70, isDefault: true,
-          identifier: "archive.disk.cancel"
-        ) { dismiss() }
-          .offset(x: 343, y: 203)
-        DiskSheetButton(
-          localized("Archive"), width: 75, isEnabled: false,
-          identifier: "archive.disk.confirm"
-        ) {}
-          .offset(x: 425, y: 203)
-      } else {
-        DiskSheetButton(localized("Cancel"), width: 70, identifier: "archive.disk.cancel") { dismiss() }
-          .offset(x: 343, y: 203)
-        DiskSheetButton(
-          localized("Archive"), width: 75, isDefault: true,
-          identifier: "archive.disk.confirm"
-        ) {
-          if destinationName != nil {
-            model.applyArchive(name: "")
+      // Right-anchored: a wider translated label would otherwise grow into the
+      // neighbouring button. Trailing edge (500) and 12pt gap match the English
+      // layout exactly (Cancel 343-413, Archive 425-500).
+      HStack(spacing: 12) {
+        if destinationName == nil {
+          DiskSheetButton(
+            localized("Cancel"), width: 70, isDefault: true,
+            identifier: "archive.disk.cancel"
+          ) { dismiss() }
+          DiskSheetButton(
+            localized("Archive"), width: 75, isEnabled: false,
+            identifier: "archive.disk.confirm"
+          ) {}
+        } else {
+          DiskSheetButton(localized("Cancel"), width: 70, identifier: "archive.disk.cancel") {
             dismiss()
           }
+          DiskSheetButton(
+            localized("Archive"), width: 75, isDefault: true,
+            identifier: "archive.disk.confirm"
+          ) {
+            if destinationName != nil {
+              model.applyArchive(name: "")
+              dismiss()
+            }
+          }
         }
-        .offset(x: 425, y: 203)
       }
+      .frame(width: 500, alignment: .trailing)
+      .offset(x: 0, y: 203)
     }
     .frame(width: 521, height: 244, alignment: .topLeading)
     .background(AirPortSheetBackground())
