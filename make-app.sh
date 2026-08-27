@@ -13,8 +13,8 @@
 #
 # Configuration (environment variables):
 #   BUNDLE_ID                 overrides Packaging/Local.xcconfig
-#   MARKETING_VERSION         default 0.1.2
-#   CURRENT_PROJECT_VERSION   default 3
+#   MARKETING_VERSION         default: Packaging/Base.xcconfig
+#   CURRENT_PROJECT_VERSION   default: Packaging/Base.xcconfig
 #   SIGN_IDENTITY             default "Developer ID Application" (first match)
 #   NOTARY_PROFILE            notarytool keychain profile name, or supply
 #                             NOTARY_APPLE_ID + NOTARY_TEAM_ID + NOTARY_PASSWORD
@@ -35,18 +35,19 @@ EXECUTABLE_NAME="AirPort Utility"
 #      fork can set its own without modifying a committed file). Xcode reads the
 #      same file, which keeps the two build paths in agreement.
 #   3. the neutral default below
-local_bundle_id() {
-  [ -f Packaging/Local.xcconfig ] || return 0
-  sed -n 's/^[[:space:]]*PRODUCT_BUNDLE_IDENTIFIER[[:space:]]*=[[:space:]]*//p' \
-    Packaging/Local.xcconfig | tail -1 | tr -d '[:space:]'
+xcconfig_value() {
+  # $1 setting, $2 file. Last assignment wins, as in Xcode.
+  [ -f "$2" ] || return 0
+  sed -n "s/^[[:space:]]*$1[[:space:]]*=[[:space:]]*//p" "$2" | tail -1 | tr -d '[:space:]'
 }
-BUNDLE_ID=${BUNDLE_ID:-$(local_bundle_id)}
+BUNDLE_ID=${BUNDLE_ID:-$(xcconfig_value PRODUCT_BUNDLE_IDENTIFIER Packaging/Local.xcconfig)}
 BUNDLE_ID=${BUNDLE_ID:-io.github.jackhumphries.airport-utility}
-# Keep in step with the release tag: a build that is not given a version
-# still has to say which one it is, since this is what the About box and the
-# released .zip name report.
-MARKETING_VERSION=${MARKETING_VERSION:-0.1.2}
-CURRENT_PROJECT_VERSION=${CURRENT_PROJECT_VERSION:-3}
+# The version lives in Packaging/Base.xcconfig, which the Xcode target also
+# reads. It used to be defaulted here and set again in project.pbxproj, and the
+# two drifted: a release built through Xcode reported the version the script had
+# already moved past.
+MARKETING_VERSION=${MARKETING_VERSION:-$(xcconfig_value MARKETING_VERSION Packaging/Base.xcconfig)}
+CURRENT_PROJECT_VERSION=${CURRENT_PROJECT_VERSION:-$(xcconfig_value CURRENT_PROJECT_VERSION Packaging/Base.xcconfig)}
 OUTPUT_DIR=${OUTPUT_DIR:-dist}
 SIGN_IDENTITY=${SIGN_IDENTITY:-}
 ARCHS=${ARCHS:-"arm64 x86_64"}

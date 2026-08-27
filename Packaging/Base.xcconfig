@@ -10,5 +10,11 @@
 
 PRODUCT_BUNDLE_IDENTIFIER = io.github.jackhumphries.airport-utility
 
+// The release version, read by both build paths. The Xcode target used to
+// carry its own copy in project.pbxproj, so a release built through Xcode
+// kept reporting the version the script had already moved past.
+MARKETING_VERSION = 0.1.2
+CURRENT_PROJECT_VERSION = 3
+
 // Optional include: absent by default, and the build must not fail without it.
 #include? "Local.xcconfig"
