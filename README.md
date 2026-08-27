@@ -4,9 +4,10 @@ Apple's AirPort Utility is not guaranteed to run on macOS 27 and newer, so I rev
 
 ## Download
 
-**[Download AirPort Utility](https://github.com/JYPochez/VNS-Airport-Utility/releases)**
+**[Download AirPort Utility 0.1.2](https://github.com/JYPochez/VNS-Airport-Utility/releases/download/v0.1.2/AirPort-Utility-0.1.2.zip)**
 — signed, notarized, and localized into English, French, German, Spanish and
 Italian. Universal (Apple Silicon and Intel), macOS 13 or later.
+([All releases](https://github.com/JYPochez/VNS-Airport-Utility/releases).)
 
 Unzip and drag **AirPort Utility.app** to your Applications folder. Because the
 build is notarized by Apple, it opens without a Gatekeeper warning.
@@ -20,7 +21,19 @@ Two things on first launch:
   it, run with the interpreter already on your Mac. The system `python3` works.
 
 This is a fork of [jackhumphries/airport-utility](https://github.com/jackhumphries/airport-utility)
-adding a double-clickable app bundle and localization. Not affiliated with Apple.
+adding a double-clickable app bundle, localization, and a more detailed Disks
+pane. Not affiliated with Apple.
+
+New in 0.1.2:
+
+- **Disk rows show the drive and its health** — vendor and model, firmware
+  revision, used and total capacity, and the SMART status the drive already
+  keeps, so nothing extra is run to read it.
+- **Published file-sharing protocols** (AFP, SMB) appear in the device popover,
+  so you can see whether a Time Capsule is really sharing its disk.
+- **The Time Capsule generation** is named in the Base Station pane.
+- **The window opens at the top-left** of the screen. It widens as devices are
+  discovered, and opening centred could push it off the edge.
 
 ---
 
@@ -95,6 +108,18 @@ open AirPortUtility.xcodeproj          # scheme: "AirPort Utility App"
 Set your team under Signing & Capabilities on first use. The project consumes
 the package at the repository root as a local Swift package, so the source list
 is never duplicated.
+
+**Version and bundle identifier live in `Packaging/Base.xcconfig`**, which both
+paths read — the Xcode target through its base configuration, `make-app.sh` by
+parsing the same file. Releasing means bumping `MARKETING_VERSION` and
+`CURRENT_PROJECT_VERSION` there and nowhere else. To sign under your own
+identifier without touching a committed file, create the gitignored
+`Packaging/Local.xcconfig`:
+
+```
+PRODUCT_BUNDLE_IDENTIFIER = com.example.airport-utility
+DEVELOPMENT_TEAM = ABCDE12345
+```
 
 Both paths build a universal binary (`arm64` + `x86_64`) and lay the bundle out
 like this:
