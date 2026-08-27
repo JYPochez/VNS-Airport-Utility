@@ -546,4 +546,13 @@ final class DiskInventoryParserTests: XCTestCase {
     XCTAssertTrue(result.combinedOutput.contains("no external AirPort disk partition"))
     XCTAssertTrue(result.redactedArguments.contains("<password>"))
   }
+
+  func testMockInventoryCarriesDriveDetail() {
+    let records = DiskInventoryParser.parse(stdout: AirportMockBackend.maStJSON)
+    let first = records.first
+    XCTAssertEqual(first?.vendor, "WDC WD20EARX-00PASB0")
+    XCTAssertEqual(first?.revision, "51.0AB51")
+    XCTAssertEqual(first?.smartStatus, "verified")
+    XCTAssertNotNil(first?.sizeUsed)
+  }
 }

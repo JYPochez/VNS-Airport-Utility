@@ -16,6 +16,8 @@ enum DiskInventoryParser {
     var smartStatus: String = ""
     var size: Int64?
     var sizeFree: Int64?
+    var vendor: String = ""
+    var revision: String = ""
   }
 
   private static func records(
@@ -53,6 +55,12 @@ enum DiskInventoryParser {
         if !diskSMART.isEmpty { childInherited.smartStatus = diskSMART }
         if let size = maStByteCount(object["size"]) { childInherited.size = size }
         if let sizeFree = maStByteCount(object["sizeFree"]) { childInherited.sizeFree = sizeFree }
+        // Vendor and firmware revision describe the physical drive, so they are
+        // only ever present on the disk, never on a partition.
+        let vendor = string(object["vendor"])
+        if !vendor.isEmpty { childInherited.vendor = vendor }
+        let revision = string(object["revision"])
+        if !revision.isEmpty { childInherited.revision = revision }
         return partitions.flatMap {
           records(in: $0, parentBuiltIn: diskBuiltIn, inherited: childInherited)
         }
@@ -82,6 +90,15 @@ enum DiskInventoryParser {
       size: maStByteCount(object["size"]) ?? inherited.size,
       sizeFree: maStByteCount(object["sizeFree"]) ?? inherited.sizeFree,
       builtIn: diskBuiltIn(object, defaultBuiltIn: parentBuiltIn),
+      vendor: {
+        let own = string(object["vendor"])
+        return own.isEmpty ? inherited.vendor : own
+      }(),
+      revision: {
+        let own = string(object["revision"])
+        return own.isEmpty ? inherited.revision : own
+      }(),
+      sizeUsed: maStByteCount(object["sizeUsed"]),
       smartStatus: {
         let own = string(object["smartStatus"])
         return own.isEmpty ? inherited.smartStatus : own

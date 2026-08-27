@@ -3,7 +3,8 @@
    English automatically, so this table may be incomplete.
    Do NOT add ACP keys, backend flags or persisted raw values here. */
 
-"%@ Free" = "%@ libres";
+"%@ free" = "%@ libres";
+"%@ used" = "%@ utilisés";
 "0 - Emergency" = "0 – Urgence";
 "1 - Alert" = "1 – Alerte";
 "1 hour" = "1 heure";
@@ -413,7 +414,7 @@
 "Router Address must be an IPv4 address." = "L’adresse du routeur doit être une adresse IPv4.";
 "Router Address:" = "Adresse du routeur :";
 "Router Mode:" = "Mode du routeur :";
-"S.M.A.R.T.: %@" = "S.M.A.R.T. : %@";
+"SMART: %@" = "SMART : %@";
 "Save" = "Enregistrer";
 "Scanning for AirPort base stations…" = "Recherche de bornes d’accès AirPort…";
 "Secondary Port:" = "Port secondaire :";
@@ -547,6 +548,7 @@
 "second" = "seconde";
 "serial number" = "numéro de série";
 "status" = "état";
+"verified" = "vérifié";
 "version" = "version";
 "week" = "semaine";
 "wireless clients" = "clients sans fil";

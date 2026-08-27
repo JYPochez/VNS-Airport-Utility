@@ -1096,26 +1096,10 @@ public final class AirportAppModel: ObservableObject {
       rememberPassword: true,
       windowsWorkgroup: "WORKGROUP",
       winsServer: "",
-      inventory: [
-        DiskRecord(
-          deviceName: "dk2",
-          name: "Jack's Time Capsule Home",
-          format: "HFS",
-          uuid: "adabbc6e09e0579081f8444e687f35b9",
-          size: 1_000_000_000_000,
-          sizeFree: 497_850_000_000,
-          builtIn: true
-        ),
-        DiskRecord(
-          deviceName: "dk3",
-          name: "USB Archive Disk",
-          format: "HFS",
-          uuid: "22222222222222222222222222222222",
-          size: 2_000_000_000_000,
-          sizeFree: 1_500_000_000_000,
-          builtIn: false
-        ),
-      ],
+      // Parsed from the same fixture the mock backend serves, rather than
+      // duplicated as literals: the two drifted, so the pane showed neither the
+      // drive detail nor the used size that the fixture already carried.
+      inventory: AirportMockBackend.diskInventoryRefreshResult.records,
       rawInventory: AirportMockBackend.maStJSON,
       didLoadInventory: true
     )

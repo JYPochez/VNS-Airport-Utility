@@ -676,23 +676,43 @@ private struct DiskInventoryRow: View {
   var record: DiskRecord
   var isSelected: Bool
 
-  /// Free space and, when the device reports one, its SMART status.
+  /// The drive behind this volume: vendor and model, then firmware revision.
+  static func hardwareLine(for record: DiskRecord) -> String? {
+    let parts = [record.vendor, record.revision]
+      .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+      .filter { !$0.isEmpty }
+    return parts.isEmpty ? nil : parts.joined(separator: " · ")
+  }
+
+  /// Capacity and health: total, how much is used, and the SMART status.
   ///
-  /// The status is shown beside the volume rather than behind a button: the
-  /// device publishes it with the disk inventory, so there is nothing to run and
-  /// nothing to wait for. The reported value is passed through `localized` so a
-  /// known term is translated and anything unfamiliar is shown verbatim rather
-  /// than guessed at.
-  static func subtitle(for record: DiskRecord) -> String? {
+  /// Shown beside the volume rather than behind a button: the device publishes
+  /// all of it with the disk inventory, so there is nothing to run. The SMART
+  /// value passes through `localized`, so a known term is translated and
+  /// anything unfamiliar appears verbatim rather than being guessed at.
+  static func capacityLine(for record: DiskRecord) -> String? {
     var parts: [String] = []
-    if let free = record.sizeFree {
-      parts.append(
-        localizedFormat(
-          "%@ Free", ByteCountFormatter.string(fromByteCount: free, countStyle: .file)))
+    let byteCount = { ByteCountFormatter.string(fromByteCount: $0, countStyle: .file) }
+    // "used / total" rather than spelling both out: the row is about 220pt wide
+    // once the icon is placed, and the longer phrasing clipped the SMART status
+    // off the end.
+    switch (record.sizeUsed, record.size, record.sizeFree) {
+    case let (used?, total?, _):
+      parts.append("\(byteCount(used)) / \(byteCount(total))")
+    case let (nil, total?, free?):
+      parts.append("\(byteCount(total - free)) / \(byteCount(total))")
+    case let (used?, nil, _):
+      parts.append(localizedFormat("%@ used", byteCount(used)))
+    case let (nil, nil, free?):
+      parts.append(localizedFormat("%@ free", byteCount(free)))
+    case let (nil, total?, nil):
+      parts.append(byteCount(total))
+    default:
+      break
     }
     let smartStatus = record.smartStatus.trimmingCharacters(in: .whitespacesAndNewlines)
     if !smartStatus.isEmpty {
-      parts.append(localizedFormat("S.M.A.R.T.: %@", localized(smartStatus)))
+      parts.append(localizedFormat("SMART: %@", localized(smartStatus)))
     }
     return parts.isEmpty ? nil : parts.joined(separator: " · ")
   }
@@ -708,10 +728,15 @@ private struct DiskInventoryRow: View {
       VStack(alignment: .leading, spacing: 3) {
         DiskNameTextField(record.name)
           .frame(height: 19)
-        if let subtitle = Self.subtitle(for: record) {
-          Text(subtitle)
-            .font(.system(size: 12))
-            .foregroundStyle(Color.white.opacity(isSelected ? 0.78 : 0.42))
+        if let hardware = Self.hardwareLine(for: record) {
+          Text(hardware)
+            .font(.system(size: 10))
+            .foregroundStyle(Color.white.opacity(isSelected ? 0.7 : 0.38))
+        }
+        if let capacity = Self.capacityLine(for: record) {
+          Text(capacity)
+            .font(.system(size: 10))
+            .foregroundStyle(Color.white.opacity(isSelected ? 0.7 : 0.38))
         }
       }
       Spacer()

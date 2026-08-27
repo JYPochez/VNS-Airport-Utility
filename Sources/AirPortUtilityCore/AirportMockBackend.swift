@@ -10,6 +10,9 @@ enum AirportMockBackend {
           {
             "deviceName": "wd0",
             "builtIn": true,
+            "vendor": "WDC WD20EARX-00PASB0",
+            "revision": "51.0AB51",
+            "smartStatus": "verified",
             "partitions": [
               {
                 "deviceName": "dk2",
@@ -17,7 +20,8 @@ enum AirportMockBackend {
                 "format": "HFS",
                 "uuid": {"type":"bytes","length":16,"hex":"adabbc6e09e0579081f8444e687f35b9"},
                 "size": 953674,
-                "sizeFree": 474787
+                "sizeFree": 474787,
+                "sizeUsed": 478887
               }
             ]
           },

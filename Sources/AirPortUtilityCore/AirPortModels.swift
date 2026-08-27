@@ -1244,6 +1244,13 @@ struct DiskRecord: Identifiable, Equatable, Sendable, Codable {
   var size: Int64?
   var sizeFree: Int64?
   var builtIn: Bool
+  /// Drive vendor and model as one string, e.g. "WDC WD20EARX-00PASB0".
+  /// Reported on the physical disk, so partitions inherit it.
+  var vendor: String = ""
+  /// Drive firmware revision, e.g. "51.0AB51". Also per physical disk.
+  var revision: String = ""
+  /// Bytes in use on this partition.
+  var sizeUsed: Int64?
   /// SMART status as reported in the disk inventory, e.g. "Verified". Carried
   /// down from the disk to its partitions, since the device reports it once per
   /// physical disk. Empty when the device does not report one.

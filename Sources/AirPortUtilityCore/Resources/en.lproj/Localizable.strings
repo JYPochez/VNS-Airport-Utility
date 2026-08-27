@@ -3,7 +3,8 @@
    English automatically, so this table may be incomplete.
    Do NOT add ACP keys, backend flags or persisted raw values here. */
 
-"%@ Free" = "%@ Free";
+"%@ free" = "%@ free";
+"%@ used" = "%@ used";
 "0 - Emergency" = "0 - Emergency";
 "1 - Alert" = "1 - Alert";
 "1 hour" = "1 hour";
@@ -413,7 +414,7 @@
 "Router Address must be an IPv4 address." = "Router Address must be an IPv4 address.";
 "Router Address:" = "Router Address:";
 "Router Mode:" = "Router Mode:";
-"S.M.A.R.T.: %@" = "S.M.A.R.T.: %@";
+"SMART: %@" = "SMART: %@";
 "Save" = "Save";
 "Scanning for AirPort base stations…" = "Scanning for AirPort base stations…";
 "Secondary Port:" = "Secondary Port:";
@@ -547,6 +548,7 @@
 "second" = "second";
 "serial number" = "serial number";
 "status" = "status";
+"verified" = "verified";
 "version" = "version";
 "week" = "week";
 "wireless clients" = "wireless clients";
