@@ -115,6 +115,8 @@
 "Connect to Base Station" = "Connect to Base Station";
 "Connect to Base Station..." = "Connect to Base Station...";
 "Connected" = "Connected";
+"Connected to %@" = "Connected to %@";
+"Connected to %@. Mock mode." = "Connected to %@. Mock mode.";
 "Connecting to Base Station" = "Connecting to Base Station";
 "Connection:" = "Connection:";
 "Contact:" = "Contact:";
@@ -365,6 +367,7 @@
 "Radio channel must be 'automatic' or a channel number." = "Radio channel must be 'automatic' or a channel number.";
 "Read Only" = "Read Only";
 "Read and Write" = "Read and Write";
+"Ready to connect to %@" = "Ready to connect to %@";
 "Redo" = "Redo";
 "Refresh" = "Refresh";
 "Refresh completed." = "Refresh completed.";
@@ -392,6 +395,7 @@
 "Restore Default Settings..." = "Restore Default Settings...";
 "Restore Default Settings?" = "Restore Default Settings?";
 "Restore Factory Defaults" = "Restore Factory Defaults";
+"Restore failed: %@" = "Restore failed: %@";
 "Restoring" = "Restoring";
 "Restoring Base Station…" = "Restoring Base Station…";
 "Restoring this Base Station to factory defaults erases its settings." = "Restoring this Base Station to factory defaults erases its settings.";
@@ -416,6 +420,8 @@
 "Service Name:" = "Service Name:";
 "Services" = "Services";
 "Set time automatically" = "Set time automatically";
+"Set up this %@ to create a new Wi-Fi network." = "Set up this %@ to create a new Wi-Fi network.";
+"Setting up this %@…" = "Setting up this %@…";
 "Settings" = "Settings";
 "Setup" = "Setup";
 "Setup Complete" = "Setup Complete";
@@ -444,6 +450,7 @@
 "The base station setup profile is missing Wi-Fi or timezone settings." = "The base station setup profile is missing Wi-Fi or timezone settings.";
 "The device and its network services will be temporarily unavailable. Are you sure you want to continue?" = "The device and its network services will be temporarily unavailable. Are you sure you want to continue?";
 "The wireless network is open and does not require a Wi-Fi password." = "The wireless network is open and does not require a Wi-Fi password.";
+"This %@ will create a network." = "This %@ will create a network.";
 "This AirPort wireless device supports log messages that may help diagnose a problem." = "This AirPort wireless device supports log messages that may help diagnose a problem.";
 "This base station does not support AirPlay." = "This base station does not support AirPlay.";
 "This base station does not support a modem connection." = "This base station does not support a modem connection.";
@@ -494,6 +501,7 @@
 "Waiting for this base station to restart with default settings." = "Waiting for this base station to restart with default settings.";
 "Waiting for this base station to restore its default settings and restart…" = "Waiting for this base station to restore its default settings and restart…";
 "Waiting to restore default settings" = "Waiting to restore default settings";
+"What do you want to do with this %@?" = "What do you want to do with this %@?";
 "Window" = "Window";
 "Wireless" = "Wireless";
 "Wireless Network Name" = "Wireless Network Name";
@@ -529,3 +537,4 @@
 "status" = "status";
 "week" = "week";
 "wireless clients" = "wireless clients";
+"“%@” is now available." = "“%@” is now available.";

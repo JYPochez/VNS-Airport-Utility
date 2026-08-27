@@ -115,6 +115,8 @@
 "Connect to Base Station" = "Mit Basisstation verbinden";
 "Connect to Base Station..." = "Mit Basisstation verbinden…";
 "Connected" = "Verbunden";
+"Connected to %@" = "Verbunden mit %@";
+"Connected to %@. Mock mode." = "Verbunden mit %@. Mock-Modus.";
 "Connecting to Base Station" = "Verbindung zur Basisstation wird hergestellt";
 "Connection:" = "Verbindung:";
 "Contact:" = "Kontakt:";
@@ -365,6 +367,7 @@
 "Radio channel must be 'automatic' or a channel number." = "Der Funkkanal muss „automatisch“ oder eine Kanalnummer sein.";
 "Read Only" = "Nur Lesen";
 "Read and Write" = "Lesen und Schreiben";
+"Ready to connect to %@" = "Bereit zur Verbindung mit %@";
 "Redo" = "Wiederholen";
 "Refresh" = "Aktualisieren";
 "Refresh completed." = "Aktualisierung abgeschlossen.";
@@ -392,6 +395,7 @@
 "Restore Default Settings..." = "Standardeinstellungen wiederherstellen…";
 "Restore Default Settings?" = "Standardeinstellungen wiederherstellen?";
 "Restore Factory Defaults" = "Werkseinstellungen wiederherstellen";
+"Restore failed: %@" = "Wiederherstellung fehlgeschlagen: %@";
 "Restoring" = "Wiederherstellung";
 "Restoring Base Station…" = "Basisstation wird wiederhergestellt…";
 "Restoring this Base Station to factory defaults erases its settings." = "Beim Wiederherstellen der Werkseinstellungen werden die Einstellungen dieser Basisstation gelöscht.";
@@ -416,6 +420,8 @@
 "Service Name:" = "Dienstname:";
 "Services" = "Dienste";
 "Set time automatically" = "Uhrzeit automatisch einstellen";
+"Set up this %@ to create a new Wi-Fi network." = "%@ für ein neues Wi-Fi-Netzwerk konfigurieren.";
+"Setting up this %@…" = "%@ wird konfiguriert…";
 "Settings" = "Einstellungen";
 "Setup" = "Konfiguration";
 "Setup Complete" = "Konfiguration abgeschlossen";
@@ -444,6 +450,7 @@
 "The base station setup profile is missing Wi-Fi or timezone settings." = "Im Konfigurationsprofil der Basisstation fehlen Wi-Fi- oder Zeitzoneneinstellungen.";
 "The device and its network services will be temporarily unavailable. Are you sure you want to continue?" = "Das Gerät und seine Netzwerkdienste sind vorübergehend nicht verfügbar. Möchten Sie wirklich fortfahren?";
 "The wireless network is open and does not require a Wi-Fi password." = "Das WLAN-Netzwerk ist offen und erfordert kein Wi-Fi-Passwort.";
+"This %@ will create a network." = "%@ erstellt ein Netzwerk.";
 "This AirPort wireless device supports log messages that may help diagnose a problem." = "Dieses AirPort-WLAN-Gerät unterstützt Protokollmeldungen, die bei der Diagnose eines Problems helfen können.";
 "This base station does not support AirPlay." = "Diese Basisstation unterstützt AirPlay nicht.";
 "This base station does not support a modem connection." = "Diese Basisstation unterstützt Modemverbindungen nicht.";
@@ -494,6 +501,7 @@
 "Waiting for this base station to restart with default settings." = "Warten, bis diese Basisstation mit Standardeinstellungen neu startet.";
 "Waiting for this base station to restore its default settings and restart…" = "Warten, bis diese Basisstation ihre Standardeinstellungen wiederherstellt und neu startet…";
 "Waiting to restore default settings" = "Warten auf Wiederherstellung der Standardeinstellungen";
+"What do you want to do with this %@?" = "Was möchten Sie mit %@ tun?";
 "Window" = "Fenster";
 "Wireless" = "WLAN";
 "Wireless Network Name" = "WLAN-Name";
@@ -529,3 +537,4 @@
 "status" = "Status";
 "week" = "Woche";
 "wireless clients" = "WLAN-Clients";
+"“%@” is now available." = "„%@“ ist jetzt verfügbar.";

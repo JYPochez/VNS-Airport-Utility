@@ -259,7 +259,7 @@ extension AirportAppModel {
       self.pendingRestoreDeviceIdentifiers = []
       self.isShowingRestoreConfirmation = false
       self.clearBaseStationUpdate()
-      self.status = "Restore failed: \(description)"
+      self.status = localizedFormat("Restore failed: %@", description)
     }
   }
 
@@ -321,7 +321,7 @@ extension AirportAppModel {
     isWaitingForSetupRestart = false
     didSetupDeviceDisappear = false
     setup.step = .applying
-    setup.progressText = "Setting up this \(setupDeviceModelName)…"
+    setup.progressText = localizedFormat("Setting up this %@…", setupDeviceModelName)
     applySequence(
       title: localized("Setup"), commands: commands, connection: activeConnection, cleanScope: .none,
       appliedAdminPassword: password, allowsConnectionHostChange: true
@@ -708,9 +708,9 @@ struct AirPortSetupSheet: View {
   private var recommendation: some View {
     VStack(spacing: 20) {
       deviceImage
-      Text("Set up this \(model.setupDeviceModelName) to create a new Wi-Fi network.")
+      Text(localizedFormat("Set up this %@ to create a new Wi-Fi network.", model.setupDeviceModelName))
         .font(.system(size: 16, weight: .semibold))
-      Text("This \(model.setupDeviceModelName) will create a network.")
+      Text(localizedFormat("This %@ will create a network.", model.setupDeviceModelName))
         .font(.system(size: 13)).foregroundStyle(.secondary)
     }
     .padding(40)
@@ -718,7 +718,7 @@ struct AirPortSetupSheet: View {
 
   private var choices: some View {
     VStack(alignment: .leading, spacing: 18) {
-      Text("What do you want to do with this \(model.setupDeviceModelName)?")
+      Text(localizedFormat("What do you want to do with this %@?", model.setupDeviceModelName))
         .font(.system(size: 16, weight: .semibold))
       Picker("", selection: $model.setup.mode) {
         ForEach(AirPortSetupMode.allCases) { mode in Text(mode.title).tag(mode) }
@@ -769,7 +769,7 @@ struct AirPortSetupSheet: View {
     VStack(spacing: 18) {
       deviceImage
       Text(localized("Setup Complete")).font(.system(size: 18, weight: .semibold))
-      Text("“\(model.setup.deviceName)” is now available.").font(.system(size: 13))
+      Text(localizedFormat("“%@” is now available.", model.setup.deviceName)).font(.system(size: 13))
     }
   }
 
