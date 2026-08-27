@@ -4,7 +4,7 @@ Apple's AirPort Utility is not guaranteed to run on macOS 27 and newer, so I rev
 
 ## Download
 
-**[Download AirPort Utility 0.1.0](https://github.com/JYPochez/VNS-Airport-Utility/releases/tag/v0.1.0)**
+**[Download AirPort Utility](https://github.com/JYPochez/VNS-Airport-Utility/releases)**
 — signed, notarized, and localized into English, French, German, Spanish and
 Italian. Universal (Apple Silicon and Intel), macOS 13 or later.
 
