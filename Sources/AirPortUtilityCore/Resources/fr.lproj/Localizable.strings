@@ -547,6 +547,7 @@
 "second" = "seconde";
 "serial number" = "numéro de série";
 "status" = "état";
+"version" = "version";
 "week" = "semaine";
 "wireless clients" = "clients sans fil";
 "“%@” is now available." = "« %@ » est maintenant disponible.";
