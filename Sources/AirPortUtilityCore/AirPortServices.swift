@@ -279,7 +279,7 @@ public final class AirportAppModel: ObservableObject {
     if mockMode {
       loadMockState()
     } else if liveCredentialsAvailable {
-      status = "Ready to connect to \(connection.host)"
+      status = localizedFormat("Ready to connect to %@", connection.host)
     } else {
       status = localized("Enter base station password to load settings.")
     }
@@ -937,12 +937,12 @@ public final class AirportAppModel: ObservableObject {
 
   func updateIdleConnectionStatus() {
     if mockMode {
-      status = "Connected to \(connection.host). Mock mode."
+      status = localizedFormat("Connected to %@. Mock mode.", connection.host)
       return
     }
     status =
       liveCredentialsAvailable
-      ? "Ready to connect to \(connection.host)"
+      ? localizedFormat("Ready to connect to %@", connection.host)
       : localized("Enter base station password to load settings.")
   }
 
@@ -1134,7 +1134,7 @@ public final class AirportAppModel: ObservableObject {
     firmware.currentVersion = baseStation.version
     firmware.productID = mockProductID
     loadMockFirmwareImagesIfNeeded(force: true)
-    status = "Connected to \(connection.host). Mock mode."
+    status = localizedFormat("Connected to %@. Mock mode.", connection.host)
     showConnectionDetails = false
     logs = [localized("Mock backend enabled with fixture Time Capsule settings.")]
     discoveredDevices = AirportMockBackend.discoveredDevices(

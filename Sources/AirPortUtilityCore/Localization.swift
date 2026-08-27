@@ -85,6 +85,16 @@ public enum AirPortLocalization {
   }
 }
 
+/// Looks up a format string and fills it in.
+///
+/// Interpolated text ("Set up this \(model) to ...") cannot be a key, because
+/// the key would change with the value. The table stores a format instead
+/// ("Set up this %@ to ...") so a translation can move the placeholder to
+/// wherever its grammar needs it.
+func localizedFormat(_ key: String, _ arguments: CVarArg...) -> String {
+  String(format: AirPortLocalization.text(key), arguments: arguments)
+}
+
 /// Shorthand for ``AirPortLocalization/text(_:)`` inside this module.
 func localized(_ key: String, context: String? = nil) -> String {
   AirPortLocalization.text(key, context: context)

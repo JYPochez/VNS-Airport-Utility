@@ -162,7 +162,7 @@ extension AirportAppModel {
     markClean()
     hasLoadedSettings = true
     hasTrustedConnectionPassword = true
-    status = "Connected to \(connection.host)"
+    status = localizedFormat("Connected to %@", connection.host)
     clearBaseStationUpdate(requestHost: requestHost)
     showConnectionDetails = false
     saveConnectionPasswordIfRequested()

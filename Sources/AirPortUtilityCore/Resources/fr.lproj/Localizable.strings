@@ -115,6 +115,8 @@
 "Connect to Base Station" = "Se connecter à la borne d’accès";
 "Connect to Base Station..." = "Se connecter à la borne d’accès…";
 "Connected" = "Connecté";
+"Connected to %@" = "Connecté à %@";
+"Connected to %@. Mock mode." = "Connecté à %@. Mode simulé.";
 "Connecting to Base Station" = "Connexion à la borne d’accès";
 "Connection:" = "Connexion :";
 "Contact:" = "Contact :";
@@ -365,6 +367,7 @@
 "Radio channel must be 'automatic' or a channel number." = "Le canal radio doit être « automatique » ou un numéro de canal.";
 "Read Only" = "Lecture seule";
 "Read and Write" = "Lecture et écriture";
+"Ready to connect to %@" = "Prêt à se connecter à %@";
 "Redo" = "Rétablir";
 "Refresh" = "Actualiser";
 "Refresh completed." = "Actualisation terminée.";
@@ -392,6 +395,7 @@
 "Restore Default Settings..." = "Rétablir les réglages par défaut…";
 "Restore Default Settings?" = "Rétablir les réglages par défaut ?";
 "Restore Factory Defaults" = "Rétablir les réglages d’usine";
+"Restore failed: %@" = "Échec de la restauration : %@";
 "Restoring" = "Restauration";
 "Restoring Base Station…" = "Restauration de la borne d’accès…";
 "Restoring this Base Station to factory defaults erases its settings." = "Rétablir les réglages d’usine de cette borne d’accès efface ses réglages.";
@@ -416,6 +420,8 @@
 "Service Name:" = "Nom du service :";
 "Services" = "Services";
 "Set time automatically" = "Régler l’heure automatiquement";
+"Set up this %@ to create a new Wi-Fi network." = "Configurer %@ pour créer un réseau Wi-Fi.";
+"Setting up this %@…" = "Configuration de %@…";
 "Settings" = "Réglages";
 "Setup" = "Configuration";
 "Setup Complete" = "Configuration terminée";
@@ -444,6 +450,7 @@
 "The base station setup profile is missing Wi-Fi or timezone settings." = "Le profil de configuration de la borne d’accès ne contient pas les réglages Wi-Fi ou de fuseau horaire.";
 "The device and its network services will be temporarily unavailable. Are you sure you want to continue?" = "L’appareil et ses services réseau seront temporairement indisponibles. Voulez-vous vraiment continuer ?";
 "The wireless network is open and does not require a Wi-Fi password." = "Le réseau sans fil est ouvert et ne requiert aucun mot de passe Wi-Fi.";
+"This %@ will create a network." = "%@ va créer un réseau.";
 "This AirPort wireless device supports log messages that may help diagnose a problem." = "Cet appareil sans fil AirPort prend en charge des messages de journal pouvant aider à diagnostiquer un problème.";
 "This base station does not support AirPlay." = "Cette borne d’accès ne prend pas en charge AirPlay.";
 "This base station does not support a modem connection." = "Cette borne d’accès ne prend pas en charge les connexions par modem.";
@@ -494,6 +501,7 @@
 "Waiting for this base station to restart with default settings." = "En attente du redémarrage de cette borne d’accès avec les réglages par défaut.";
 "Waiting for this base station to restore its default settings and restart…" = "En attente du rétablissement des réglages par défaut et du redémarrage de cette borne d’accès…";
 "Waiting to restore default settings" = "En attente du rétablissement des réglages par défaut";
+"What do you want to do with this %@?" = "Que voulez-vous faire avec %@ ?";
 "Window" = "Fenêtre";
 "Wireless" = "Sans fil";
 "Wireless Network Name" = "Nom du réseau sans fil";
@@ -529,3 +537,4 @@
 "status" = "état";
 "week" = "semaine";
 "wireless clients" = "clients sans fil";
+"“%@” is now available." = "« %@ » est maintenant disponible.";

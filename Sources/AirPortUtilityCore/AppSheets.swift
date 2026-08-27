@@ -11,9 +11,13 @@ struct PasswordsSheet: View {
         .padding(.bottom, 13)
 
       VStack(alignment: .leading, spacing: 8) {
-        passwordRow(localized("Base Station Password:"), value: baseStationPassword)
+        passwordRow(
+          localized("Base Station Password:"), value: baseStationPassword,
+          identifier: "passwords.base.station.value")
         if shouldShowDiskPassword {
-          passwordRow(localized("Disk Password:"), value: diskPassword)
+          passwordRow(
+            localized("Disk Password:"), value: diskPassword,
+            identifier: "passwords.disk.value")
         }
       }
       .padding(.bottom, 20)
@@ -32,7 +36,12 @@ struct PasswordsSheet: View {
     .frame(width: 360, alignment: .leading)
   }
 
-  private func passwordRow(_ label: String, value: String) -> some View {
+  /// The accessibility identifier is passed in rather than derived from the
+  /// label. Deriving it meant matching the English word "Disk", which stops
+  /// matching as soon as the label is translated.
+  private func passwordRow(
+    _ label: String, value: String, identifier: String
+  ) -> some View {
     HStack(alignment: .firstTextBaseline, spacing: 8) {
       Text(label)
         .font(.system(size: 13))
@@ -40,9 +49,7 @@ struct PasswordsSheet: View {
       Text(value.isEmpty ? localized("Not available") : value)
         .font(.system(size: 13))
         .textSelection(.enabled)
-        .accessibilityIdentifier(
-          label.localizedCaseInsensitiveContains("Disk") ? "passwords.disk.value"
-            : "passwords.base.station.value")
+        .accessibilityIdentifier(identifier)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
   }

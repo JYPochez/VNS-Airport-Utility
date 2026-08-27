@@ -29,25 +29,34 @@ enum AirPortLayout {
     panes.reduce(CGFloat(0)) { $0 + topTabWidth(for: $1) }
   }
 
+  /// Smallest gap between a tab's label and its edges.
+  ///
+  /// 19pt is the tightest padding the measured English widths below imply
+  /// ("Advanced", 60pt of text in a 79pt tab), so sizing to text + this value
+  /// can never make an English tab wider than it already is.
+  static let topTabHorizontalPadding: CGFloat = 19
+
+  /// Width of one tab.
+  ///
+  /// The constants are the widths measured against the English labels, kept as
+  /// a floor so the English tab bar is unchanged. A translated label that needs
+  /// more room than its English counterpart gets it, instead of being cramped
+  /// or clipped.
   static func topTabWidth(for pane: Pane) -> CGFloat {
-    switch pane {
-    case .baseStation:
-      99
-    case .internet:
-      70
-    case .wireless:
-      74
-    case .network:
-      73
-    case .airPlay:
-      67
-    case .disks:
-      55
-    case .advanced:
-      79
-    case .firmware:
-      82
-    }
+    let englishWidth: CGFloat =
+      switch pane {
+      case .baseStation: 99
+      case .internet: 70
+      case .wireless: 74
+      case .network: 73
+      case .airPlay: 67
+      case .disks: 55
+      case .advanced: 79
+      case .firmware: 82
+      }
+    let label = pane.displayName.size(
+      withAttributes: [.font: NSFont.systemFont(ofSize: 13)])
+    return max(englishWidth, ceil(label.width) + topTabHorizontalPadding)
   }
 }
 
@@ -116,16 +125,25 @@ struct ConfigurationSheet<Content: View>: View {
     AirPortLayout.configurationSheetWidth(for: model.visiblePanes)
   }
 
-  /// NOTE: `status` is display text, so these comparisons must use the same
-  /// localized values the status was built from. "Connected to ..." and
-  /// "Ready to connect to ..." are still English because they interpolate the
-  /// host; localize those and these prefixes must change with them.
+  /// Whether `status` is one of the connection-state messages the footer hides.
+  ///
+  /// The prefix is taken from the same format string the status was built from,
+  /// so this keeps working in every language. Hardcoding the English prefix
+  /// silently stopped matching as soon as those messages were localized.
+  private func isConnectionStatus(_ status: String) -> Bool {
+    for key in ["Connected to %@", "Ready to connect to %@"] {
+      let prefix = localized(key).components(separatedBy: "%@")[0]
+      if !prefix.isEmpty, status.hasPrefix(prefix) {
+        return true
+      }
+    }
+    return false
+  }
+
   private var footerStatus: String? {
     let status = model.status.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !status.isEmpty else { return nil }
-    guard !status.hasPrefix("Connected"), !status.hasPrefix("Ready to connect"),
-      status != localized("Not connected")
-    else {
+    guard !isConnectionStatus(status), status != localized("Not connected") else {
       return nil
     }
     return status
