@@ -131,6 +131,24 @@ final class LocalizationTests: XCTestCase {
     XCTAssertEqual(BaseStationState().statusText, DeviceStatusMessage.text(problemCodes: []))
   }
 
+  /// A conflicted merge in a .strings file compiles and ships: Swift never
+  /// parses these, so the markers are copied into the bundle verbatim and the
+  /// build succeeds. This is the only thing that would catch it.
+  func testTablesContainNoMergeConflictMarkers() throws {
+    for language in Self.expectedLanguages {
+      let bundle = AirPortLocalization.resourceBundle
+      let url = try XCTUnwrap(
+        bundle.url(
+          forResource: "Localizable", withExtension: "strings",
+          subdirectory: "\(language).lproj"))
+      let text = try String(contentsOf: url, encoding: .utf8)
+      for marker in ["<<<<<<<", "=======", ">>>>>>>"] {
+        XCTAssertFalse(
+          text.contains("\n" + marker), "\(language) table contains a \(marker) conflict marker")
+      }
+    }
+  }
+
   func testLookupFallsBackToTheKeyWhenUntranslated() {
     let key = "A string that is deliberately absent from every table"
     XCTAssertEqual(AirPortLocalization.text(key), key)
