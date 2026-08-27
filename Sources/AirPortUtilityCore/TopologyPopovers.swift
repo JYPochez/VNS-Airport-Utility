@@ -77,7 +77,7 @@ struct DevicePopover: View {
       (localized("IP address"), model.internet.ipv4Address),
       (localized("LAN IP address"), model.network.lanIPAddress),
       (localized("serial number"), model.baseStation.serialNumber),
-      ("version", model.baseStation.version),
+      (localized("version"), model.baseStation.version),
     ]
     let protocols = model.selectedTopologyDevice()?.publishedProtocols ?? []
     if !protocols.isEmpty {

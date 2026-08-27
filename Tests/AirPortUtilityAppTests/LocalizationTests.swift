@@ -43,7 +43,7 @@ final class LocalizationTests: XCTestCase {
   /// actually uses. Add to it only after checking the term in that language.
   private static let identicalByDesign: [String: Set<String>] = [
     "fr": [
-      "15 minutes", "30 minutes", "AirPlay", "AirPort Express", "AirPort Extreme", "Description", "Destination", "Double NAT", "Internet", "Local", "Services", "Time Capsule", "Tunnel", "Type", "Zoom", "minute",
+      "15 minutes", "30 minutes", "AirPlay", "AirPort Express", "AirPort Extreme", "Description", "Destination", "Double NAT", "Internet", "Local", "Services", "Time Capsule", "Tunnel", "Type", "Zoom", "minute", "version",
     ],
     "de": [
       "Accounts:", "AirPlay", "AirPort Express", "AirPort Extreme", "Firmware", "Generation:", "Host", "Host:", "Hostname:", "Internet", "Name", "Name:", "Region", "Region:", "Repo", "Repository", "Repository:", "Router", "S.M.A.R.T.: %@", "Time Capsule", "Tunnel", "Version:",
