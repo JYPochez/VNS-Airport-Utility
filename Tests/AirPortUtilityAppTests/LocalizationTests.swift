@@ -46,13 +46,13 @@ final class LocalizationTests: XCTestCase {
       "15 minutes", "30 minutes", "AirPlay", "AirPort Express", "AirPort Extreme", "Description", "Destination", "Double NAT", "Internet", "Local", "Services", "Time Capsule", "Tunnel", "Type", "Zoom", "minute",
     ],
     "de": [
-      "Accounts:", "AirPlay", "AirPort Express", "AirPort Extreme", "Firmware", "Host", "Host:", "Hostname:", "Internet", "Name", "Name:", "Region", "Region:", "Repo", "Repository", "Repository:", "Router", "Time Capsule", "Tunnel", "Version:",
+      "Accounts:", "AirPlay", "AirPort Express", "AirPort Extreme", "Firmware", "Generation:", "Host", "Host:", "Hostname:", "Internet", "Name", "Name:", "Region", "Region:", "Repo", "Repository", "Repository:", "Router", "S.M.A.R.T.: %@", "Time Capsule", "Tunnel", "Version:",
     ],
     "es": [
-      "AirPlay", "AirPort Express", "AirPort Extreme", "Firmware", "Host", "Host:", "Internet", "Local", "Repo", "Router", "Time Capsule", "Zoom",
+      "AirPlay", "AirPort Express", "AirPort Extreme", "Firmware", "Host", "Host:", "Internet", "Local", "Repo", "Router", "S.M.A.R.T.: %@", "Time Capsule", "Zoom",
     ],
     "it": [
-      "AirPlay", "AirPort Express", "AirPort Extreme", "Default", "Firmware", "Host", "Host:", "Internet", "Password", "Password:", "Repo", "Repository", "Repository:", "Router", "Time Capsule", "Tunnel", "Wireless", "Zoom",
+      "AirPlay", "AirPort Express", "AirPort Extreme", "Default", "Firmware", "Host", "Host:", "Internet", "Password", "Password:", "Repo", "Repository", "Repository:", "Router", "S.M.A.R.T.: %@", "Time Capsule", "Tunnel", "Wireless", "Zoom",
     ],
   ]
 
