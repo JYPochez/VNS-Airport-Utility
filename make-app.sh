@@ -13,8 +13,8 @@
 #
 # Configuration (environment variables):
 #   BUNDLE_ID                 overrides Packaging/Local.xcconfig
-#   MARKETING_VERSION         default 0.1.0
-#   CURRENT_PROJECT_VERSION   default 1
+#   MARKETING_VERSION         default 0.1.2
+#   CURRENT_PROJECT_VERSION   default 3
 #   SIGN_IDENTITY             default "Developer ID Application" (first match)
 #   NOTARY_PROFILE            notarytool keychain profile name, or supply
 #                             NOTARY_APPLE_ID + NOTARY_TEAM_ID + NOTARY_PASSWORD
@@ -42,8 +42,11 @@ local_bundle_id() {
 }
 BUNDLE_ID=${BUNDLE_ID:-$(local_bundle_id)}
 BUNDLE_ID=${BUNDLE_ID:-io.github.jackhumphries.airport-utility}
-MARKETING_VERSION=${MARKETING_VERSION:-0.1.0}
-CURRENT_PROJECT_VERSION=${CURRENT_PROJECT_VERSION:-1}
+# Keep in step with the release tag: a build that is not given a version
+# still has to say which one it is, since this is what the About box and the
+# released .zip name report.
+MARKETING_VERSION=${MARKETING_VERSION:-0.1.2}
+CURRENT_PROJECT_VERSION=${CURRENT_PROJECT_VERSION:-3}
 OUTPUT_DIR=${OUTPUT_DIR:-dist}
 SIGN_IDENTITY=${SIGN_IDENTITY:-}
 ARCHS=${ARCHS:-"arm64 x86_64"}
