@@ -4,10 +4,10 @@ Apple's AirPort Utility is not guaranteed to run on macOS 27 and newer, so I rev
 
 ## Download
 
-**[Download AirPort Utility 0.1.2](https://github.com/JYPochez/VNS-Airport-Utility/releases/download/v0.1.2/AirPort-Utility-0.1.2.zip)**
-— signed, notarized, and localized into English, French, German, Spanish and
-Italian. Universal (Apple Silicon and Intel), macOS 13 or later.
-([All releases](https://github.com/JYPochez/VNS-Airport-Utility/releases).)
+**[Download the latest AirPort Utility](https://github.com/JYPochez/VNS-Airport-Utility/releases)**
+— newest release first; grab the `.zip` from the one at the top. Signed,
+notarized, and localized into English, French, German, Spanish and Italian.
+Universal (Apple Silicon and Intel), macOS 13 or later.
 
 Unzip and drag **AirPort Utility.app** to your Applications folder. Because the
 build is notarized by Apple, it opens without a Gatekeeper warning.
@@ -24,7 +24,7 @@ This is a fork of [jackhumphries/airport-utility](https://github.com/jackhumphri
 adding a double-clickable app bundle, localization, and a more detailed Disks
 pane. Not affiliated with Apple.
 
-New in 0.1.2:
+New in the current release (0.1.2):
 
 - **Disk rows show the drive and its health** — vendor and model, firmware
   revision, used and total capacity, and the SMART status the drive already
