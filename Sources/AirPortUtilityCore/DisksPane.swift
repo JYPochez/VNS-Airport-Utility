@@ -687,6 +687,27 @@ private struct DiskInventoryRow: View {
   var record: DiskRecord
   var isSelected: Bool
 
+  /// Free space and, when the device reports one, its SMART status.
+  ///
+  /// The status is shown beside the volume rather than behind a button: the
+  /// device publishes it with the disk inventory, so there is nothing to run and
+  /// nothing to wait for. The reported value is passed through `localized` so a
+  /// known term is translated and anything unfamiliar is shown verbatim rather
+  /// than guessed at.
+  static func subtitle(for record: DiskRecord) -> String? {
+    var parts: [String] = []
+    if let free = record.sizeFree {
+      parts.append(
+        localizedFormat(
+          "%@ Free", ByteCountFormatter.string(fromByteCount: free, countStyle: .file)))
+    }
+    let smartStatus = record.smartStatus.trimmingCharacters(in: .whitespacesAndNewlines)
+    if !smartStatus.isEmpty {
+      parts.append(localizedFormat("S.M.A.R.T.: %@", localized(smartStatus)))
+    }
+    return parts.isEmpty ? nil : parts.joined(separator: " · ")
+  }
+
   var body: some View {
     HStack(spacing: 6) {
       airPortResourceImage(named: iconResourceName, fallbackSystemName: iconFallbackSystemName)
@@ -694,11 +715,12 @@ private struct DiskInventoryRow: View {
         .scaledToFit()
         .frame(width: 50, height: 50)
         .accessibilityLabel(iconAccessibilityLabel)
+
       VStack(alignment: .leading, spacing: 3) {
         DiskNameTextField(record.name)
           .frame(height: 19)
-        if let free = record.sizeFree {
-          Text("\(ByteCountFormatter.string(fromByteCount: free, countStyle: .file)) Free")
+        if let subtitle = Self.subtitle(for: record) {
+          Text(subtitle)
             .font(.system(size: 12))
             .foregroundStyle(Color.white.opacity(isSelected ? 0.78 : 0.42))
         }

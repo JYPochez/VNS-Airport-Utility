@@ -3,20 +3,27 @@
    English automatically, so this table may be incomplete.
    Do NOT add ACP keys, backend flags or persisted raw values here. */
 
+"%@ Free" = "%@ Free";
 "0 - Emergency" = "0 - Emergency";
 "1 - Alert" = "1 - Alert";
 "1 hour" = "1 hour";
 "15 minutes" = "15 minutes";
+"1st generation" = "1st generation";
 "2 - Critical" = "2 - Critical";
 "2 hours" = "2 hours";
 "24 hours" = "24 hours";
+"2nd generation" = "2nd generation";
 "3 - Error" = "3 - Error";
 "30 minutes" = "30 minutes";
 "35-Pass Erase" = "35-Pass Erase";
+"3rd generation" = "3rd generation";
 "4 - Warning" = "4 - Warning";
 "4 hours" = "4 hours";
+"4th generation" = "4th generation";
 "5 - Notice" = "5 - Notice";
+"5th generation" = "5th generation";
 "6 - Informational" = "6 - Informational";
+"6th generation" = "6th generation";
 "7 - Debug" = "7 - Debug";
 "7-Pass Erase" = "7-Pass Erase";
 "8 hours" = "8 hours";
@@ -97,7 +104,6 @@
 "Block incoming IPv6 connections" = "Block incoming IPv6 connections";
 "Bring All to Front" = "Bring All to Front";
 "Cancel" = "Cancel";
-"Check S.M.A.R.T." = "Check S.M.A.R.T.";
 "Check for Updates" = "Check for Updates";
 "Choose a base station" = "Choose a base station";
 "Choose..." = "Choose...";
@@ -200,6 +206,7 @@
 "Export Configuration File" = "Export Configuration File";
 "Export Configuration File..." = "Export Configuration File...";
 "Extend a wireless network" = "Extend a wireless network";
+"Failing" = "Failing";
 "File" = "File";
 "File Sharing Access must be read-write, read-only, or not-allowed." = "File Sharing Access must be read-write, read-only, or not-allowed.";
 "File Sharing Access:" = "File Sharing Access:";
@@ -214,6 +221,7 @@
 "Firmware upload completed, but the base station reboot command was not sent." = "Firmware upload completed, but the base station reboot command was not sent.";
 "Firmware uploaded. Restart requested." = "Firmware uploaded. Restart requested.";
 "Gathering information about your network…" = "Gathering information about your network…";
+"Generation:" = "Generation:";
 "Global Hostname cannot be empty." = "Global Hostname cannot be empty.";
 "Guest Disk Access is not supported." = "Guest Disk Access is not supported.";
 "Help" = "Help";
@@ -405,7 +413,7 @@
 "Router Address must be an IPv4 address." = "Router Address must be an IPv4 address.";
 "Router Address:" = "Router Address:";
 "Router Mode:" = "Router Mode:";
-"S.M.A.R.T. status for %@: %@" = "S.M.A.R.T. status for %@: %@";
+"S.M.A.R.T.: %@" = "S.M.A.R.T.: %@";
 "Save" = "Save";
 "Scanning for AirPort base stations…" = "Scanning for AirPort base stations…";
 "Secondary Port:" = "Secondary Port:";
@@ -419,7 +427,6 @@
 "Security Method" = "Security Method";
 "Security Method:" = "Security Method:";
 "Select All" = "Select All";
-"Select a disk to check its S.M.A.R.T. status." = "Select a disk to check its S.M.A.R.T. status.";
 "Service Name:" = "Service Name:";
 "Services" = "Services";
 "Set time automatically" = "Set time automatically";
@@ -455,7 +462,6 @@
 "The wireless network is open and does not require a Wi-Fi password." = "The wireless network is open and does not require a Wi-Fi password.";
 "This %@ will create a network." = "This %@ will create a network.";
 "This AirPort wireless device supports log messages that may help diagnose a problem." = "This AirPort wireless device supports log messages that may help diagnose a problem.";
-"This base station does not report a S.M.A.R.T. status for %@." = "This base station does not report a S.M.A.R.T. status for %@.";
 "This base station does not support AirPlay." = "This base station does not support AirPlay.";
 "This base station does not support a modem connection." = "This base station does not support a modem connection.";
 "This base station does not support advanced settings." = "This base station does not support advanced settings.";
@@ -480,6 +486,7 @@
 "User:" = "User:";
 "Using bundled mock firmware." = "Using bundled mock firmware.";
 "Using selected firmware file." = "Using selected firmware file.";
+"Verified" = "Verified";
 "Verify Password:" = "Verify Password:";
 "Verify Secret:" = "Verify Secret:";
 "Verify account password" = "Verify account password";

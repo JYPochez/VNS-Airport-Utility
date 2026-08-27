@@ -3,20 +3,27 @@
    English automatically, so this table may be incomplete.
    Do NOT add ACP keys, backend flags or persisted raw values here. */
 
+"%@ Free" = "%@ libres";
 "0 - Emergency" = "0 – Urgence";
 "1 - Alert" = "1 – Alerte";
 "1 hour" = "1 heure";
 "15 minutes" = "15 minutes";
+"1st generation" = "1re génération";
 "2 - Critical" = "2 – Critique";
 "2 hours" = "2 heures";
 "24 hours" = "24 heures";
+"2nd generation" = "2e génération";
 "3 - Error" = "3 – Erreur";
 "30 minutes" = "30 minutes";
 "35-Pass Erase" = "Effacement en 35 passes";
+"3rd generation" = "3e génération";
 "4 - Warning" = "4 – Avertissement";
 "4 hours" = "4 heures";
+"4th generation" = "4e génération";
 "5 - Notice" = "5 – Remarque";
+"5th generation" = "5e génération";
 "6 - Informational" = "6 – Information";
+"6th generation" = "6e génération";
 "7 - Debug" = "7 – Débogage";
 "7-Pass Erase" = "Effacement en 7 passes";
 "8 hours" = "8 heures";
@@ -97,7 +104,6 @@
 "Block incoming IPv6 connections" = "Bloquer les connexions IPv6 entrantes";
 "Bring All to Front" = "Tout ramener au premier plan";
 "Cancel" = "Annuler";
-"Check S.M.A.R.T." = "Vérifier S.M.A.R.T.";
 "Check for Updates" = "Rechercher des mises à jour";
 "Choose a base station" = "Choisir une borne d’accès";
 "Choose..." = "Choisir…";
@@ -200,6 +206,7 @@
 "Export Configuration File" = "Exporter le fichier de configuration";
 "Export Configuration File..." = "Exporter le fichier de configuration…";
 "Extend a wireless network" = "Étendre un réseau sans fil";
+"Failing" = "Défaillant";
 "File" = "Fichier";
 "File Sharing Access must be read-write, read-only, or not-allowed." = "L’accès au partage de fichiers doit être lecture-écriture, lecture seule ou non autorisé.";
 "File Sharing Access:" = "Accès au partage de fichiers :";
@@ -214,6 +221,7 @@
 "Firmware upload completed, but the base station reboot command was not sent." = "L’envoi du micrologiciel est terminé, mais la commande de redémarrage de la borne d’accès n’a pas été envoyée.";
 "Firmware uploaded. Restart requested." = "Micrologiciel envoyé. Redémarrage demandé.";
 "Gathering information about your network…" = "Collecte d’informations sur votre réseau…";
+"Generation:" = "Génération :";
 "Global Hostname cannot be empty." = "Le nom d’hôte global ne peut pas être vide.";
 "Guest Disk Access is not supported." = "L’accès invité au disque n’est pas pris en charge.";
 "Help" = "Aide";
@@ -405,7 +413,7 @@
 "Router Address must be an IPv4 address." = "L’adresse du routeur doit être une adresse IPv4.";
 "Router Address:" = "Adresse du routeur :";
 "Router Mode:" = "Mode du routeur :";
-"S.M.A.R.T. status for %@: %@" = "État S.M.A.R.T. de %@ : %@";
+"S.M.A.R.T.: %@" = "S.M.A.R.T. : %@";
 "Save" = "Enregistrer";
 "Scanning for AirPort base stations…" = "Recherche de bornes d’accès AirPort…";
 "Secondary Port:" = "Port secondaire :";
@@ -419,7 +427,6 @@
 "Security Method" = "Méthode de sécurité";
 "Security Method:" = "Méthode de sécurité :";
 "Select All" = "Tout sélectionner";
-"Select a disk to check its S.M.A.R.T. status." = "Sélectionnez un disque pour vérifier son état S.M.A.R.T.";
 "Service Name:" = "Nom du service :";
 "Services" = "Services";
 "Set time automatically" = "Régler l’heure automatiquement";
@@ -455,7 +462,6 @@
 "The wireless network is open and does not require a Wi-Fi password." = "Le réseau sans fil est ouvert et ne requiert aucun mot de passe Wi-Fi.";
 "This %@ will create a network." = "%@ va créer un réseau.";
 "This AirPort wireless device supports log messages that may help diagnose a problem." = "Cet appareil sans fil AirPort prend en charge des messages de journal pouvant aider à diagnostiquer un problème.";
-"This base station does not report a S.M.A.R.T. status for %@." = "Cette borne d’accès ne communique pas d’état S.M.A.R.T. pour %@.";
 "This base station does not support AirPlay." = "Cette borne d’accès ne prend pas en charge AirPlay.";
 "This base station does not support a modem connection." = "Cette borne d’accès ne prend pas en charge les connexions par modem.";
 "This base station does not support advanced settings." = "Cette borne d’accès ne prend pas en charge les réglages avancés.";
@@ -480,6 +486,7 @@
 "User:" = "Utilisateur :";
 "Using bundled mock firmware." = "Utilisation du micrologiciel simulé fourni.";
 "Using selected firmware file." = "Utilisation du fichier de micrologiciel sélectionné.";
+"Verified" = "Vérifié";
 "Verify Password:" = "Confirmer le mot de passe :";
 "Verify Secret:" = "Vérifier le secret :";
 "Verify account password" = "Vérifier le mot de passe du compte";

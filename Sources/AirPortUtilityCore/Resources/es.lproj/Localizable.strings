@@ -3,20 +3,27 @@
    English automatically, so this table may be incomplete.
    Do NOT add ACP keys, backend flags or persisted raw values here. */
 
+"%@ Free" = "%@ libres";
 "0 - Emergency" = "0 – Emergencia";
 "1 - Alert" = "1 – Alerta";
 "1 hour" = "1 hora";
 "15 minutes" = "15 minutos";
+"1st generation" = "1.ª generación";
 "2 - Critical" = "2 – Crítico";
 "2 hours" = "2 horas";
 "24 hours" = "24 horas";
+"2nd generation" = "2.ª generación";
 "3 - Error" = "3 – Error";
 "30 minutes" = "30 minutos";
 "35-Pass Erase" = "Borrado de 35 pasadas";
+"3rd generation" = "3.ª generación";
 "4 - Warning" = "4 – Advertencia";
 "4 hours" = "4 horas";
+"4th generation" = "4.ª generación";
 "5 - Notice" = "5 – Aviso";
+"5th generation" = "5.ª generación";
 "6 - Informational" = "6 – Información";
+"6th generation" = "6.ª generación";
 "7 - Debug" = "7 – Depuración";
 "7-Pass Erase" = "Borrado de 7 pasadas";
 "8 hours" = "8 horas";
@@ -97,7 +104,6 @@
 "Block incoming IPv6 connections" = "Bloquear conexiones IPv6 entrantes";
 "Bring All to Front" = "Traer todo al frente";
 "Cancel" = "Cancelar";
-"Check S.M.A.R.T." = "Comprobar S.M.A.R.T.";
 "Check for Updates" = "Buscar actualizaciones";
 "Choose a base station" = "Selecciona una estación base";
 "Choose..." = "Seleccionar…";
@@ -200,6 +206,7 @@
 "Export Configuration File" = "Exportar archivo de configuración";
 "Export Configuration File..." = "Exportar archivo de configuración…";
 "Extend a wireless network" = "Extender una red inalámbrica";
+"Failing" = "Fallando";
 "File" = "Archivo";
 "File Sharing Access must be read-write, read-only, or not-allowed." = "El acceso a la compartición de archivos debe ser lectura-escritura, solo lectura o no permitido.";
 "File Sharing Access:" = "Acceso a la compartición de archivos:";
@@ -214,6 +221,7 @@
 "Firmware upload completed, but the base station reboot command was not sent." = "La carga del firmware ha finalizado, pero no se ha enviado el comando de reinicio de la estación base.";
 "Firmware uploaded. Restart requested." = "Firmware cargado. Reinicio solicitado.";
 "Gathering information about your network…" = "Recopilando información sobre tu red…";
+"Generation:" = "Generación:";
 "Global Hostname cannot be empty." = "El nombre de host global no puede estar vacío.";
 "Guest Disk Access is not supported." = "El acceso de invitados al disco no es compatible.";
 "Help" = "Ayuda";
@@ -405,7 +413,7 @@
 "Router Address must be an IPv4 address." = "La dirección del router debe ser una dirección IPv4.";
 "Router Address:" = "Dirección del router:";
 "Router Mode:" = "Modo del router:";
-"S.M.A.R.T. status for %@: %@" = "Estado S.M.A.R.T. de %@: %@";
+"S.M.A.R.T.: %@" = "S.M.A.R.T.: %@";
 "Save" = "Guardar";
 "Scanning for AirPort base stations…" = "Buscando estaciones base AirPort…";
 "Secondary Port:" = "Puerto secundario:";
@@ -419,7 +427,6 @@
 "Security Method" = "Método de seguridad";
 "Security Method:" = "Método de seguridad:";
 "Select All" = "Seleccionar todo";
-"Select a disk to check its S.M.A.R.T. status." = "Selecciona un disco para comprobar su estado S.M.A.R.T.";
 "Service Name:" = "Nombre del servicio:";
 "Services" = "Servicios";
 "Set time automatically" = "Ajustar la hora automáticamente";
@@ -455,7 +462,6 @@
 "The wireless network is open and does not require a Wi-Fi password." = "La red inalámbrica está abierta y no requiere contraseña Wi-Fi.";
 "This %@ will create a network." = "%@ creará una red.";
 "This AirPort wireless device supports log messages that may help diagnose a problem." = "Este dispositivo inalámbrico AirPort admite mensajes de registro que pueden ayudar a diagnosticar un problema.";
-"This base station does not report a S.M.A.R.T. status for %@." = "Esta estación base no informa de un estado S.M.A.R.T. para %@.";
 "This base station does not support AirPlay." = "Esta estación base no admite AirPlay.";
 "This base station does not support a modem connection." = "Esta estación base no admite las conexiones por módem.";
 "This base station does not support advanced settings." = "Esta estación base no admite los ajustes avanzados.";
@@ -480,6 +486,7 @@
 "User:" = "Usuario:";
 "Using bundled mock firmware." = "Usando el firmware simulado incluido.";
 "Using selected firmware file." = "Usando el archivo de firmware seleccionado.";
+"Verified" = "Verificado";
 "Verify Password:" = "Verificar contraseña:";
 "Verify Secret:" = "Verificar secreto:";
 "Verify account password" = "Verificar contraseña de la cuenta";

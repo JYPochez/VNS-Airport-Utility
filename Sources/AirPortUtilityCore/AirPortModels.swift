@@ -1020,6 +1020,39 @@ struct DeviceCapabilities: Equatable, Codable {
   private static let legacyOptionProductIDs: Set<String> = ["3"]
 }
 
+/// Hardware generation for a base station, derived from its ACP product ID.
+///
+/// Generations are numbered per product line, so a Time Capsule and an AirPort
+/// Extreme can share a number without being the same hardware. The device does
+/// not report a generation itself; the product ID is the only signal.
+///
+/// Mapping taken from jamesyc/TimeCapsuleSMB, which reads the same `syAP` field.
+enum AirPortDeviceGeneration {
+  private static let generationsByProductID = [
+    "104": 1, "105": 2, "108": 3, "114": 4, "117": 5, "120": 6,
+    "106": 1, "109": 2, "113": 3, "116": 4, "119": 5,
+  ]
+
+  /// Localized generation label, or nil for a product ID with no known
+  /// generation -- better to show nothing than to guess at unfamiliar hardware.
+  static func label(forProductID productID: String) -> String? {
+    let productID = productID.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard let generation = generationsByProductID[productID] else { return nil }
+    // Written out per language rather than composed from a number: ordinals
+    // carry gender and abbreviation rules that a formatter gets wrong here
+    // ("1re génération", not "1er génération").
+    switch generation {
+    case 1: return localized("1st generation")
+    case 2: return localized("2nd generation")
+    case 3: return localized("3rd generation")
+    case 4: return localized("4th generation")
+    case 5: return localized("5th generation")
+    case 6: return localized("6th generation")
+    default: return nil
+    }
+  }
+}
+
 struct FirmwareImage: Identifiable, Equatable, Sendable, Codable {
   var productID: String
   var version: String

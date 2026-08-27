@@ -5,6 +5,19 @@ struct BaseStationPane: View {
 
   var body: some View {
     PaneBox {
+      // Read-only: the device reports a product ID, not a generation, and this
+      // is the only place the hardware it maps to is stated.
+      if let generation = AirPortDeviceGeneration.label(
+        forProductID: model.baseStation.productID)
+      {
+        FormRow(title: localized("Generation:")) {
+          Text(generation)
+            .font(.system(size: 13))
+            .textSelection(.enabled)
+            .accessibilityIdentifier("base.station.generation")
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+      }
       FormRow(title: localized("Base Station Name:")) {
         AirPortTextField(
           text: $model.baseStation.name,
