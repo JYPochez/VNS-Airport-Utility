@@ -97,6 +97,7 @@
 "Block incoming IPv6 connections" = "Bloquer les connexions IPv6 entrantes";
 "Bring All to Front" = "Tout ramener au premier plan";
 "Cancel" = "Annuler";
+"Check S.M.A.R.T." = "Vérifier S.M.A.R.T.";
 "Check for Updates" = "Rechercher des mises à jour";
 "Choose a base station" = "Choisir une borne d’accès";
 "Choose..." = "Choisir…";
@@ -404,6 +405,7 @@
 "Router Address must be an IPv4 address." = "L’adresse du routeur doit être une adresse IPv4.";
 "Router Address:" = "Adresse du routeur :";
 "Router Mode:" = "Mode du routeur :";
+"S.M.A.R.T. status for %@: %@" = "État S.M.A.R.T. de %@ : %@";
 "Save" = "Enregistrer";
 "Scanning for AirPort base stations…" = "Recherche de bornes d’accès AirPort…";
 "Secondary Port:" = "Port secondaire :";
@@ -417,6 +419,7 @@
 "Security Method" = "Méthode de sécurité";
 "Security Method:" = "Méthode de sécurité :";
 "Select All" = "Tout sélectionner";
+"Select a disk to check its S.M.A.R.T. status." = "Sélectionnez un disque pour vérifier son état S.M.A.R.T.";
 "Service Name:" = "Nom du service :";
 "Services" = "Services";
 "Set time automatically" = "Régler l’heure automatiquement";
@@ -452,6 +455,7 @@
 "The wireless network is open and does not require a Wi-Fi password." = "Le réseau sans fil est ouvert et ne requiert aucun mot de passe Wi-Fi.";
 "This %@ will create a network." = "%@ va créer un réseau.";
 "This AirPort wireless device supports log messages that may help diagnose a problem." = "Cet appareil sans fil AirPort prend en charge des messages de journal pouvant aider à diagnostiquer un problème.";
+"This base station does not report a S.M.A.R.T. status for %@." = "Cette borne d’accès ne communique pas d’état S.M.A.R.T. pour %@.";
 "This base station does not support AirPlay." = "Cette borne d’accès ne prend pas en charge AirPlay.";
 "This base station does not support a modem connection." = "Cette borne d’accès ne prend pas en charge les connexions par modem.";
 "This base station does not support advanced settings." = "Cette borne d’accès ne prend pas en charge les réglages avancés.";
@@ -526,6 +530,7 @@
 "Zero Out Data" = "Remplir de zéros";
 "Zoom" = "Zoom";
 "day" = "jour";
+"file sharing" = "partage de fichiers";
 "firmware update" = "mise à jour du micrologiciel";
 "hour" = "heure";
 "menu.Edit" = "Édition";

@@ -74,6 +74,26 @@ extension AirportAppModel {
     return selected?.uuid.trimmingCharacters(in: .whitespacesAndNewlines)
   }
 
+  /// Reports the SMART status the base station publishes for the selected disk.
+  ///
+  /// This does not start a self-test on the drive: the device reports a status
+  /// in its disk inventory and this surfaces it. There is no ACP command to
+  /// initiate a SMART test, so "checking" can only mean reading what is there.
+  func checkSelectedDiskSMARTStatus() {
+    guard let disk = DisksPane.selectedDisk(in: disks) else {
+      status = localized("Select a disk to check its S.M.A.R.T. status.")
+      return
+    }
+    let smartStatus = disk.smartStatus.trimmingCharacters(in: .whitespacesAndNewlines)
+    let name = disk.name.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !smartStatus.isEmpty else {
+      status = localizedFormat(
+        "This base station does not report a S.M.A.R.T. status for %@.", name)
+      return
+    }
+    status = localizedFormat("S.M.A.R.T. status for %@: %@", name, smartStatus)
+  }
+
   func applyDiskInventoryRefreshResult(_ result: (raw: String, records: [DiskRecord])?) {
     guard let result else { return }
     guard !Self.isPendingDiskInventoryPlaceholder(result.raw) else {
