@@ -31,17 +31,6 @@ struct DisksPane: View {
       }
       HStack {
         Spacer().frame(width: AirPortLayout.formControlLeading)
-        DisksPaneButton(
-          localized("Check S.M.A.R.T."), width: 140, isEnabled: selectedDisk != nil,
-          identifier: "disks.smart.check"
-        ) {
-          model.checkSelectedDiskSMARTStatus()
-        }
-        Spacer()
-      }
-      .frame(width: 485)
-      HStack {
-        Spacer().frame(width: AirPortLayout.formControlLeading)
         DisksCheckbox(
           localized("Enable file sharing"), isOn: $model.disks.fileSharing,
           identifier: "disks.file.sharing")

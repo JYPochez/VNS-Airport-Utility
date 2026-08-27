@@ -4,6 +4,35 @@ import XCTest
 
 final class DiskInventoryParserTests: XCTestCase {
 
+  /// Some devices report capacity on the physical disk rather than on each
+  /// partition. A partition with no size of its own falls back to the disk's,
+  /// so the pane shows free space instead of nothing.
+  func testPartitionInheritsCapacityFromItsDisk() {
+    let json = """
+      {"decoded": {"disks": [{"deviceName": "wd0", "size": 1000, "sizeFree": 400,
+        "partitions": [
+          {"deviceName": "dk2", "name": {"type":"bytes","text":"Data"},
+           "uuid": {"type":"bytes","hex":"aa"}}
+        ]}]}}
+      """
+    let record = DiskInventoryParser.parse(stdout: json).first
+    XCTAssertEqual(record?.sizeFree, 400 * 1024 * 1024)
+    XCTAssertEqual(record?.size, 1000 * 1024 * 1024)
+  }
+
+  /// A partition that reports its own capacity keeps it.
+  func testPartitionCapacityWinsOverTheDisk() {
+    let json = """
+      {"decoded": {"disks": [{"deviceName": "wd0", "size": 1000, "sizeFree": 400,
+        "partitions": [
+          {"deviceName": "dk2", "name": {"type":"bytes","text":"Data"},
+           "uuid": {"type":"bytes","hex":"aa"}, "size": 500, "sizeFree": 250}
+        ]}]}}
+      """
+    XCTAssertEqual(
+      DiskInventoryParser.parse(stdout: json).first?.sizeFree, 250 * 1024 * 1024)
+  }
+
   /// The device reports SMART once per physical disk, so every partition on that
   /// disk must inherit it -- otherwise the pane shows a health status for one
   /// volume and nothing for its sibling.

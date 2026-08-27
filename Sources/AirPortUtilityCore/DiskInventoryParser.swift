@@ -10,14 +10,22 @@ enum DiskInventoryParser {
     return records(in: value, parentBuiltIn: nil)
   }
 
+  /// Values a partition can inherit from the disk it lives on. The device
+  /// reports some of them once per physical disk rather than per partition.
+  struct InheritedDiskValues {
+    var smartStatus: String = ""
+    var size: Int64?
+    var sizeFree: Int64?
+  }
+
   private static func records(
-    in value: JSONValue, parentBuiltIn: Bool?, parentSMARTStatus: String = ""
+    in value: JSONValue, parentBuiltIn: Bool?, inherited: InheritedDiskValues = .init()
   ) -> [DiskRecord] {
     switch value {
     case .array(let values):
       let diskDefaultBuiltIn = isSingleUnlabeledDiskArray(values) ? true : parentBuiltIn
       return values.flatMap {
-        records(in: $0, parentBuiltIn: diskDefaultBuiltIn, parentSMARTStatus: parentSMARTStatus)
+        records(in: $0, parentBuiltIn: diskDefaultBuiltIn, inherited: inherited)
       }
     case .object(let object):
       if let settings = object["settings"],
@@ -30,25 +38,26 @@ enum DiskInventoryParser {
         return records(in: mast, parentBuiltIn: nil)
       }
       if let decoded = object["decoded"] {
-        return records(in: decoded, parentBuiltIn: parentBuiltIn, parentSMARTStatus: parentSMARTStatus)
+        return records(in: decoded, parentBuiltIn: parentBuiltIn, inherited: inherited)
       }
       if let disks = object["disks"] {
         return records(in: disks, parentBuiltIn: nil)
       }
       if case .array(let partitions) = object["partitions"] {
         let diskBuiltIn = diskBuiltIn(object, defaultBuiltIn: parentBuiltIn)
-        // The device reports SMART once per physical disk; carry it down so each
-        // partition can show the health of the disk it lives on.
+        // SMART, and on some devices the capacity too, are reported once per
+        // physical disk rather than per partition. Carry them down so a
+        // partition can fall back to its disk's values.
         let diskSMART = string(object["smartStatus"])
+        var childInherited = inherited
+        if !diskSMART.isEmpty { childInherited.smartStatus = diskSMART }
+        if let size = maStByteCount(object["size"]) { childInherited.size = size }
+        if let sizeFree = maStByteCount(object["sizeFree"]) { childInherited.sizeFree = sizeFree }
         return partitions.flatMap {
-          records(
-            in: $0, parentBuiltIn: diskBuiltIn,
-            parentSMARTStatus: diskSMART.isEmpty ? parentSMARTStatus : diskSMART)
+          records(in: $0, parentBuiltIn: diskBuiltIn, inherited: childInherited)
         }
       }
-      if let record = record(
-        from: object, parentBuiltIn: parentBuiltIn, parentSMARTStatus: parentSMARTStatus)
-      {
+      if let record = record(from: object, parentBuiltIn: parentBuiltIn, inherited: inherited) {
         return [record]
       }
       return []
@@ -58,7 +67,8 @@ enum DiskInventoryParser {
   }
 
   private static func record(
-    from object: [String: JSONValue], parentBuiltIn: Bool?, parentSMARTStatus: String = ""
+    from object: [String: JSONValue], parentBuiltIn: Bool?,
+    inherited: InheritedDiskValues = .init()
   ) -> DiskRecord? {
     let uuid = string(object["uuid"])
     let name = string(object["name"])
@@ -69,12 +79,12 @@ enum DiskInventoryParser {
       name: name.isEmpty ? deviceName : name,
       format: string(object["format"]),
       uuid: uuid,
-      size: maStByteCount(object["size"]),
-      sizeFree: maStByteCount(object["sizeFree"]),
+      size: maStByteCount(object["size"]) ?? inherited.size,
+      sizeFree: maStByteCount(object["sizeFree"]) ?? inherited.sizeFree,
       builtIn: diskBuiltIn(object, defaultBuiltIn: parentBuiltIn),
       smartStatus: {
         let own = string(object["smartStatus"])
-        return own.isEmpty ? parentSMARTStatus : own
+        return own.isEmpty ? inherited.smartStatus : own
       }()
     )
   }
