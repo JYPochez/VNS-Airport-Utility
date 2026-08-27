@@ -54,6 +54,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
   // MARK: - Window
 
+  /// Places the window near the top-left of the active screen.
+  ///
+  /// Not centred: the window grows wider as base stations are discovered, and a
+  /// centred window expands in both directions, so on a busy network it ends up
+  /// partly off-screen. Anchored top-left it grows right and down into free
+  /// space. Uses visibleFrame, so it sits below the menu bar and clear of the
+  /// Dock, and falls back to centring if no screen is available.
+  private static func positionAtTopLeft(_ window: NSWindow) {
+    guard let screen = window.screen ?? NSScreen.main else {
+      window.center()
+      return
+    }
+    let margin: CGFloat = 20
+    let visible = screen.visibleFrame
+    window.setFrameOrigin(
+      NSPoint(
+        x: visible.minX + margin,
+        y: visible.maxY - window.frame.height - margin))
+  }
+
   private func showMainWindow() {
     if let window = windowController?.window {
       window.makeKeyAndOrderFront(nil)
@@ -80,7 +100,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     ).size
     window.contentViewController = NSHostingController(rootView: content)
     window.isReleasedWhenClosed = false
-    window.center()
+    Self.positionAtTopLeft(window)
 
     let controller = NSWindowController(window: window)
     windowController = controller
