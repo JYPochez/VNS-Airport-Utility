@@ -67,6 +67,7 @@ jobs:
           echo "Building version $VERSION"
 
       - name: Import Developer ID certificate
+        if: ${{ secrets.MACOS_CERTIFICATE != '' }}
         env:
           MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
           MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
@@ -92,6 +93,7 @@ jobs:
           security find-identity -v -p codesigning "$KEYCHAIN"
 
       - name: Build, sign, notarize and staple
+        if: ${{ secrets.MACOS_CERTIFICATE != '' }}
         env:
           MARKETING_VERSION: ${{ steps.version.outputs.version }}
           CURRENT_PROJECT_VERSION: ${{ github.run_number }}
@@ -102,6 +104,7 @@ jobs:
         run: ./make-app.sh --sign --notarize --zip
 
       - name: Verify the shipped bundle
+        if: ${{ secrets.MACOS_CERTIFICATE != '' }}
         run: |
           set -euo pipefail
           APP="dist/AirPort Utility.app"
@@ -115,16 +118,24 @@ jobs:
           spctl --assess --type exec --verbose=2 "$APP"
 
       - uses: actions/upload-artifact@v4
+        if: ${{ secrets.MACOS_CERTIFICATE != '' }}
         with:
           name: AirPort-Utility-${{ steps.version.outputs.version }}
           path: dist/*.zip
 
       - name: Publish release
-        if: github.event_name == 'push'
+        if: ${{ github.event_name == 'push' && secrets.MACOS_CERTIFICATE != '' }}
         uses: softprops/action-gh-release@v2
         with:
           files: dist/*.zip
           generate_release_notes: true
+
+      - name: Note that signing was skipped
+        if: ${{ secrets.MACOS_CERTIFICATE == '' }}
+        run: |
+          echo "::notice::Built and tested only. Signing, notarization and"\
+            " release publishing were skipped because the signing secrets are"\
+            " not configured for this repository."
 
       - name: Clean up keychain
         if: always()
