@@ -672,7 +672,7 @@ struct DiskInventoryList: View {
   }
 }
 
-private struct DiskInventoryRow: View {
+struct DiskInventoryRow: View {
   var record: DiskRecord
   var isSelected: Bool
 
@@ -693,14 +693,17 @@ private struct DiskInventoryRow: View {
   static func capacityLine(for record: DiskRecord) -> String? {
     var parts: [String] = []
     let byteCount = { ByteCountFormatter.string(fromByteCount: $0, countStyle: .file) }
-    // "used / total" rather than spelling both out: the row is about 220pt wide
-    // once the icon is placed, and the longer phrasing clipped the SMART status
-    // off the end.
+    // "1.34 TB used / 2 TB" rather than a bare "1.34 TB / 2 TB": without the
+    // word there is nothing to say which number is which. The row only has
+    // about 205pt of text width, which a full-precision pair overruns even
+    // without the word, so the line is allowed to scale down slightly (see
+    // `body`) instead of being kept short at the cost of being ambiguous.
     switch (record.sizeUsed, record.size, record.sizeFree) {
     case let (used?, total?, _):
-      parts.append("\(byteCount(used)) / \(byteCount(total))")
+      parts.append(localizedFormat("%1$@ used / %2$@", byteCount(used), byteCount(total)))
     case let (nil, total?, free?):
-      parts.append("\(byteCount(total - free)) / \(byteCount(total))")
+      parts.append(
+        localizedFormat("%1$@ used / %2$@", byteCount(total - free), byteCount(total)))
     case let (used?, nil, _):
       parts.append(localizedFormat("%@ used", byteCount(used)))
     case let (nil, nil, free?):
@@ -717,6 +720,13 @@ private struct DiskInventoryRow: View {
     return parts.isEmpty ? nil : parts.joined(separator: " · ")
   }
 
+  /// Long vendor strings and full-precision capacity pairs ("502.15 GB used /
+  /// 931.32 GB · SMART: verified" is 244pt in Spanish against 205pt of room)
+  /// overrun the row. Shrinking to 8pt keeps the whole line readable, where
+  /// truncation would drop the SMART status — the part worth reading — off the
+  /// end. Ordinary values render at the full 10pt.
+  static let detailMinimumScale: CGFloat = 0.8
+
   var body: some View {
     HStack(spacing: 6) {
       airPortResourceImage(named: iconResourceName, fallbackSystemName: iconFallbackSystemName)
@@ -731,11 +741,15 @@ private struct DiskInventoryRow: View {
         if let hardware = Self.hardwareLine(for: record) {
           Text(hardware)
             .font(.system(size: 10))
+            .lineLimit(1)
+            .minimumScaleFactor(Self.detailMinimumScale)
             .foregroundStyle(Color.white.opacity(isSelected ? 0.7 : 0.38))
         }
         if let capacity = Self.capacityLine(for: record) {
           Text(capacity)
             .font(.system(size: 10))
+            .lineLimit(1)
+            .minimumScaleFactor(Self.detailMinimumScale)
             .foregroundStyle(Color.white.opacity(isSelected ? 0.7 : 0.38))
         }
       }

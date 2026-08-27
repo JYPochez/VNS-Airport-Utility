@@ -3,6 +3,7 @@
    English automatically, so this table may be incomplete.
    Do NOT add ACP keys, backend flags or persisted raw values here. */
 
+"%1$@ used / %2$@" = "%1$@ utilisés / %2$@";
 "%@ free" = "%@ libres";
 "%@ used" = "%@ utilisés";
 "0 - Emergency" = "0 – Urgence";
