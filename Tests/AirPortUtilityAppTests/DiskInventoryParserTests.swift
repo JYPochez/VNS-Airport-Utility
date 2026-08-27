@@ -4,6 +4,42 @@ import XCTest
 
 final class DiskInventoryParserTests: XCTestCase {
 
+  /// The shape a real Time Capsule actually returns for MaSt: a bare array, and
+  /// every integer wrapped as {"type": "integer", "decimal": "...", "width": n}
+  /// rather than sent as a JSON number. Decoding only bare numbers and strings
+  /// silently produced nil sizes, so the pane showed no free space at all.
+  /// Identifiers here are anonymised; the structure is verbatim.
+  func testParsesTheWrappedIntegerFormARealDeviceSends() {
+    let json = """
+      [{
+        "blockSize": {"decimal": "512", "type": "integer", "width": 2},
+        "builtin": true,
+        "deviceName": "wd0",
+        "info": "Disk 1",
+        "partitions": [{
+          "deviceName": "dk2",
+          "format": "hfs",
+          "name": "Data2000",
+          "size": {"decimal": "1905681", "type": "integer", "width": 4},
+          "sizeFree": {"decimal": "623863", "type": "integer", "width": 4},
+          "sizeUsed": {"decimal": "1281818", "type": "integer", "width": 4},
+          "uuid": {"hex": "00000000000000000000000000000001", "length": 16, "type": "bytes"}
+        }],
+        "size": {"decimal": "1907729", "type": "integer", "width": 4},
+        "smartStatus": "verified",
+        "uuid": {"hex": "00000000000000000000000000000002", "length": 16, "type": "bytes"}
+      }]
+      """
+    let records = DiskInventoryParser.parse(stdout: json)
+    XCTAssertEqual(records.count, 1)
+    let record = records[0]
+    XCTAssertEqual(record.name, "Data2000")
+    XCTAssertEqual(record.sizeFree, 623_863 * 1024 * 1024)
+    XCTAssertEqual(record.size, 1_905_681 * 1024 * 1024)
+    XCTAssertEqual(record.smartStatus, "verified")
+    XCTAssertTrue(record.builtIn)
+  }
+
   /// Some devices report capacity on the physical disk rather than on each
   /// partition. A partition with no size of its own falls back to the disk's,
   /// so the pane shows free space instead of nothing.

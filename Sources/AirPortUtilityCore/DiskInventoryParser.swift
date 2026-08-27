@@ -147,6 +147,11 @@ enum DiskInventoryParser {
       return safeInt64(number)
     case .string(let text):
       return Int64(text)
+    case .object(let object):
+      // The device does not send bare numbers: an integer arrives wrapped as
+      // {"type": "integer", "decimal": "623863", "width": 4}. Without this the
+      // sizes decode to nil and the Disks pane shows no free space.
+      return int64(object["decimal"])
     default:
       return nil
     }
