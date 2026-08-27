@@ -3,6 +3,36 @@ import XCTest
 @testable import AirPortUtilityCore
 
 final class DiskInventoryParserTests: XCTestCase {
+
+  /// The device reports SMART once per physical disk, so every partition on that
+  /// disk must inherit it -- otherwise the pane shows a health status for one
+  /// volume and nothing for its sibling.
+  func testSMARTStatusIsCarriedFromTheDiskToItsPartitions() {
+    let json = """
+      {"decoded": {"disks": [{"deviceName": "wd0", "builtIn": true,
+        "smartStatus": "Verified",
+        "partitions": [
+          {"deviceName": "dk2", "name": {"type":"bytes","text":"Data"}, "uuid": {"type":"bytes","hex":"aa"}},
+          {"deviceName": "dk3", "name": {"type":"bytes","text":"Backup"}, "uuid": {"type":"bytes","hex":"bb"}}
+        ]}]}}
+      """
+    let records = DiskInventoryParser.parse(stdout: json)
+    XCTAssertEqual(records.count, 2)
+    XCTAssertEqual(records.map(\.smartStatus), ["Verified", "Verified"])
+  }
+
+  /// A partition that reports its own status keeps it.
+  func testPartitionSMARTStatusWinsOverTheDisk() {
+    let json = """
+      {"decoded": {"disks": [{"deviceName": "wd0", "smartStatus": "Verified",
+        "partitions": [
+          {"deviceName": "dk2", "name": {"type":"bytes","text":"Data"},
+           "uuid": {"type":"bytes","hex":"aa"}, "smartStatus": "Failing"}
+        ]}]}}
+      """
+    XCTAssertEqual(DiskInventoryParser.parse(stdout: json).first?.smartStatus, "Failing")
+  }
+
   func testDiskInventoryEmptyStateDoesNotExposeMaStRefreshInstruction() {
     XCTAssertEqual(
       DiskInventoryList.emptyStateText(didLoadInventory: false, isLoading: true),

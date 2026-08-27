@@ -29,6 +29,16 @@ struct DisksPane: View {
           showArchive = true
         }
       }
+      HStack {
+        Spacer().frame(width: AirPortLayout.formControlLeading)
+        DisksPaneButton(
+          localized("Check S.M.A.R.T."), width: 140, isEnabled: selectedDisk != nil,
+          identifier: "disks.smart.check"
+        ) {
+          model.checkSelectedDiskSMARTStatus()
+        }
+        Spacer()
+      }
       .frame(width: 485)
       HStack {
         Spacer().frame(width: AirPortLayout.formControlLeading)

@@ -97,6 +97,7 @@
 "Block incoming IPv6 connections" = "Eingehende IPv6-Verbindungen blockieren";
 "Bring All to Front" = "Alle nach vorne bringen";
 "Cancel" = "Abbrechen";
+"Check S.M.A.R.T." = "S.M.A.R.T. prüfen";
 "Check for Updates" = "Nach Updates suchen";
 "Choose a base station" = "Basisstation auswählen";
 "Choose..." = "Auswählen…";
@@ -404,6 +405,7 @@
 "Router Address must be an IPv4 address." = "Die Router-Adresse muss eine IPv4-Adresse sein.";
 "Router Address:" = "Router-Adresse:";
 "Router Mode:" = "Router-Modus:";
+"S.M.A.R.T. status for %@: %@" = "S.M.A.R.T.-Status für %@: %@";
 "Save" = "Sichern";
 "Scanning for AirPort base stations…" = "Suche nach AirPort-Basisstationen…";
 "Secondary Port:" = "Sekundärer Anschluss:";
@@ -417,6 +419,7 @@
 "Security Method" = "Sicherheitsmethode";
 "Security Method:" = "Sicherheitsmethode:";
 "Select All" = "Alles auswählen";
+"Select a disk to check its S.M.A.R.T. status." = "Wählen Sie ein Volume aus, um dessen S.M.A.R.T.-Status zu prüfen.";
 "Service Name:" = "Dienstname:";
 "Services" = "Dienste";
 "Set time automatically" = "Uhrzeit automatisch einstellen";
@@ -452,6 +455,7 @@
 "The wireless network is open and does not require a Wi-Fi password." = "Das WLAN-Netzwerk ist offen und erfordert kein Wi-Fi-Passwort.";
 "This %@ will create a network." = "%@ erstellt ein Netzwerk.";
 "This AirPort wireless device supports log messages that may help diagnose a problem." = "Dieses AirPort-WLAN-Gerät unterstützt Protokollmeldungen, die bei der Diagnose eines Problems helfen können.";
+"This base station does not report a S.M.A.R.T. status for %@." = "Diese Basisstation meldet keinen S.M.A.R.T.-Status für %@.";
 "This base station does not support AirPlay." = "Diese Basisstation unterstützt AirPlay nicht.";
 "This base station does not support a modem connection." = "Diese Basisstation unterstützt Modemverbindungen nicht.";
 "This base station does not support advanced settings." = "Diese Basisstation unterstützt erweiterte Einstellungen nicht.";
@@ -526,6 +530,7 @@
 "Zero Out Data" = "Mit Nullen überschreiben";
 "Zoom" = "Zoomen";
 "day" = "Tag";
+"file sharing" = "Dateifreigabe";
 "firmware update" = "Firmware-Update";
 "hour" = "Stunde";
 "menu.Edit" = "Bearbeiten";

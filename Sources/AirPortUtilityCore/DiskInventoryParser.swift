@@ -10,11 +10,15 @@ enum DiskInventoryParser {
     return records(in: value, parentBuiltIn: nil)
   }
 
-  private static func records(in value: JSONValue, parentBuiltIn: Bool?) -> [DiskRecord] {
+  private static func records(
+    in value: JSONValue, parentBuiltIn: Bool?, parentSMARTStatus: String = ""
+  ) -> [DiskRecord] {
     switch value {
     case .array(let values):
       let diskDefaultBuiltIn = isSingleUnlabeledDiskArray(values) ? true : parentBuiltIn
-      return values.flatMap { records(in: $0, parentBuiltIn: diskDefaultBuiltIn) }
+      return values.flatMap {
+        records(in: $0, parentBuiltIn: diskDefaultBuiltIn, parentSMARTStatus: parentSMARTStatus)
+      }
     case .object(let object):
       if let settings = object["settings"],
         case .object(let settingsObject) = settings,
@@ -26,16 +30,25 @@ enum DiskInventoryParser {
         return records(in: mast, parentBuiltIn: nil)
       }
       if let decoded = object["decoded"] {
-        return records(in: decoded, parentBuiltIn: parentBuiltIn)
+        return records(in: decoded, parentBuiltIn: parentBuiltIn, parentSMARTStatus: parentSMARTStatus)
       }
       if let disks = object["disks"] {
         return records(in: disks, parentBuiltIn: nil)
       }
       if case .array(let partitions) = object["partitions"] {
         let diskBuiltIn = diskBuiltIn(object, defaultBuiltIn: parentBuiltIn)
-        return partitions.flatMap { records(in: $0, parentBuiltIn: diskBuiltIn) }
+        // The device reports SMART once per physical disk; carry it down so each
+        // partition can show the health of the disk it lives on.
+        let diskSMART = string(object["smartStatus"])
+        return partitions.flatMap {
+          records(
+            in: $0, parentBuiltIn: diskBuiltIn,
+            parentSMARTStatus: diskSMART.isEmpty ? parentSMARTStatus : diskSMART)
+        }
       }
-      if let record = record(from: object, parentBuiltIn: parentBuiltIn) {
+      if let record = record(
+        from: object, parentBuiltIn: parentBuiltIn, parentSMARTStatus: parentSMARTStatus)
+      {
         return [record]
       }
       return []
@@ -44,8 +57,9 @@ enum DiskInventoryParser {
     }
   }
 
-  private static func record(from object: [String: JSONValue], parentBuiltIn: Bool?) -> DiskRecord?
-  {
+  private static func record(
+    from object: [String: JSONValue], parentBuiltIn: Bool?, parentSMARTStatus: String = ""
+  ) -> DiskRecord? {
     let uuid = string(object["uuid"])
     let name = string(object["name"])
     let deviceName = string(object["deviceName"])
@@ -57,7 +71,11 @@ enum DiskInventoryParser {
       uuid: uuid,
       size: maStByteCount(object["size"]),
       sizeFree: maStByteCount(object["sizeFree"]),
-      builtIn: diskBuiltIn(object, defaultBuiltIn: parentBuiltIn)
+      builtIn: diskBuiltIn(object, defaultBuiltIn: parentBuiltIn),
+      smartStatus: {
+        let own = string(object["smartStatus"])
+        return own.isEmpty ? parentSMARTStatus : own
+      }()
     )
   }
 

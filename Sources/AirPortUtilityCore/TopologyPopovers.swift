@@ -79,6 +79,12 @@ struct DevicePopover: View {
       (localized("serial number"), model.baseStation.serialNumber),
       ("version", model.baseStation.version),
     ]
+    let protocols = model.selectedTopologyDevice()?.publishedProtocols ?? []
+    if !protocols.isEmpty {
+      // Omitted when the device advertises nothing, matching how the popover
+      // already leaves out values it does not have.
+      rows.append((localized("file sharing"), protocols.joined(separator: " · ")))
+    }
     let firmwareUpdate = model.selectedDeviceFirmwareUpdateDetail
       .trimmingCharacters(in: .whitespacesAndNewlines)
     if !firmwareUpdate.isEmpty {

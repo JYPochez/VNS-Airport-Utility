@@ -1211,6 +1211,10 @@ struct DiskRecord: Identifiable, Equatable, Sendable, Codable {
   var size: Int64?
   var sizeFree: Int64?
   var builtIn: Bool
+  /// SMART status as reported in the disk inventory, e.g. "Verified". Carried
+  /// down from the disk to its partitions, since the device reports it once per
+  /// physical disk. Empty when the device does not report one.
+  var smartStatus: String = ""
 }
 
 struct AirportDiscoveredDevice: Identifiable, Equatable, Sendable {
@@ -1224,6 +1228,9 @@ struct AirportDiscoveredDevice: Identifiable, Equatable, Sendable {
   var modelName: String = ""
   var productID: String = ""
   var statusText: String = ""
+  /// File-sharing protocols the device advertises over Bonjour, such as AFP or
+  /// SMB. Presence only: Bonjour does not advertise an SMB dialect.
+  var publishedProtocols: [String] = []
 
   var displayName: String {
     let displayName = name.trimmingCharacters(in: .whitespacesAndNewlines)
